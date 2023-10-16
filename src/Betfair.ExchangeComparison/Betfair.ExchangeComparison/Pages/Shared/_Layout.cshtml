@@ -1,0 +1,45 @@
+﻿@*@model SiteViewModel;*@
+@using Microsoft.AspNetCore.Http;
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Horse Racing Entity Specials</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+@{
+    //var bgstyle = Model.AppEnvironment == "Production" ? " bg-prd " : "bg-nxt";
+    //var headerstyle = Model.AppEnvironment == "Production" ? "section-header-prd" : "section-header-nxt";
+    //var route = Model.Route != null ? Model.Route : "";
+}
+<body>
+    @*<div class="d-none" id="signalr-connection-id-head"></div>*@
+    <div class="pb-5" id="main-body">
+        <header>
+            <!--<nav class="navbar navbar-expand-sm navbar-toggleable-sm text-light border-bottom box-shadow mb-3">-->
+            @*<a class="navbar-brand ps-3" asp-area="" asp-controller="SpecialsState" asp-action="Index"><strong>Horse Racing Entity Specials Builder</strong> - @Model.AppEnvironment</a>*@
+            @*<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div id="flash-message" class="flash-message"></div>*@
+            <!--</nav>-->
+        </header>
+        <div class="container-fluid m-0 p-0">
+            <main role="main">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <footer></footer>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="~/js/index.js"></script>
+</body>
+</html>

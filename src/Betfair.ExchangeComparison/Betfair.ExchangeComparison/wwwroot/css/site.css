@@ -1,0 +1,82 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+body {
+    font-family: "Open Sans", Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.seperator {
+    margin: 10px 0px;
+}
+
+.break {
+    height: 10px;
+}
+
+.card {
+    border: 1px solid black;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.card-body {
+    font-size: 11px;
+}
+
+.my-btn {
+    width: 30%;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.bg-nxt {
+    background-color: rgb(211, 138, 237);
+    min-height: 100vh;
+}
+
+.section-header-nxt {
+    background-color: rgb(111, 6, 115);
+}
+
+.bg-prd {
+    background-color: rgb(103, 224, 127);
+    min-height: 100vh;
+}
+
+.section-header-prd {
+    background-color: rgb(37, 128, 4);
+}
+
+.linethru {
+    text-decoration: line-through;
+}
+
+.flash-message {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    height: 70px;
+    padding: 20px;
+    border: 3px solid white;
+    border-radius: 5px;
+    display: none;
+    font-size: 16px;
+}
+
+.text-lime {
+    color: lime;
+}
+
+.text-orange {
+    color: orange;
+}
+
+.text-pink {
+    color: pink;
+}
+
+.text-purple {
+    color: Lavender;
+}

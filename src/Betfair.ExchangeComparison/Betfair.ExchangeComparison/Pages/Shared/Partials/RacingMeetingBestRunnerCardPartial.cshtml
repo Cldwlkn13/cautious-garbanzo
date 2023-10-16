@@ -1,0 +1,56 @@
+﻿@using Betfair.ExchangeComparison.Pages.Models;
+@using Betfair.ExchangeComparison.Domain.Extensions;
+@model IGrouping<string, BestRunner>
+@{
+    var winOrEachWay = ViewData["WinOrEachWay"] as string;
+}
+
+<div class="col-12">
+    <div class="m-2 p-1 bg-secondary border rounded">
+        <h6 class="text-orange">@Model.Key.Substring(0, @Model.Key.Length - 8)</h6>
+
+        @foreach (var groupedRunner in @Model.GroupBy(r => r.MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime()))
+        {
+            <div class="mt-2">
+                <span class="text-purple">@groupedRunner.Key.ToString("HH:mm")</span>
+                <small>
+                    <span class="text-info">@groupedRunner.First().MarketDetail.numberOfPlaces</span>
+                    <span class="text-info">1/@groupedRunner.First().MarketDetail.placeFractionDenominator</span>
+                </small>
+            </div>
+
+            @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValue))
+            {
+
+
+                if (winOrEachWay == "Win")
+                {
+                    var ev = @bestRunner.ExpectedValue + 1;
+                    var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
+
+                    <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
+                        @bestRunner.SportsbookRunner.selectionName
+                        <span class="text-lime"> @bestRunner.WinnerOddsString </span>
+                        [<span class="text-pink">@bestRunner.ExchangeWinBestPink.ToString("0.00")</span>]
+                        <span>@ev.ToString("0.00")</span>
+                    </div>
+                }
+                else
+                {
+                    var ev = @bestRunner.ExpectedValue;
+                    var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
+
+                    <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
+                        @bestRunner.SportsbookRunner.selectionName
+                        <span class="text-lime"> @bestRunner.WinnerOddsString </span>
+                        <span class="text-lime">@bestRunner.PlacePartOddsString </span>
+                        [<span class="text-pink">@bestRunner.ExchangeWinBestPink.ToString("0.00")</span> :
+                        <span class="text-pink">@bestRunner.ExchangePlaceBestPink.ToString("0.00")</span>]
+
+                        <span>@ev.ToString("0.00")</span>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>

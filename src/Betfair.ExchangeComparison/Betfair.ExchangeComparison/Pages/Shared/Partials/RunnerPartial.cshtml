@@ -1,0 +1,23 @@
+﻿@model Betfair.ExchangeComparison.Pages.Models.RunnerViewModel
+@{
+    var data = $"{Model.SportsbookRunner.runnerOrder}. <strong>{Model.SportsbookRunner.selectionName}</strong>";
+
+    var sportsbookWinPrice = @Model.SportsbookWinPrice.ToString("0.00");
+    var sportsbookPlacePrice = @Model.SportsbookPlacePrice.ToString("0.00");
+    var exchangeWinPrice = @Model.ExpectedExchangeWinPrice.ToString("0.00");
+    var exchangePlacePrice = @Model.ExpectedExchangePlacePrice.ToString("0.00");
+    var winExpectedValue = @Model.WinExpectedValue.ToString("0.00");
+    var placeExpectedValue = @Model.PlaceExpectedValue.ToString("0.00");
+    var eachWayExpectedValue = @Model.EachWayExpectedValue.ToString("0.00");
+    var winnerOddsString = Model.WinnerOddsString;
+}
+
+<div class="ms-2 mb-1 p-1 bg-light border border-dark rounded">
+    <div class="w-100 text-start border border-dark p-1" id="@Model.SportsbookRunner.selectionId">
+        @Html.Raw(@data) -
+        @winnerOddsString : @exchangeWinPrice (@winExpectedValue);
+        @sportsbookPlacePrice : @exchangePlacePrice (@placeExpectedValue);
+        @eachWayExpectedValue
+    </div>
+</div>
+

@@ -1,0 +1,29 @@
+﻿@using Betfair.ExchangeComparison.Domain.Extensions;
+
+@model Betfair.ExchangeComparison.Pages.Models.MarketViewModel
+@{
+    var meetingName = ViewData["MeetingName"];
+    var numPlaces = @Model.SportsbookMarket.numberOfPlaces;
+    var placeOr = @Model.EachWayPlaceOverround;
+    var tabColor = (numPlaces * 100) > placeOr ? "bg-warning" : "bg-secondary";
+}
+
+<div class="card m-2 p-2 @tabColor border border-dark rounded">
+    <span type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample-@Model.SportsbookMarket.marketId.Replace(".","")" aria-expanded="false" aria-controls="collapseExample-@Model.SportsbookMarket.marketId.Replace(".","")"><span class="text-light me-1">@meetingName @Model.SportsbookMarket.marketName @Model.SportsbookMarket.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToString("HH:mm") </span> </span>
+
+    <span>Places: @Model.SportsbookMarket.numberOfPlaces</span>
+    <span>Terms: 1/@Model.SportsbookMarket.placeFractionDenominator </span>
+    <span>Win: @Model.WinOverround.ToString("0.00")</span>
+    <span>Pl4: @Model.EachWayPlaceOverround.ToString("0.00")</span>
+</div>
+@*}*@
+<div class="collapse" id="collapseExample-@Model.SportsbookMarket.marketId.Replace(".","")">
+    <div class="card-body p-1">
+        <div></div>
+        @foreach (var @runner in @Model.Runners)
+        {
+            @await Html.PartialAsync("./RunnerPartial.cshtml", @runner)
+        }
+    </div>
+</div>
+
