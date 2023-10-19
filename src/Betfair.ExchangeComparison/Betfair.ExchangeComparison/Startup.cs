@@ -27,6 +27,8 @@ namespace Betfair.ExchangeComparison
             services.AddHealthChecks();
             services.AddSignalR();
 
+            services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));
+
             services.AddDistributedMemoryCache();
 
             var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -73,6 +75,8 @@ namespace Betfair.ExchangeComparison
             app.UseAuthorization();
             app.UseSession();
             //app.UseHttpsRedirection();
+
+
 
             app.UseEndpoints(endpoints =>
             {
