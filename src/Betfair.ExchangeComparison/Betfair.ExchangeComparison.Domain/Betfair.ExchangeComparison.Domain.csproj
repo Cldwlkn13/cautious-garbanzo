@@ -9,9 +9,9 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Extensions\" />
+		<None Remove="Extensions\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Extensions\" />
+		<Folder Include="Extensions\" />
 	</ItemGroup>
 </Project>

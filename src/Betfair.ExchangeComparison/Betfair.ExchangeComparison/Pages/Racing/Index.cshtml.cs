@@ -179,6 +179,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                         .FirstOrDefault(r => r.SelectionId == sportsbookRunner.selectionId);
 
                                     double? bestPinkWin = 0;
+                                    double? bestPinkWinSize = 0;
                                     double? bestPinkPlace = 0;
                                     double? bestBlueWin = 0;
                                     double? bestBluePlace = 0;
@@ -190,6 +191,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                             if (mappedExchangeWinRunner.ExchangePrices.AvailableToLay.Any() && mappedExchangePlaceRunner.ExchangePrices.AvailableToLay.Any())
                                             {
                                                 bestPinkWin = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Price;
+                                                bestPinkWinSize = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Size;
                                                 bestPinkPlace = mappedExchangePlaceRunner.ExchangePrices.AvailableToLay[0]?.Price;
                                             }
 
@@ -208,7 +210,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                     var expectedWinPrice = bestPinkWin != null && bestPinkWin > 0 && winSpread != null ? bestPinkWin - (winSpread * 0.1) : 1;
 
                                     var placeSpread = bestPinkPlace != null && bestPinkPlace > 0 && bestBluePlace != null && bestBluePlace > 0 ? bestPinkPlace - bestBluePlace : 0;
-                                    var expectedPlacePrice = bestPinkPlace != null && bestPinkPlace > 0 && placeSpread != null ? bestPinkPlace - (placeSpread * 0.1) : 1;
+                                    var expectedPlacePrice = bestPinkPlace != null && bestPinkPlace > 0 && placeSpread != null ? bestPinkPlace - (placeSpread * 0.03) : 1;
 
                                     var expectedValueWin = ExpectedValue(sportsbookRunner.winRunnerOdds.@decimal, expectedWinPrice.Value);
                                     var expectedValuePlace = ExpectedValue(eachWayPlacePart, expectedPlacePrice.Value);
@@ -220,7 +222,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                     //    var str = "";
                                     //}
 
-                                    if (expectedValueWin > -0.05 && marketDetail.numberOfPlaces > 1 && expectedWinPrice > 1)
+                                    if (expectedValueWin > -0.03 && marketDetail.numberOfPlaces > 1 && expectedWinPrice > 1)
                                     {
                                         bestWinRunners.Add(new BestRunner()
                                         {
@@ -229,11 +231,14 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                             SportsbookRunner = sportsbookRunner,
                                             WinnerOddsString = winnerOddsString,
                                             ExpectedValue = expectedValueWin,
-                                            ExchangeWinBestPink = bestPinkWin!.Value
+                                            ExchangeWinBestBlue = bestBlueWin!.Value,
+                                            ExchangeWinBestPink = bestPinkWin!.Value,
+                                            ExchangeWinBestPinkSize = bestPinkWinSize!.Value
+
                                         });
                                     }
 
-                                    if (eachWayExpectedValue > 0.93 && marketDetail.numberOfPlaces > 1 && expectedWinPrice > 1)
+                                    if (eachWayExpectedValue > 0.96 && marketDetail.numberOfPlaces > 1 && expectedWinPrice > 1)
                                     {
                                         bestEachWayRunners.Add(new BestRunner()
                                         {
