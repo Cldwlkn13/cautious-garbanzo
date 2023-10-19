@@ -12,24 +12,39 @@ public class SportsbookHandler : ISportsbookHandler
 {
     private readonly IAuthClient _authClient;
     private readonly IOptions<ExchangeSettings> _options;
-
+    private readonly IOptions<LoginSettings> _logins;
     private ISportsbookClient? _client;
 
-    public SportsbookHandler(IAuthClient authClient, IOptions<ExchangeSettings> options)
+    public SportsbookHandler(IAuthClient authClient, IOptions<ExchangeSettings> options, IOptions<LoginSettings> logins)
     {
         _authClient = authClient;
         _options = options;
+        _logins = logins;
 
         SessionToken = string.Empty;
-        AppKey = _options.Value.AppKey;
+
+        Username = Environment.GetEnvironmentVariable("USERNAME") != null ?
+            Environment.GetEnvironmentVariable("USERNAME")! :
+            logins.Value.USERNAME!;
+
+        Password = Environment.GetEnvironmentVariable("PASSWORD") != null ?
+            Environment.GetEnvironmentVariable("PASSWORD")! :
+            logins.Value.PASSWORD!;
+
+        AppKey = Environment.GetEnvironmentVariable("APP_KEY") != null ?
+            Environment.GetEnvironmentVariable("APP_KEY")! :
+            logins.Value.APP_KEY!;
     }
 
     public string SessionToken { get; private set; }
     public string AppKey { get; private set; }
 
+    private string Username { get; set; }
+    private string Password { get; set; }
+
     public bool Login(string username, string password)
     {
-        var loginResult = _authClient.Login("", "") ??
+        var loginResult = _authClient.Login(Username, Password) ??
             throw new NullReferenceException($"Login Failed");
 
         SessionToken = loginResult.Token;

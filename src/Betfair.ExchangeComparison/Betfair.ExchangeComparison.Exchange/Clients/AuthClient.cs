@@ -51,9 +51,6 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
 
         public KeepAliveLogoutResponse Login(string username, string password)
         {
-            username = "TradingProdTest17";
-            password = "Trading_Prod_17";
-
             var handler = getWebRequestHandlerWithCert("");
             var client = initHttpClientInstance(handler, appKey);
             var content = getLoginBodyAsContent(username, password);

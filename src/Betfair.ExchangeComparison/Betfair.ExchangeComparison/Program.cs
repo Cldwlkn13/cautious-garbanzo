@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Betfair.ExchangeComparison.Data;
+using Betfair.ExchangeComparison.Exchange;
+using Betfair.ExchangeComparison.Sportsbook;
+using Betfair.ExchangeComparison.Exchange.Settings;
 
 namespace Betfair.ExchangeComparison;
 
@@ -22,6 +25,8 @@ public class Program
             .AddUserSecrets(typeof(Program).Assembly)
             .AddCommandLine(args)
             .Build();
+
+        var logins = configuration.GetSection("LoginSettings");
 
         CreateHostBuilder(args).Build().Run();
     }
