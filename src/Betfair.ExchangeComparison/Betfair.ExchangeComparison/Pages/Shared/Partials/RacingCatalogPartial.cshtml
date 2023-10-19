@@ -1,4 +1,5 @@
-﻿@using Betfair.ExchangeComparison.Domain.Extensions;
+﻿
+@using Betfair.ExchangeComparison.Domain.Extensions;
 @model Betfair.ExchangeComparison.Pages.Models.CatalogViewModel;
 @*@if (!string.IsNullOrEmpty(Model.Message))
     {
@@ -7,8 +8,8 @@
             });</script>
     }*@
 <a href="/racing" class="btn btn-warning">Refresh</a>
-<div class="row">
-    <div class="col-4 offset-1 mr-1 p-1 bg-dark">
+<div class="row" style="min-height:100vh">
+    <div class="col-md-4 offset-md-1 m-1 p-3">
         <div class="text-light p-1">Best Win</div>
         <div class="row">
             @{
@@ -19,7 +20,7 @@
                     .ToList();
                 ViewData["WinOrEachWay"] = "Win";
             }
-            <div class="col-6">
+            <div class="col-md-6">
                 @if (winSplitGroups.Count() > 0)
                 {
                     @foreach (var bestRunnerGrouped in winSplitGroups[0])
@@ -28,7 +29,7 @@
                     }
                 }
             </div>
-            <div class="col-6">
+            <div class="col-md-6">
                 @if (winSplitGroups.Count() > 1)
                 {
                     @foreach (var bestRunnerGrouped in winSplitGroups[1])
@@ -39,7 +40,7 @@
             </div>
         </div>
     </div>
-    <div class="col-4 offset-1 mr-1 p-1 bg-dark">
+    <div class="col-md-4 offset-md-1 m-1 p-3">
         <div class="text-light p-1">Best Each Way</div>
         <div class="row">
             @{
@@ -50,7 +51,7 @@
                     .ToList();
                 ViewData["WinOrEachWay"] = "EachWay";
             }
-            <div class="col-6">
+            <div class="col-md-6">
                 @if (ewSplitGroups.Count() > 0)
                 {
                     @foreach (var bestRunnerGrouped in ewSplitGroups[0])
@@ -60,7 +61,7 @@
                 }
 
             </div>
-            <div class="col-6">
+            <div class="col-md-6">
                 @if (ewSplitGroups.Count() > 1)
                 {
                     @foreach (var bestRunnerGrouped in ewSplitGroups[1])
@@ -78,7 +79,7 @@
     {
         ViewData["MeetingName"] = meetingKvp.Key.Name;
         var date = meetingKvp.FirstOrDefault()?.SportsbookMarket.marketStartTime.Date ?? new DateTime();
-        <div class="col-4">
+        <div class="col-md-4 m-1 p-1">
             <h6 class="m-2">@meetingKvp.Key.Name @date.ToLongDateString()</h6>
             @foreach (var @race in meetingKvp.OrderBy(r => r.SportsbookMarket.marketStartTime))
             {

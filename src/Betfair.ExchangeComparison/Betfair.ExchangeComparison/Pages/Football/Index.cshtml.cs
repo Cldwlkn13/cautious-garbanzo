@@ -63,7 +63,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                 marketBooks.Add(eventDict[@event.Key], marketBooksInEvent);
             }
 
-            var eventsWithMarkets = new ConcurrentDictionary<EventResult, IList<MarketCatalogue>>();
+            var eventsWithMarkets = new Dictionary<EventResult, IList<MarketCatalogue>>();
             var eventsWithPrices = new Dictionary<Event, IList<MarketDetail>>();
 
             if (!_sportsbookHandler.SessionValid())
@@ -81,15 +81,15 @@ namespace Betfair.ExchangeComparison.Pages.Football
                     .Select(e => e.Event.Id)
                     .ToHashSet();
 
-            Parallel.ForEach(eventIds, eventId =>
+            //Parallel.ForEach(eventIds, eventId =>
+            //{
+            foreach (var eventId in eventIds)
             {
-                //foreach (var eventId in eventIds)
-                //{
-                var marketCatalogue = _sportsbookHandler.ListMarketCatalogues(new HashSet<string> { eventId });
+                var marketCatalogue = _sportsbookHandler.ListMarketCatalogues(new HashSet<string> { eventId }, "1");
 
-                eventsWithMarkets.AddOrUpdate(events.First(e => e.Event.Id == eventId), marketCatalogue, (k, v) => v = marketCatalogue);
-                //}
-            });
+                eventsWithMarkets.Add(events.First(e => e.Event.Id == eventId), marketCatalogue);
+            }
+            //});
 
             var marketIds = eventsWithMarkets.SelectMany(m => m.Value).Select(m => m.MarketId).ToList();
 
@@ -169,6 +169,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                     .FirstOrDefault(r => r.SelectionId == sportsbookRunner.selectionId);
 
                                 double? bestPinkWin = 0;
+                                double? bestPinkWinSize = 0;
                                 double? bestBlueWin = 0;
 
                                 if (mappedExchangeWinRunner != null)
@@ -178,6 +179,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                         if (mappedExchangeWinRunner.ExchangePrices.AvailableToLay.Any())
                                         {
                                             bestPinkWin = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Price;
+                                            bestPinkWinSize = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Size;
                                         }
 
                                         if (mappedExchangeWinRunner.ExchangePrices.AvailableToBack.Any())
@@ -190,7 +192,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                 var winnerOddsString = $"{sportsbookRunner.winRunnerOdds.numerator}/{sportsbookRunner.winRunnerOdds.denominator}";
 
                                 var winSpread = bestPinkWin != null && bestPinkWin > 0 && bestBlueWin != null && bestBlueWin > 0 ? bestPinkWin - bestBlueWin : 0;
-                                var expectedWinPrice = bestPinkWin != null && bestPinkWin > 0 && winSpread != null ? bestPinkWin - (winSpread * 0.1) : 1;
+                                var expectedWinPrice = bestPinkWin != null && bestPinkWin > 0 && winSpread != null ? bestPinkWin - (winSpread * 0.03) : 1;
 
                                 var expectedValueWin = ExpectedValue(sportsbookRunner.winRunnerOdds.@decimal, expectedWinPrice.Value);
 
@@ -203,7 +205,9 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                         SportsbookRunner = sportsbookRunner,
                                         WinnerOddsString = winnerOddsString,
                                         ExpectedValue = expectedValueWin,
-                                        ExchangeWinBestPink = bestPinkWin!.Value
+                                        ExchangeWinBestBlue = bestBlueWin!.Value,
+                                        ExchangeWinBestPink = bestPinkWin!.Value,
+                                        ExchangeWinBestPinkSize = bestPinkWinSize!.Value
                                     });
                                 }
 

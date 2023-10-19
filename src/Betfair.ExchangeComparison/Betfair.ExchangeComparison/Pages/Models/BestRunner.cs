@@ -11,7 +11,9 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public RunnerDetail SportsbookRunner { get; set; }
         public string WinnerOddsString { get; set; }
         public string PlacePartOddsString { get; set; }
+        public double ExchangeWinBestBlue { get; set; }
         public double ExchangeWinBestPink { get; set; }
+        public double ExchangeWinBestPinkSize { get; set; }
         public double ExchangePlaceBestPink { get; set; }
         public double ExpectedValue { get; set; }
     }

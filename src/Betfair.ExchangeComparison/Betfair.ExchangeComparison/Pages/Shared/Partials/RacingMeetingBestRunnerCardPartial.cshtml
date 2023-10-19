@@ -12,43 +12,20 @@
         @foreach (var groupedRunner in @Model.GroupBy(r => r.MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime()))
         {
             <div class="mt-2">
-                <span class="text-purple">@groupedRunner.Key.ToString("HH:mm")</span>
-                <small>
-                    <span class="text-info">@groupedRunner.First().MarketDetail.numberOfPlaces</span>
-                    <span class="text-info">1/@groupedRunner.First().MarketDetail.placeFractionDenominator</span>
-                </small>
+                <span class="text-dark">@groupedRunner.Key.ToString("HH:mm")</span> -
+                <span class="text-info">@groupedRunner.First().MarketDetail.numberOfPlaces</span>
+                <span class="text-info">1/@groupedRunner.First().MarketDetail.placeFractionDenominator</span>
             </div>
 
             @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValue))
             {
-
-
                 if (winOrEachWay == "Win")
                 {
-                    var ev = @bestRunner.ExpectedValue + 1;
-                    var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
-
-                    <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
-                        @bestRunner.SportsbookRunner.selectionName
-                        <span class="text-lime"> @bestRunner.WinnerOddsString </span>
-                        [<span class="text-pink">@bestRunner.ExchangeWinBestPink.ToString("0.00")</span>]
-                        <span>@ev.ToString("0.00")</span>
-                    </div>
+                    @await Html.PartialAsync("./BestWinRunnerPartial.cshtml", bestRunner)
                 }
                 else
                 {
-                    var ev = @bestRunner.ExpectedValue;
-                    var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
-
-                    <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
-                        @bestRunner.SportsbookRunner.selectionName
-                        <span class="text-lime"> @bestRunner.WinnerOddsString </span>
-                        <span class="text-lime">@bestRunner.PlacePartOddsString </span>
-                        [<span class="text-pink">@bestRunner.ExchangeWinBestPink.ToString("0.00")</span> :
-                        <span class="text-pink">@bestRunner.ExchangePlaceBestPink.ToString("0.00")</span>]
-
-                        <span>@ev.ToString("0.00")</span>
-                    </div>
+                    @await Html.PartialAsync("./BestEachWayRunnerPartial.cshtml", bestRunner)
                 }
             }
         }

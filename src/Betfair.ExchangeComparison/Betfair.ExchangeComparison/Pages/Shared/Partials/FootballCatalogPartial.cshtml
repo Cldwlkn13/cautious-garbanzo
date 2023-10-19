@@ -9,37 +9,30 @@
 <a href="/football" class="btn btn-warning">Refresh</a>
 <div class="row" style="min-height:100vh">
     <div class="col-12 mr-1 p-1 bg-dark">
-        @*<div class="text-light p-1">Best Win</div>*@
         <div class="row">
             @foreach (var bestRunnerGrouped in Model.BestWinRunners
-                .OrderBy(m => m.MarketDetail.marketType)
-                .ThenBy(m => m.MarketDetail.marketStartTime)
-                .GroupBy(m => m.MarketDetail.marketType))
+        .OrderBy(m => m.MarketDetail.marketType)
+        .ThenBy(m => m.MarketDetail.marketStartTime)
+        .GroupBy(m => m.MarketDetail.marketType))
             {
-                <div class="col-3">
+                <div class="col-2">
                     <div class="m-1 p-1 bg-secondary border rounded">
 
                         <h6 class="text-pink">@bestRunnerGrouped.Key</h6>
 
                         @foreach (var groupedRunner in @bestRunnerGrouped.GroupBy(r => r.Event.Name))
                         {
-                            <span class="text-orange text-lg">@groupedRunner.Key</span>
-                            <span class="text-purple">
-                                @groupedRunner.First().MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToString("HH:mm")
-                            </span>
+                            <div class="mb-2">
+                                <span class="text-goldenrod text-lg">@groupedRunner.Key</span>
+                                <span class="text-purple">
+                                    @groupedRunner.First().MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToString("HH:mm")
+                                </span>
 
-                            @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValue))
-                            {
-                                var ev = @bestRunner.ExpectedValue + 1;
-                                var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
-
-                                <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
-                                    @bestRunner.SportsbookRunner.selectionName
-                                    <span class="text-lime"> @bestRunner.WinnerOddsString </span>
-                                    [<span class="text-pink">@bestRunner.ExchangeWinBestPink.ToString("0.00")</span>]
-                                    <span>@ev.ToString("0.00")</span>
-                                </div>
-                            }
+                                @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValue))
+                                {
+                                    @await Html.PartialAsync("./BestWinRunnerPartial.cshtml", bestRunner)
+                                }
+                            </div>
                         }
                     </div>
                 </div>

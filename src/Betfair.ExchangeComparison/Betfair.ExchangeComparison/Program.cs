@@ -32,6 +32,7 @@ public class Program
         {
             webBuilder
                 .UseKestrel()
+                .UseIISIntegration()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
                 .ConfigureAppConfiguration((hostingContext, config) =>
