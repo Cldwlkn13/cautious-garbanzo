@@ -70,7 +70,7 @@ namespace Betfair.ExchangeComparison.Exchange
                     break;
                 case "1":
                     marketFilter.MarketTypeCodes = new HashSet<String>() { "MATCH_ODDS", "OVER_UNDER_15", "OVER_UNDER_25", "OVER_UNDER_35", "BOTH_TEAMS_TO_SCORE" };
-                    time.To = DateTime.Now.AddHours(3);
+                    time.To = DateTime.Now.AddHours(6);
                     break;
             }
 
