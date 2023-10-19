@@ -7,15 +7,15 @@
             });</script>
     }*@
 <a href="/football" class="btn btn-warning">Refresh</a>
-<div class="row" style="min-height:100vh">
-    <div class="col-12 mr-1 p-1 bg-dark">
+<div class="row">
+    <div class="col-12 mr-1 p-1">
         <div class="row">
             @foreach (var bestRunnerGrouped in Model.BestWinRunners
-        .OrderBy(m => m.MarketDetail.marketType)
-        .ThenBy(m => m.MarketDetail.marketStartTime)
-        .GroupBy(m => m.MarketDetail.marketType))
+       .OrderBy(m => m.MarketDetail.marketType)
+       .ThenBy(m => m.MarketDetail.marketStartTime)
+       .GroupBy(m => m.MarketDetail.marketType))
             {
-                <div class="col-2">
+                <div class="col-md-2">
                     <div class="m-1 p-1 bg-secondary border rounded">
 
                         <h6 class="text-pink">@bestRunnerGrouped.Key</h6>
