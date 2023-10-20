@@ -37,6 +37,7 @@ public class SportsbookHandler : ISportsbookHandler
     }
 
     public string SessionToken { get; private set; }
+    public DateTime TokenExpiry { get; set; }
     public string AppKey { get; private set; }
 
     private string Username { get; set; }
@@ -48,6 +49,10 @@ public class SportsbookHandler : ISportsbookHandler
             throw new NullReferenceException($"Login Failed");
 
         SessionToken = loginResult.Token;
+        TokenExpiry = DateTime.UtcNow.AddHours(6);
+
+        Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
+            $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
 
         _client = new SportsbookClient(
             _options.Value.SportsbookUrl, AppKey, SessionToken);
@@ -57,7 +62,8 @@ public class SportsbookHandler : ISportsbookHandler
 
     public bool SessionValid()
     {
-        return !string.IsNullOrEmpty(SessionToken);
+        return !string.IsNullOrEmpty(SessionToken) &&
+            DateTime.UtcNow < TokenExpiry;
     }
 
     public IList<EventTypeResult> ListEventTypes()
