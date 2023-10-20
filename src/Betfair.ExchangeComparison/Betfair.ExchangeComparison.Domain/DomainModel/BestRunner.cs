@@ -16,6 +16,8 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double ExchangeWinBestPinkSize { get; set; }
         public double ExchangePlaceBestPink { get; set; }
         public double ExpectedValue { get; set; }
+        public double NumberOfPlaces { get; set; }
+        public double PlaceFractionDenominator { get; set; }
     }
 }
 

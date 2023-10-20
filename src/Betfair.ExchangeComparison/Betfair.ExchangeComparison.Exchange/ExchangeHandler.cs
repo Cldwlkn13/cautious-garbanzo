@@ -36,6 +36,7 @@ namespace Betfair.ExchangeComparison.Exchange
         }
 
         public string SessionToken { get; private set; }
+        public DateTime TokenExpiry { get; set; }
         public string AppKey { get; private set; }
 
         private string Username { get; set; }
@@ -47,6 +48,10 @@ namespace Betfair.ExchangeComparison.Exchange
                 throw new NullReferenceException($"Login Failed");
 
             SessionToken = loginResult.Token;
+            TokenExpiry = DateTime.UtcNow.AddHours(1);
+
+            Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
+                $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
 
             _exchangeClient = new ExchangeClient(
                 _options.Value.Url, AppKey, SessionToken);
@@ -56,7 +61,8 @@ namespace Betfair.ExchangeComparison.Exchange
 
         public bool SessionValid()
         {
-            return !string.IsNullOrEmpty(SessionToken);
+            return !string.IsNullOrEmpty(SessionToken) &&
+                DateTime.UtcNow < TokenExpiry;
         }
 
         public IList<EventTypeResult> ListEventTypes()

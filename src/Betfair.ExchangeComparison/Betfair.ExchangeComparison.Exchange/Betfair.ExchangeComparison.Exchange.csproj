@@ -13,4 +13,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
 	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj" />
+	</ItemGroup>
 </Project>

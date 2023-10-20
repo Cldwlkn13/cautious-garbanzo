@@ -13,6 +13,10 @@
 	<ItemGroup>
 		<None Remove="Pages\Racing\" />
 		<None Remove="Pages\Football\" />
+		<None Remove="Handlers\" />
+		<None Remove="Interfaces\" />
+		<None Remove="Services\" />
+		<None Remove="Pages\Model\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
@@ -37,10 +41,17 @@
 			<GlobalPropertiesToRemove>
 			</GlobalPropertiesToRemove>
 		</ProjectReference>
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Scraping\Betfair.ExchangeComparison.Scraping.csproj">
+		  <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Pages\Racing\" />
 		<Folder Include="Pages\Football\" />
+		<Folder Include="Handlers\" />
+		<Folder Include="Interfaces\" />
+		<Folder Include="Services\" />
+		<Folder Include="Pages\Model\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="glabal.json" />

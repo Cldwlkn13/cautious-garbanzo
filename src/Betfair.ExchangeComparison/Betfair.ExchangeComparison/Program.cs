@@ -26,8 +26,6 @@ public class Program
             .AddCommandLine(args)
             .Build();
 
-        var logins = configuration.GetSection("LoginSettings");
-
         CreateHostBuilder(args).Build().Run();
     }
 

@@ -6,6 +6,9 @@ using Betfair.ExchangeComparison.Exchange.Settings;
 using Betfair.ExchangeComparison.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Betfair.ExchangeComparison.Interfaces;
+using Betfair.ExchangeComparison.Handlers;
+using Betfair.ExchangeComparison.Services;
 
 namespace Betfair.ExchangeComparison
 {
@@ -24,8 +27,12 @@ namespace Betfair.ExchangeComparison
 
             services.ConfigureExchange();
             services.ConfigureSportsbook();
+            services.ConfigureScrapers();
             services.AddHealthChecks();
             services.AddSignalR();
+
+            services.AddSingleton<ICatalogService, CatalogService>();
+            services.AddSingleton<IScrapingHandler, ScrapingHandler>();
 
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));
 
@@ -47,6 +54,8 @@ namespace Betfair.ExchangeComparison
                 //options.Cookie.Name = $"{Domain.Constants.Constants.AppName}";
                 //options.Cookie.IsEssential = false;
             });
+
+            services.AddHostedService<Worker>();
 
             BindSettings(services);
         }

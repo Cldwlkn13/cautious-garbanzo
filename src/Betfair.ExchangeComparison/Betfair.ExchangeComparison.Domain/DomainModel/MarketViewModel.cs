@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
@@ -7,11 +8,12 @@ namespace Betfair.ExchangeComparison.Pages.Models
     public class MarketViewModel
     {
         public Event Parent { get; set; }
-        public MarketDetail SportsbookMarket { get; set; }
         IEnumerable<MarketBook> ExchangeMarketBooks { get; set; }
+        public MarketDetail SportsbookMarket { get; set; }
         public IEnumerable<RunnerViewModel> Runners { get; set; }
         public double WinOverround { get; set; }
         public double EachWayPlaceOverround { get; set; }
+        public string ComparisonSource { get; set; }
 
         public MarketViewModel(Event parent)
         {
@@ -26,7 +28,9 @@ namespace Betfair.ExchangeComparison.Pages.Models
             var name = SportsbookMarket != null ? SportsbookMarket.marketName : "Unknown";
             var meeting = SportsbookMarket != null && Parent.Name != null ? Parent.Name : "Unknown";
             var uuid = SportsbookMarket != null ? SportsbookMarket.marketId : "Unknown";
-            var offTime = SportsbookMarket != null ? SportsbookMarket.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToDateTimeString() : "Unknown";
+            var offTime = SportsbookMarket != null ? SportsbookMarket.marketStartTime
+                .ConvertUtcToBritishIrishLocalTime()
+                .ToDateTimeString() : "Unknown";
 
             return $"{meeting} {offTime} - {name} {uuid}";
         }

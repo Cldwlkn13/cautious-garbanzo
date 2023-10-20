@@ -9,22 +9,21 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
+		<None Remove="Boylesports\" />
+		<None Remove="Interfaces\" />
 		<None Remove="Extensions\" />
-		<None Remove="ScrapingModel\" />
-		<None Remove="ExchangeModel\" />
-		<None Remove="DomainModel\" />
-		<None Remove="SportsbookModel\" />
-		<None Remove="Enums\" />
+		<None Remove="Boylesports\Interfaces\" />
 	</ItemGroup>
 	<ItemGroup>
+		<Folder Include="Boylesports\" />
+		<Folder Include="Interfaces\" />
 		<Folder Include="Extensions\" />
-		<Folder Include="ScrapingModel\" />
-		<Folder Include="ExchangeModel\" />
-		<Folder Include="DomainModel\" />
-		<Folder Include="SportsbookModel\" />
-		<Folder Include="Enums\" />
+		<Folder Include="Boylesports\Interfaces\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj" />
 	</ItemGroup>
 </Project>
