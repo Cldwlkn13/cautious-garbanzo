@@ -162,15 +162,27 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
 
         public MarketDetails ListMarketPrices(IList<string> marketIds)
         {
-            var obj = new
-            {
-                listMarketPricesRequestParams = new ListMarketPricesRequestParams()
-                {
-                    MarketIds = marketIds
-                },
-            };
+            MarketDetails marketDetails = new MarketDetails() { marketDetails = new List<MarketDetail>() };
 
-            return Invoke<MarketDetails>(LIST_MARKET_PRICES_METHOD, obj);
+            foreach (var batch in marketIds.Chunk(100))
+            {
+                var obj = new
+                {
+                    listMarketPricesRequestParams = new ListMarketPricesRequestParams()
+                    {
+                        MarketIds = batch
+                    },
+                };
+
+                var batchResult = Invoke<MarketDetails>(LIST_MARKET_PRICES_METHOD, obj);
+
+                foreach (var md in batchResult.marketDetails)
+                {
+                    marketDetails.marketDetails.Add(md);
+                }
+            }
+
+            return marketDetails;
         }
 
         public IList<MarketCatalogue> ListMarketCatalogue(SportsbookMarketFilter marketFilter, string maxResults = "1", string? locale = null)

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
+using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Models;
+using Betfair.ExchangeComparison.Services;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,13 +14,17 @@ namespace Betfair.ExchangeComparison.Pages.Football
     {
         private readonly IExchangeHandler _exchangeHandler;
         private readonly ISportsbookHandler _sportsbookHandler;
+        private readonly ICatalogService _catalogService;
+
+        const string EventTypeId = "1";
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
-        public IndexModel(IExchangeHandler exchangeHandler, ISportsbookHandler sportsbookHandler)
+        public IndexModel(IExchangeHandler exchangeHandler, ISportsbookHandler sportsbookHandler, ICatalogService catalogService)
         {
             _exchangeHandler = exchangeHandler;
             _sportsbookHandler = sportsbookHandler;
+            _catalogService = catalogService;
 
             CatalogViewModel = new CatalogViewModel();
         }
@@ -27,100 +33,16 @@ namespace Betfair.ExchangeComparison.Pages.Football
         {
             var bestWinRunners = new List<BestRunner>();
 
-            if (!_exchangeHandler.SessionValid())
-            {
-                var login = _exchangeHandler.Login("", "");
-            }
+            var eventDict = _catalogService.GetExchangeEventsWithMarkets(EventTypeId);
+            var marketCatalogues = _catalogService.GetExchangeMarketCatalogues(EventTypeId, eventDict.Keys.ToList());
+            var marketBooks = _catalogService.GetExchangeMarketBooks(marketCatalogues, eventDict);
 
-            var marketCatalogues = _exchangeHandler.ListMarketCatalogues("1");
-
-            var eventDict = new Dictionary<string, Event>();
-            var eventsx = marketCatalogues.Select(m => m.Event);
-            foreach (var @event in eventsx)
-            {
-                if (!eventDict.ContainsKey(@event.Id))
-                {
-                    eventDict.Add(@event.Id, @event);
-                }
-            }
-
-            var marketBooks = new Dictionary<Event, Dictionary<DateTime, IList<MarketBook>>>();
-            foreach (var @event in marketCatalogues.GroupBy(m => m.Event.Id))
-            {
-                var marketsInEvent = @event.GroupBy(m => m.Description.MarketTime).ToList();
-                var marketBooksInEvent = new Dictionary<DateTime, IList<MarketBook>>();
-
-                Parallel.ForEach(marketsInEvent, market =>
-                {
-                    //foreach (var market in marketsInEvent)
-                    //{
-                    var marketIdsInRace = market.Select(m => m.MarketId);
-                    var batchResult = _exchangeHandler.ListMarketBooks(marketIdsInRace.ToList());
-                    marketBooksInEvent.Add(market.Key, batchResult);
-                    //}
-                });
-
-                marketBooks.Add(eventDict[@event.Key], marketBooksInEvent);
-            }
-
-            var eventsWithMarkets = new Dictionary<EventResult, IList<MarketCatalogue>>();
-            var eventsWithPrices = new Dictionary<Event, IList<MarketDetail>>();
-
-            if (!_sportsbookHandler.SessionValid())
-            {
-                var sbklogin = _sportsbookHandler.Login("", "");
-            }
-
-            //var eventTypes = _sportsbookHandler.ListEventTypes();
-            //var competitions = _sportsbookHandler.ListCompetitions();
-            //var marketTypes = _sportsbookHandler.ListMarketTypes();
-
-            var events = _sportsbookHandler.ListEventsByEventType("1");
-
-            var eventIds = events
-                    .Select(e => e.Event.Id)
-                    .ToHashSet();
-
-            //Parallel.ForEach(eventIds, eventId =>
-            //{
-            foreach (var eventId in eventIds)
-            {
-                var marketCatalogue = _sportsbookHandler.ListMarketCatalogues(new HashSet<string> { eventId }, "1");
-
-                eventsWithMarkets.Add(events.First(e => e.Event.Id == eventId), marketCatalogue);
-            }
-            //});
-
-            var marketIds = eventsWithMarkets.SelectMany(m => m.Value).Select(m => m.MarketId).ToList();
-
-            var prices = _sportsbookHandler.ListPrices(marketIds);
-
-            foreach (var eventResult in eventsWithMarkets)
-            {
-                if (eventResult.Key.Event.Name.ToLower().Contains("odds") ||
-                    eventResult.Key.Event.Name.ToLower().Contains("specials"))
-                {
-                    continue;
-                }
-
-                var marketsInEvent = new List<MarketDetail>();
-
-                foreach (var marketCatalog in eventResult.Value)
-                {
-                    var marketDetail = prices.marketDetails.FirstOrDefault(m => m.marketId == marketCatalog.MarketId);
-
-                    if (marketDetail != null)
-                    {
-                        marketsInEvent.Add(marketDetail);
-                    }
-                }
-
-                eventsWithPrices.Add(eventResult.Key.Event, marketsInEvent.OrderBy(m => m.marketStartTime).ToList());
-            }
+            var sportsbookEventsWithMarkets = _catalogService.GetSportsbookEventsWithMarkets(EventTypeId);
+            var sportsbookEventsWithPrices = _catalogService.GetSportsbookEventsWithPrices(sportsbookEventsWithMarkets);
 
             var markets = new List<MarketViewModel>();
 
-            foreach (var @event in eventsWithPrices.Keys)
+            foreach (var @event in sportsbookEventsWithPrices.Keys)
             {
                 try
                 {
@@ -131,7 +53,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                         continue;
                     }
 
-                    var mappedEvent = eventsWithPrices[@event];
+                    var mappedEvent = sportsbookEventsWithPrices[@event];
 
                     if (mappedEvent == null)
                     {

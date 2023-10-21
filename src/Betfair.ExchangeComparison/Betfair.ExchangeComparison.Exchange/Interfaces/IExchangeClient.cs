@@ -14,6 +14,8 @@ namespace Betfair.ExchangeComparison.Exchange.Interfaces
          * */
         IList<EventTypeResult> ListEventTypes(MarketFilter marketFilter, string locale = null);
 
+        IList<EventResult> ListEvents(MarketFilter marketFilter, string locale = null);
+
         /**
          * calls api-ng to get a list of market catalogues
          * */

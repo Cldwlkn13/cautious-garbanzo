@@ -9,10 +9,10 @@
 <div class="p-3 bg-dark">
     <div id="meetings-container">
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-3 m-1">
                 <a href="/racing" class="btn btn-warning">Refresh</a>
             </div>
-            <div class="col-md-6 offset-1">
+            <div class="col-md-6 offset-md-1 m-1">
                 <form method="POST">
                     <select asp-for="FormModel.Bookmaker" asp-items="@(new SelectList(Enum.GetValues<Bookmaker>()))">
                         <option>Please select one.</option>

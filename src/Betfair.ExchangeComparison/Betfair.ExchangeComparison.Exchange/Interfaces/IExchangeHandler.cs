@@ -14,7 +14,8 @@ namespace Betfair.ExchangeComparison.Exchange.Interfaces
         bool SessionValid();
 
         IList<EventTypeResult> ListEventTypes();
-        IList<MarketCatalogue> ListMarketCatalogues(string eventTypeId = "7");
+        IList<EventResult> ListEvents(string eventTypeId = "7");
+        IList<MarketCatalogue> ListMarketCatalogues(string eventTypeId = "7", TimeRange? timeRange = null, IEnumerable<string>? eventIds = null);
         IList<MarketBook> ListMarketBooks(IList<string> marketIds);
     }
 }
