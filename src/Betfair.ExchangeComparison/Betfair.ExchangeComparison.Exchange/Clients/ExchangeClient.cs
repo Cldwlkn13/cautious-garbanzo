@@ -21,6 +21,7 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
         public const string SESSION_TOKEN_HEADER = "X-Authentication";
         public WebHeaderCollection CustomHeaders { get; set; }
         private static readonly string LIST_EVENT_TYPES_METHOD = "SportsAPING/v1.0/listEventTypes";
+        private static readonly string LIST_EVENTS_METHOD = "SportsAPING/v1.0/listEvents";
         private static readonly string LIST_MARKET_TYPES_METHOD = "SportsAPING/v1.0/listMarketTypes";
         private static readonly string LIST_MARKET_CATALOGUE_METHOD = "SportsAPING/v1.0/listMarketCatalogue";
         private static readonly string LIST_MARKET_BOOK_METHOD = "SportsAPING/v1.0/listMarketBook";
@@ -91,7 +92,15 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<List<EventTypeResult>>(LIST_EVENT_TYPES_METHOD, args);
         }
 
-        public IList<MarketCatalogue> ListMarketCatalogue(MarketFilter marketFilter, ISet<MarketProjection> marketProjections, MarketSort marketSort, string maxResult = "1", string locale = null)
+        public IList<EventResult> ListEvents(MarketFilter marketFilter, string locale = null)
+        {
+            var args = new Dictionary<string, object>();
+            args[FILTER] = marketFilter;
+            args[LOCALE] = locale;
+            return Invoke<List<EventResult>>(LIST_EVENTS_METHOD, args);
+        }
+
+        public IList<MarketCatalogue> ListMarketCatalogue(MarketFilter marketFilter, ISet<MarketProjection> marketProjections, MarketSort marketSort, string maxResult = "100", string locale = null)
         {
             var args = new Dictionary<string, object>();
             args[FILTER] = marketFilter;

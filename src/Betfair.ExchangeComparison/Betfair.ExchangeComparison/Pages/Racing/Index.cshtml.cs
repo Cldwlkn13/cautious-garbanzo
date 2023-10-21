@@ -1,9 +1,11 @@
-﻿using Betfair.ExchangeComparison.Domain.Enums;
+﻿using System.Text;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
 using Betfair.ExchangeComparison.Pages.Models;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -33,10 +35,22 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             CatalogViewModel = new CatalogViewModel();
         }
 
-        public IActionResult OnGet(Bookmaker bookmaker = Bookmaker.Betfair)
+        public IActionResult OnGet()
         {
             var bestWinRunners = new List<BestRunner>();
             var bestEachWayRunners = new List<BestRunner>();
+
+            var bookmakerString = HttpContext.Session.GetString("Bookmaker") ?? "Other";
+            var bookmaker = Bookmaker.Unknown;
+
+            if (!Enum.TryParse(typeof(Bookmaker), bookmakerString, out var savedBookmaker))
+            {
+                bookmaker = Bookmaker.Betfair;
+            }
+            else
+            {
+                bookmaker = (Bookmaker)Enum.Parse(typeof(Bookmaker), savedBookmaker.ToString());
+            }
 
             try
             {
@@ -49,7 +63,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                 var markets = new List<MarketViewModel>();
 
-                var scrapedEvents = _scrapingHandler.GetScrapedEvents(Domain.Enums.Bookmaker.Boylesports, DateTime.Today);
+                //var scrapedEvents = _scrapingHandler.GetScrapedEvents(Domain.Enums.Bookmaker.Boylesports, DateTime.Today);
 
                 foreach (var @event in sportsbookEventsWithPrices.Keys)
                 {
@@ -63,9 +77,9 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                         foreach (var marketDetail in mappedEvent)
                         {
-                            var mappedScrapedEvent = scrapedEvents.FirstOrDefault(s =>
-                                s.MappedEvent.Event.Venue == @event.Venue &&
-                                s.MappedEvent.SportsbookMarket.marketStartTime == marketDetail.marketStartTime);
+                            //var mappedScrapedEvent = scrapedEvents.FirstOrDefault(s =>
+                            //    s.MappedEvent.Event.Venue == @event.Venue &&
+                            //    s.MappedEvent.SportsbookMarket.marketStartTime == marketDetail.marketStartTime);
 
                             var exchangeMarketBooks = exchangeEventWithMarketBooks.Value
                                 .FirstOrDefault(m => m.Key == marketDetail.marketStartTime);
@@ -91,11 +105,11 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                             {
                                 try
                                 {
-                                    var mappedScrapedMarket = mappedScrapedEvent?.ScrapedMarkets
-                                        .First();
+                                    //var mappedScrapedMarket = mappedScrapedEvent?.ScrapedMarkets
+                                    //    .First();
 
-                                    var mappedScrapedRunner = mappedScrapedMarket?.ScrapedRunners.FirstOrDefault(r =>
-                                            r.Name.ToLower().Replace("'", "") == sportsbookRunner.selectionName.ToLower().Replace("'", ""));
+                                    //var mappedScrapedRunner = mappedScrapedMarket?.ScrapedRunners.FirstOrDefault(r =>
+                                    //        r.Name.ToLower().Replace("'", "") == sportsbookRunner.selectionName.ToLower().Replace("'", ""));
 
                                     if (sportsbookRunner.runnerOrder >= 98 ||
                                         sportsbookRunner.runnerStatus != "ACTIVE" ||
@@ -160,24 +174,24 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                                     if (bookmaker == Bookmaker.Boylesports)
                                     {
-                                        if (mappedScrapedRunner != null)
-                                        {
-                                            numberOfPlaces = mappedScrapedMarket!.ScrapedEachWayTerms.NumberOfPlaces;
-                                            placeFraction = mappedScrapedMarket!.ScrapedEachWayTerms.EachWayFraction;
+                                        //if (mappedScrapedRunner != null)
+                                        //{
+                                        //    numberOfPlaces = mappedScrapedMarket!.ScrapedEachWayTerms.NumberOfPlaces;
+                                        //    placeFraction = mappedScrapedMarket!.ScrapedEachWayTerms.EachWayFraction;
 
-                                            winnerOddsString = $"{mappedScrapedRunner.ScrapedPrice.PriceString}";
-                                            eachWayPlacePart = PlacePart((double)mappedScrapedRunner.ScrapedPrice.Decimal, placeFraction);
+                                        //    winnerOddsString = $"{mappedScrapedRunner.ScrapedPrice.PriceString}";
+                                        //    eachWayPlacePart = PlacePart((double)mappedScrapedRunner.ScrapedPrice.Decimal, placeFraction);
 
-                                            expectedValueWin = ExpectedValue((double)mappedScrapedRunner.ScrapedPrice.Decimal, expectedWinPrice.Value);
-                                            expectedValuePlace = ExpectedValue(eachWayPlacePart, expectedPlacePrice.Value);
+                                        //    expectedValueWin = ExpectedValue((double)mappedScrapedRunner.ScrapedPrice.Decimal, expectedWinPrice.Value);
+                                        //    expectedValuePlace = ExpectedValue(eachWayPlacePart, expectedPlacePrice.Value);
 
-                                            eachWayExpectedValue = (expectedValueWin + expectedValuePlace) + 1;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine($"Could not map runner={sportsbookRunner.selectionName} in " +
-                                                $"{marketDetail.marketName} {marketDetail.marketStartTime}");
-                                        }
+                                        //    eachWayExpectedValue = (expectedValueWin + expectedValuePlace) + 1;
+                                        //}
+                                        //else
+                                        //{
+                                        //    Console.WriteLine($"Could not map runner={sportsbookRunner.selectionName} in " +
+                                        //        $"{marketDetail.marketName} {marketDetail.marketStartTime}");
+                                        //}
                                     }
                                     else
                                     {
@@ -279,7 +293,9 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
         public IActionResult OnPost(RacingFormModel formModel)
         {
-            return OnGet(formModel.Bookmaker);
+            HttpContext.Session.SetString("Bookmaker", formModel.Bookmaker.ToString());
+
+            return OnGet();
         }
 
         private static double ExpectedValue(double sportsbookPrice, double exchangePrice)

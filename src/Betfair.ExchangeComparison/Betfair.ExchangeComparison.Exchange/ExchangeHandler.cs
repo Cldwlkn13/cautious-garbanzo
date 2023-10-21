@@ -75,24 +75,72 @@ namespace Betfair.ExchangeComparison.Exchange
             return eventTypes;
         }
 
-        public IList<MarketCatalogue> ListMarketCatalogues(string eventTypeId = "7")
+        public IList<EventResult> ListEvents(string eventTypeId = "7")
+        {
+            var time = new TimeRange()
+            {
+                From = DateTime.Now,
+                To = eventTypeId == "7" ? DateTime.Today.AddDays(1) : DateTime.Now.AddHours(3)
+            };
+
+            var marketFilter = new MarketFilter();
+            marketFilter.EventTypeIds = new List<string> { eventTypeId }.ToHashSet();
+            marketFilter.MarketStartTime = time;
+            var marketSort = MarketSort.FIRST_TO_START;
+            var maxResults = "1000";
+
+            var events = _exchangeClient?.ListEvents(marketFilter) ??
+                throw new NullReferenceException($"Events null.");
+
+            return events;
+        }
+
+        public IList<MarketCatalogue> ListMarketCatalogues(string eventTypeId = "7", TimeRange? timeRange = null, IEnumerable<string>? eventIds = null)
         {
             var marketFilter = new MarketFilter();
             marketFilter.EventTypeIds = new List<string> { eventTypeId }.ToHashSet();
 
+            if (eventIds != null)
+            {
+                marketFilter.EventIds = eventIds.ToHashSet();
+            }
+
             var time = new TimeRange();
-            time.From = DateTime.Now;
+
+            if (timeRange == null)
+            {
+                time.From = DateTime.Now;
+                time.To = eventTypeId == "7" ? DateTime.Today.AddDays(1) : DateTime.Now.AddHours(3);
+            }
+            else
+            {
+                time = timeRange;
+            }
 
             switch (eventTypeId)
             {
                 case "7":
-                    marketFilter.MarketCountries = new HashSet<string>() { "GB", "IE" };
-                    marketFilter.MarketTypeCodes = new HashSet<String>() { "WIN", "PLACE", "OTHER_PLACE" };
-                    time.To = DateTime.Today.AddDays(1);
+                    marketFilter.MarketCountries = new HashSet<string>()
+                    {
+                        "GB",
+                        "IE"
+                    };
+                    marketFilter.MarketTypeCodes = new HashSet<String>()
+                    {
+                        "WIN",
+                        "PLACE",
+                        "OTHER_PLACE"
+                    };
                     break;
                 case "1":
-                    marketFilter.MarketTypeCodes = new HashSet<String>() { "MATCH_ODDS", "OVER_UNDER_15", "OVER_UNDER_25", "OVER_UNDER_35", "BOTH_TEAMS_TO_SCORE" };
-                    time.To = DateTime.Now.AddHours(6);
+                    marketFilter.MarketTypeCodes = new HashSet<String>()
+                    {
+                        "MATCH_ODDS",
+                        "OVER_UNDER_15",
+                        "OVER_UNDER_25",
+                        "OVER_UNDER_35",
+                        "BOTH_TEAMS_TO_SCORE"
+                    };
                     break;
             }
 

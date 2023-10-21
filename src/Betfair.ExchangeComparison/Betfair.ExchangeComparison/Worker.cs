@@ -18,16 +18,27 @@ namespace Betfair.ExchangeComparison
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var catalog = _catalogService.GetCompoundCatalog(Sport.Racing);
+            //var catalog = _catalogService.GetCompoundCatalog(Sport.Racing);
 
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                catalog = _catalogService.UpdateCompoundCatalog(Sport.Racing);
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    catalog = _catalogService.UpdateCompoundCatalog(Sport.Racing);
 
-                await _scrapingHandler.Handle(catalog);
+            //    if (catalog.Any())
+            //    {
+            //        await _scrapingHandler.Handle(catalog);
 
-                Thread.Sleep(10000);
-            }
+            //        await Task.Delay(10000, stoppingToken);
+            //    }
+            //    else
+            //    {
+            //        var wait = 60000 * 60;
+
+            //        Console.WriteLine($"Worker : ExecuteAsync() Waiting {wait / 60 / 1000} minutes before trying again");
+
+            //        await Task.Delay(wait, stoppingToken);
+            //    }
+            //}
         }
     }
 }

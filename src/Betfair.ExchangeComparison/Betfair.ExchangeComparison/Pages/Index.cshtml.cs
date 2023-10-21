@@ -17,7 +17,7 @@ public class IndexModel : PageModel
 
     public async Task OnGet()
     {
-        //await _scraper.Handle(new List<CompoundEventWithMarketCatalogue>());
+        HttpContext.Session.Set("Set Session", new byte[] { 1 });
     }
 }
 
