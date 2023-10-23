@@ -17,7 +17,7 @@
                 <span class="text-info">1/@groupedRunner.First().PlaceFractionDenominator</span>
             </div>
 
-            @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValue))
+            @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValueWin))
             {
                 if (winOrEachWay == "Win")
                 {

@@ -5,7 +5,9 @@ namespace Betfair.ExchangeComparison.Scraping.Interfaces
 {
     public interface IScrapingClient
     {
-        Task<string> Scrape(string url);
+        string Scrape(string url);
+        Task<string> ScrapeAsync(string url);
+        Task Usage();
     }
 }
 

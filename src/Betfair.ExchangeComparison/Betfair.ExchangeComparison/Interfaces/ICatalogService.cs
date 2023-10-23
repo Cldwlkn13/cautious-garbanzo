@@ -9,16 +9,19 @@ namespace Betfair.ExchangeComparison.Interfaces
 {
     public interface ICatalogService
     {
-        IEnumerable<CompoundEventWithMarketDetail> GetCompoundCatalog(Sport sport);
-        IEnumerable<CompoundEventWithMarketDetail> UpdateCompoundCatalog(Sport sport);
+        Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport);
+        Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport);
+
+        IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport);
+        IEnumerable<MarketDetailWithEvent> UpdateCatalog(Sport sport);
         IDictionary<string, Event> GetExchangeEventsWithMarkets(string eventTypeId);
         IEnumerable<MarketCatalogue> GetExchangeMarketCatalogues(string eventTypeId, IEnumerable<string>? eventIds = null);
         ConcurrentDictionary<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> GetExchangeMarketBooks(
             IEnumerable<MarketCatalogue> marketCatalogues, IDictionary<string, Event>? eventDict);
-        IDictionary<Event, IList<MarketCatalogue>> GetSportsbookEventsWithMarkets(string eventTypeId);
-        Dictionary<Event, IList<MarketDetail>> GetSportsbookEventsWithPrices(IDictionary<Event, IList<MarketCatalogue>> eventsWithMarkets);
+        IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> GetSportsbookEventsWithMarkets(string eventTypeId);
+        Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> GetSportsbookEventsWithPrices(IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> eventsWithMarkets);
 
-        public Dictionary<DateTime, IEnumerable<CompoundEventWithMarketDetail>> CompoundCatalog { get; }
+        public Dictionary<DateTime, IEnumerable<MarketDetailWithEvent>> Catalog { get; }
     }
 }
 

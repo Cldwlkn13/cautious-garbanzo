@@ -5,7 +5,8 @@ namespace Betfair.ExchangeComparison.Scraping.Interfaces
 {
     public interface IScrapingHandler
     {
-        Task<ScrapedEvent> Handle(CompoundEventWithMarketDetail @event);
+        Task<ScrapedEvent> Handle(MarketDetailWithEvent @event);
+        Task Usage();
     }
 }
 

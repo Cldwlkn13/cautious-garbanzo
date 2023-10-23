@@ -17,6 +17,7 @@
 		<None Remove="Interfaces\" />
 		<None Remove="Services\" />
 		<None Remove="Pages\Model\" />
+		<None Remove="Pages\Extensions\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
@@ -52,6 +53,7 @@
 		<Folder Include="Interfaces\" />
 		<Folder Include="Services\" />
 		<Folder Include="Pages\Model\" />
+		<Folder Include="Pages\Extensions\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="glabal.json" />

@@ -17,6 +17,12 @@
 	  <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Settings\" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Include="..\.editorconfig" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Settings\" />
 	</ItemGroup>
 </Project>

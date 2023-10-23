@@ -1,14 +1,14 @@
-﻿using System;
-using Microsoft.Extensions.FileProviders;
-using System.Diagnostics;
-using Betfair.ExchangeComparison.Configurations;
-using Betfair.ExchangeComparison.Exchange.Settings;
+﻿using Betfair.ExchangeComparison.Configurations;
 using Betfair.ExchangeComparison.Data;
+using Betfair.ExchangeComparison.Exchange.Settings;
+using Betfair.ExchangeComparison.Handlers;
+using Betfair.ExchangeComparison.Interfaces;
+using Betfair.ExchangeComparison.Scraping.Settings;
+using Betfair.ExchangeComparison.Services;
+using Betfair.ExchangeComparison.Sportsbook.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Betfair.ExchangeComparison.Interfaces;
-using Betfair.ExchangeComparison.Handlers;
-using Betfair.ExchangeComparison.Services;
+using Microsoft.Extensions.FileProviders;
 
 namespace Betfair.ExchangeComparison
 {
@@ -32,13 +32,18 @@ namespace Betfair.ExchangeComparison
             services.AddSignalR();
 
             services.AddSingleton<ICatalogService, CatalogService>();
-            services.AddSingleton<IScrapingHandler, ScrapingHandler>();
+            services.AddSingleton<IScrapingOrchestrator, ScrapingOrchestrator>();
+            services.AddSingleton<IScrapingControl, ScrapingOrchestrator>();
+            services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();
+            services.AddSingleton<IMappingService, MappingService>();
 
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));
+            services.Configure<ScrapingSettings>(Configuration.GetSection(nameof(ScrapingSettings)));
 
             services.AddDistributedMemoryCache();
 
-            var connectionString = Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            var connectionString = Configuration.GetConnectionString("DefaultConnection") ??
+                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(connectionString));
@@ -85,8 +90,6 @@ namespace Betfair.ExchangeComparison
             app.UseSession();
             //app.UseHttpsRedirection();
 
-
-
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllerRoute(
@@ -101,6 +104,9 @@ namespace Betfair.ExchangeComparison
         {
             services.Configure<ExchangeSettings>(o =>
                 Configuration.GetSection("ExchangeSettings").Bind(o));
+
+            services.Configure<SportsbookSettings>(o =>
+               Configuration.GetSection("SportsbookSettings").Bind(o));
         }
     }
 }
