@@ -1,6 +1,6 @@
 ﻿@model Betfair.ExchangeComparison.Pages.Models.BestRunner;
 @{
-    var ev = @Model.ExpectedValue;
+    var ev = @Model.ExpectedValueEachWay;
     var bgColor = ev >= 0.98 ? "bg-success" : "bg-dark";
 }
 
@@ -10,5 +10,6 @@
     <span class="text-lime">@Model.PlacePartOddsString </span>
     [<span class="text-pink">@Model.ExchangeWinBestPink.ToString("0.00")</span> :
     <span class="text-pink">@Model.ExchangePlaceBestPink.ToString("0.00")</span>]
-    <span>@ev.ToString("0.00")</span>
+    <span>@ev.ToString("0.00") </span>
+    <small class="text-danger">@Model.Bookmaker.ToString().ToLower().Substring(0, 2) </small>
 </div>

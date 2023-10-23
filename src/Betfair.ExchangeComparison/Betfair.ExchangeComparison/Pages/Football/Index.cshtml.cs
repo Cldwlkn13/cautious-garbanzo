@@ -46,7 +46,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
             {
                 try
                 {
-                    var exchangeEventWithMarketBooks = marketBooks.FirstOrDefault(e => e.Key.Id == @event.Id);
+                    var exchangeEventWithMarketBooks = marketBooks.FirstOrDefault(e => e.Key.Id == @event.Event.Id);
 
                     if (exchangeEventWithMarketBooks.Key == null)
                     {
@@ -122,11 +122,12 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                 {
                                     bestWinRunners.Add(new BestRunner()
                                     {
-                                        Event = @event,
+                                        Competition = @event.Competition,
+                                        Event = @event.Event,
                                         MarketDetail = marketDetail,
                                         SportsbookRunner = sportsbookRunner,
                                         WinnerOddsString = winnerOddsString,
-                                        ExpectedValue = expectedValueWin,
+                                        ExpectedValueWin = expectedValueWin,
                                         ExchangeWinBestBlue = bestBlueWin!.Value,
                                         ExchangeWinBestPink = bestPinkWin!.Value,
                                         ExchangeWinBestPinkSize = bestPinkWinSize!.Value
@@ -151,7 +152,7 @@ namespace Betfair.ExchangeComparison.Pages.Football
                             }
                         }
 
-                        var vm = new MarketViewModel(@event);
+                        var vm = new MarketViewModel(@event.Event);
                         vm.SportsbookMarket = marketDetail;
                         vm.Runners = runners.OrderBy(r => r.SportsbookRunner.winRunnerOdds.@decimal);
                         vm.WinOverround = winOverround;

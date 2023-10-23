@@ -8,37 +8,47 @@ namespace Betfair.ExchangeComparison
     public class Worker : BackgroundService
     {
         private readonly ICatalogService _catalogService;
-        private readonly IScrapingHandler _scrapingHandler;
+        private readonly IScrapingOrchestrator _scrapingOrchestrator;
+        private readonly IScrapingControl _scrapingControl;
 
-        public Worker(ICatalogService catalogService, IScrapingHandler scrapingHandler)
+        public Worker(ICatalogService catalogService, IScrapingOrchestrator scrapingOrchestrator, IScrapingControl scrapingControl)
         {
             _catalogService = catalogService;
-            _scrapingHandler = scrapingHandler;
+            _scrapingOrchestrator = scrapingOrchestrator;
+            _scrapingControl = scrapingControl;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //var catalog = _catalogService.GetCompoundCatalog(Sport.Racing);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                foreach (var bm in _scrapingControl.SwitchBoard.Keys)
+                {
+                    if (_scrapingControl.SwitchBoard[bm])
+                    {
+                        var catalog = _catalogService.UpdateCatalog(Sport.Racing)
+                            .Where(e =>
+                                !e.SportsbookMarket.inplay &&
+                                e.SportsbookMarket.marketStatus == "OPEN");
 
-            //while (!stoppingToken.IsCancellationRequested)
-            //{
-            //    catalog = _catalogService.UpdateCompoundCatalog(Sport.Racing);
+                        if (catalog.Any())
+                        {
+                            await _scrapingOrchestrator.Orchestrate(catalog, bm);
+                        }
+                        else
+                        {
+                            var wait = 60000 * 60;
 
-            //    if (catalog.Any())
-            //    {
-            //        await _scrapingHandler.Handle(catalog);
+                            Console.WriteLine($"Worker : ExecuteAsync() Waiting {wait / 60 / 1000} " +
+                                $"minutes before trying again");
 
-            //        await Task.Delay(10000, stoppingToken);
-            //    }
-            //    else
-            //    {
-            //        var wait = 60000 * 60;
+                            await Task.Delay(wait, stoppingToken);
+                        }
+                    }
+                }
 
-            //        Console.WriteLine($"Worker : ExecuteAsync() Waiting {wait / 60 / 1000} minutes before trying again");
-
-            //        await Task.Delay(wait, stoppingToken);
-            //    }
-            //}
+                await Task.Delay(10000, stoppingToken);
+            }
         }
     }
 }

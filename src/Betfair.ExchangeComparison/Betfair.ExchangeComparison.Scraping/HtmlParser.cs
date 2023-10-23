@@ -12,7 +12,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         {
         }
 
-        public ScrapedEvent BuildScrapedEvent(string html, CompoundEventWithMarketDetail compoundObj)
+        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
         {
             throw new NotImplementedException();
         }

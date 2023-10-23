@@ -14,12 +14,13 @@ namespace Betfair.ExchangeComparison.Sportsbook.Interfaces
 
         bool SessionValid();
 
-        IList<EventTypeResult> ListEventTypes();
-        IList<CompetitionResult> ListCompetitions();
-        IList<EventResult> ListEventsByEventType(string eventTypeId = "7");
-        IList<MarketTypeResult> ListMarketTypes();
-        IList<MarketCatalogue> ListMarketCatalogues(ISet<string> eventIds, string eventTypeId = "7");
-        MarketDetails ListPrices(IList<string> marketIds);
+        IEnumerable<EventTypeResult> ListEventTypes();
+        IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7");
+        IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7");
+        Dictionary<Competition, List<Event>> ListEventsByCompetition(string eventTypeId, IEnumerable<Competition> competitions);
+        IEnumerable<MarketTypeResult> ListMarketTypes();
+        IEnumerable<MarketCatalogue> ListMarketCatalogues(ISet<string> eventIds, string eventTypeId = "7");
+        MarketDetails ListPrices(IEnumerable<string> marketIds);
     }
 }
 

@@ -1,38 +1,107 @@
 ﻿using Betfair.ExchangeComparison.Scraping.Interfaces;
+using Betfair.ExchangeComparison.Scraping.Settings;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RestSharp;
 
 namespace Betfair.ExchangeComparison.Scraping
 {
     public class ScrapingClient : IScrapingClient
     {
-        public ILogger<ScrapingClient> _logger;
+        private readonly ILogger<ScrapingClient> _logger;
+        private readonly IOptions<ScrapingSettings> _settings;
 
-        public ScrapingClient(ILogger<ScrapingClient> logger)
+        private string ZenRowsApiKey { get; set; }
+
+        public ScrapingClient(ILogger<ScrapingClient> logger, IOptions<ScrapingSettings> settings)
         {
             _logger = logger;
+            _settings = settings;
+
+            ZenRowsApiKey = Environment.GetEnvironmentVariable("ZENROWS_API_KEY") != null ?
+                Environment.GetEnvironmentVariable("ZENROWS_API_KEY")! :
+                settings.Value.ZENROWS_API_KEY!;
         }
 
-        public async Task<string> Scrape(string url)
+        public string Scrape(string url)
         {
-            HttpClient webClient = new HttpClient();
-            webClient.DefaultRequestHeaders.UserAgent.ParseAdd(
-                "Mozilla/5.0 (iPad; CPU OS 12_2 like Mac OS X) " +
-                "AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148");
+            //var options = new RestClientOptions()
+            //{
+            //    Proxy = new WebProxy()
+            //    {
+            //        Address = new Uri("http://proxy.zenrows.com:8001"),
+            //        Credentials = new NetworkCredential("{ZenRowsApiKey}", "")
+            //    },
+            //    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
+            //    MaxTimeout = 10000
+            //};
+
+            var client = new RestClient($"https://api.zenrows.com/v1/?apikey={ZenRowsApiKey}&url={url}");
+            var request = new RestRequest();
 
             string html = string.Empty;
             try
             {
-                var result = await webClient.GetStringAsync(url);
+                var result = client.Get(request);
 
-                return result;
+                return result.Content == null ? "" : result.Content;
             }
             catch (Exception exception)
             {
-                //_logger.LogError($"SCRAPE_RESPONSE_FAILED url={url}", exception);
-
-                Console.WriteLine($"SCRAPE_RESPONSE_FAILED url={url} Exception={exception}");
+                Console.WriteLine($"SCRAPE_RESPONSE_FAILED url={url} Exception={exception.Message}");
 
                 return string.Empty;
+            }
+        }
+
+        public async Task<string> ScrapeAsync(string url)
+        {
+            //var options = new RestClientOptions()
+            //{
+            //    Proxy = new WebProxy()
+            //    {
+            //        Address = new Uri("http://proxy.zenrows.com:8001"),
+            //        Credentials = new NetworkCredential("{ZenRowsApiKey}", "")
+            //    },
+            //    RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true,
+            //    MaxTimeout = 10000
+            //};
+
+            var client = new RestClient($"https://api.zenrows.com/v1/?apikey={ZenRowsApiKey}&url={url}");
+            var request = new RestRequest();
+
+            string html = string.Empty;
+            try
+            {
+                var result = await client.GetAsync(request);
+
+                return result.Content == null ? "" : result.Content;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"SCRAPE_RESPONSE_FAILED url={url} Exception={exception.Message}");
+
+                return string.Empty;
+            }
+        }
+
+        public async Task Usage()
+        {
+            var client = new RestClient($"https://api.zenrows.com/v1/usage?apikey={ZenRowsApiKey}");
+            var request = new RestRequest();
+
+            string html = string.Empty;
+            try
+            {
+                var result = await client.GetAsync(request);
+
+                var content = result.Content == null ? "" : result.Content;
+
+                Console.WriteLine($"{content}");
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"USAGE_RESPONSE_FAILED Exception={exception.Message}");
             }
         }
     }

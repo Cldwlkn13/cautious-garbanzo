@@ -80,7 +80,9 @@ namespace Betfair.ExchangeComparison.Exchange
             var time = new TimeRange()
             {
                 From = DateTime.Now,
-                To = eventTypeId == "7" ? DateTime.Today.AddDays(1) : DateTime.Now.AddHours(3)
+                To = eventTypeId == "7" ?
+                    DateTime.Today.AddDays(_options.Value.RacingQueryToDays) :
+                    DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
             };
 
             var marketFilter = new MarketFilter();
@@ -110,7 +112,9 @@ namespace Betfair.ExchangeComparison.Exchange
             if (timeRange == null)
             {
                 time.From = DateTime.Now;
-                time.To = eventTypeId == "7" ? DateTime.Today.AddDays(1) : DateTime.Now.AddHours(3);
+                time.To = eventTypeId == "7" ?
+                    DateTime.Today.AddDays(_options.Value.RacingQueryToDays) :
+                    DateTime.Now.AddHours(_options.Value.FootballQueryToHours);
             }
             else
             {
@@ -166,7 +170,11 @@ namespace Betfair.ExchangeComparison.Exchange
             //as an example we requested runner metadata 
             PriceProjection priceProjection = new PriceProjection()
             {
-                PriceData = new HashSet<PriceData> { PriceData.EX_BEST_OFFERS, PriceData.EX_TRADED },
+                PriceData = new HashSet<PriceData>
+                {
+                    PriceData.EX_BEST_OFFERS,
+                    PriceData.EX_TRADED
+                },
             };
 
             var marketBooks = _exchangeClient!.ListMarketBook(

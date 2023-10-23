@@ -4,6 +4,7 @@ using Betfair.ExchangeComparison.Exchange.Settings;
 using Betfair.ExchangeComparison.Sportsbook.Clients;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
+using Betfair.ExchangeComparison.Sportsbook.Settings;
 using Microsoft.Extensions.Options;
 
 namespace Betfair.ExchangeComparison.Sportsbook;
@@ -11,11 +12,11 @@ namespace Betfair.ExchangeComparison.Sportsbook;
 public class SportsbookHandler : ISportsbookHandler
 {
     private readonly IAuthClient _authClient;
-    private readonly IOptions<ExchangeSettings> _options;
+    private readonly IOptions<SportsbookSettings> _options;
     private readonly IOptions<LoginSettings> _logins;
     private ISportsbookClient? _client;
 
-    public SportsbookHandler(IAuthClient authClient, IOptions<ExchangeSettings> options, IOptions<LoginSettings> logins)
+    public SportsbookHandler(IAuthClient authClient, IOptions<SportsbookSettings> options, IOptions<LoginSettings> logins)
     {
         _authClient = authClient;
         _options = options;
@@ -54,8 +55,11 @@ public class SportsbookHandler : ISportsbookHandler
         Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
             $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
 
-        _client = new SportsbookClient(
-            _options.Value.SportsbookUrl, AppKey, SessionToken);
+        var url = _options.Value.UseBetfair ?
+            _options.Value.UrlBetfair :
+            _options.Value.UrlPaddyPower;
+
+        _client = new SportsbookClient(url, AppKey, SessionToken);
 
         return SessionValid();
     }
@@ -66,7 +70,7 @@ public class SportsbookHandler : ISportsbookHandler
             DateTime.UtcNow < TokenExpiry;
     }
 
-    public IList<EventTypeResult> ListEventTypes()
+    public IEnumerable<EventTypeResult> ListEventTypes()
     {
         var marketFilter = new MarketFilter();
 
@@ -76,15 +80,15 @@ public class SportsbookHandler : ISportsbookHandler
         return eventTypes;
     }
 
-    public IList<CompetitionResult> ListCompetitions(string eventTypeId = "7")
+    public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7")
     {
-        var competitions = _client?.ListCompetitions(eventTypeId, DateTime.Today, DateTime.Today.AddDays(1)) ??
+        var competitions = _client?.ListCompetitions(eventTypeId, DateTime.Now, DateTime.Now.AddHours(3)) ??
             throw new NullReferenceException($"Competitions null.");
 
         return competitions;
     }
 
-    public IList<EventResult> ListEventsByEventType(string eventTypeId = "7")
+    public IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7")
     {
         var time = new TimeRange();
         switch (eventTypeId)
@@ -93,14 +97,14 @@ public class SportsbookHandler : ISportsbookHandler
                 time = new TimeRange()
                 {
                     From = DateTime.Today,
-                    To = DateTime.Today.AddDays(1)
+                    To = DateTime.Today.AddDays(_options.Value.RacingQueryToDays)
                 };
                 break;
             case "1":
                 time = new TimeRange()
                 {
                     From = DateTime.Now,
-                    To = DateTime.Now.AddHours(6)
+                    To = DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
                 };
                 break;
         }
@@ -108,10 +112,49 @@ public class SportsbookHandler : ISportsbookHandler
         var events = _client?.ListEventsByEventType(eventTypeId, time) ??
             throw new NullReferenceException($"Events null.");
 
-        return events;
+        return events.Select(e => e.Event);
     }
 
-    public IList<MarketTypeResult> ListMarketTypes()
+    public Dictionary<Competition, List<Event>> ListEventsByCompetition(string eventTypeId, IEnumerable<Competition> competitions)
+    {
+        var result = new Dictionary<Competition, List<Event>>();
+
+        var time = new TimeRange();
+        switch (eventTypeId)
+        {
+            case "7":
+                time = new TimeRange()
+                {
+                    From = DateTime.Today,
+                    To = DateTime.Today.AddDays(_options.Value.RacingQueryToDays)
+                };
+                break;
+            case "1":
+                time = new TimeRange()
+                {
+                    From = DateTime.Now,
+                    To = DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
+                };
+                break;
+        }
+
+        foreach (var competition in competitions)
+        {
+            var eventsInCompetition = _client?.ListEventsByCompetition(competition, time).Select(e => e.Event) ??
+                throw new NullReferenceException($"Events in Competition={competition.Name} null.");
+
+            result.Add(competition, new List<Event>());
+
+            foreach (var eventInCompetition in eventsInCompetition)
+            {
+                result[competition].Add(eventInCompetition);
+            }
+        }
+
+        return result;
+    }
+
+    public IEnumerable<MarketTypeResult> ListMarketTypes()
     {
         var marketTypes = _client?.ListMarketTypes("7") ??
             throw new NullReferenceException($"Events null.");
@@ -119,7 +162,7 @@ public class SportsbookHandler : ISportsbookHandler
         return marketTypes;
     }
 
-    public IList<MarketCatalogue> ListMarketCatalogues(ISet<string> eventIds, string eventTypeId = "7")
+    public IEnumerable<MarketCatalogue> ListMarketCatalogues(ISet<string> eventIds, string eventTypeId = "7")
     {
         var marketTypes = new List<string>();
 
@@ -129,7 +172,14 @@ public class SportsbookHandler : ISportsbookHandler
                 marketTypes = new List<string>() { "WIN" };
                 break;
             case "1":
-                marketTypes = new List<string>() { "MATCH_ODDS", "OVER_UNDER_15", "OVER_UNDER_25", "OVER_UNDER_35", "BOTH_TEAMS_TO_SCORE" };
+                marketTypes = new List<string>()
+                {
+                    "MATCH_ODDS",
+                    "OVER_UNDER_15",
+                    "OVER_UNDER_25",
+                    "OVER_UNDER_35",
+                    "BOTH_TEAMS_TO_SCORE"
+                };
                 break;
         }
 
@@ -145,17 +195,12 @@ public class SportsbookHandler : ISportsbookHandler
         return marketCatalogues;
     }
 
-    public MarketDetails ListPrices(IList<string> marketIds)
+    public MarketDetails ListPrices(IEnumerable<string> marketIds)
     {
         var prices = _client?.ListMarketPrices(marketIds) ??
             throw new NullReferenceException($"Prices null.");
 
         return prices;
-    }
-
-    public IList<CompetitionResult> ListCompetitions()
-    {
-        throw new NotImplementedException();
     }
 }
 

@@ -4,13 +4,13 @@ using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
-    public class CompoundEventWithMarketDetail
+    public class MarketDetailWithEvent
     {
-        public CompoundEventWithMarketDetail()
+        public MarketDetailWithEvent()
         {
         }
 
-        public Event Event { get; set; }
+        public EventWithCompetition EventWithCompetition { get; set; }
         public MarketDetail SportsbookMarket { get; set; }
     }
 }

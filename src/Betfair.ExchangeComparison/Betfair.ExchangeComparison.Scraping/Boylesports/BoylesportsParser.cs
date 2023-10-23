@@ -13,7 +13,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         {
         }
 
-        public new ScrapedEvent BuildScrapedEvent(string html, CompoundEventWithMarketDetail compoundObj)
+        public new ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
                 var scrapedEvent = new ScrapedEvent();
                 scrapedEvent.MappedEvent = compoundObj;
-                scrapedEvent.Name = compoundObj.Event.Venue;
+                scrapedEvent.Name = compoundObj.EventWithCompetition.Event.Venue;
                 scrapedEvent.StartTime = compoundObj.SportsbookMarket.marketStartTime
                     .ConvertUtcToBritishIrishLocalTime();
                 scrapedEvent.ScrapedMarkets.Add(scrapedMarket);
@@ -62,7 +62,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Exception={exception} on BuildScrapedEvent; {compoundObj.Event.Name} " +
+                Console.WriteLine($"Exception={exception} on BuildScrapedEvent; {compoundObj.EventWithCompetition.Event.Name} " +
                     $"{compoundObj.SportsbookMarket.marketName} {compoundObj.SportsbookMarket.marketStartTime}");
 
                 return new ScrapedEvent();

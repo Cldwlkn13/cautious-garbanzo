@@ -109,7 +109,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return result;
         }
 
-        public IList<EventTypeResult> ListEventTypes(MarketFilter marketFilter, string? locale = null)
+        public IEnumerable<EventTypeResult> ListEventTypes(MarketFilter marketFilter, string? locale = null)
         {
             var obj = new
             {
@@ -122,7 +122,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return Invoke<List<EventTypeResult>>(LIST_EVENT_TYPES_METHOD, obj);
         }
 
-        public IList<CompetitionResult> ListCompetitions(string eventTypeId, DateTime dateFrom, DateTime dateTo, string locale = null)
+        public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId, DateTime dateFrom, DateTime dateTo, string locale = null)
         {
             var obj = new
             {
@@ -143,7 +143,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return Invoke<List<CompetitionResult>>(LIST_COMPETITIONS_METHOD, obj);
         }
 
-        public IList<EventResult> ListEventsByEventType(string eventTypeId, TimeRange timeRange)
+        public IEnumerable<EventResult> ListEventsByEventType(string eventTypeId, TimeRange timeRange)
         {
             var obj = new
             {
@@ -160,7 +160,24 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return Invoke<List<EventResult>>(LIST_EVENTS_METHOD, obj);
         }
 
-        public MarketDetails ListMarketPrices(IList<string> marketIds)
+        public IEnumerable<EventResult> ListEventsByCompetition(Competition competition, TimeRange timeRange)
+        {
+            var obj = new
+            {
+                listEventsRequestParams = new ListEventsRequestParams()
+                {
+                    MarketFilter = new SportsbookMarketFilter()
+                    {
+                        CompetitionIds = new HashSet<string>() { competition.Id },
+                        TimeRange = timeRange
+                    }
+                }
+            };
+
+            return Invoke<List<EventResult>>(LIST_EVENTS_METHOD, obj);
+        }
+
+        public MarketDetails ListMarketPrices(IEnumerable<string> marketIds)
         {
             MarketDetails marketDetails = new MarketDetails() { marketDetails = new List<MarketDetail>() };
 
@@ -185,7 +202,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return marketDetails;
         }
 
-        public IList<MarketCatalogue> ListMarketCatalogue(SportsbookMarketFilter marketFilter, string maxResults = "1", string? locale = null)
+        public IEnumerable<MarketCatalogue> ListMarketCatalogue(SportsbookMarketFilter marketFilter, string maxResults = "1", string? locale = null)
         {
             var obj = new
             {
@@ -199,7 +216,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return Invoke<List<MarketCatalogue>>(LIST_MARKET_CATALOGUE_METHOD, obj);
         }
 
-        public IList<MarketTypeResult> ListMarketTypes(string eventTypeId)
+        public IEnumerable<MarketTypeResult> ListMarketTypes(string eventTypeId)
         {
             var obj = new
             {

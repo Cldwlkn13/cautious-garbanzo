@@ -10,21 +10,21 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
     public class BoylesportsHandler : IBoylesportsHandler
     {
         private readonly ILogger<BoylesportsHandler> _logger;
-        private readonly IScrapingClient _scraper;
+        private readonly IScrapingClient _scrapingClient;
         private readonly IBoylesportsParser _parser;
 
-        public BoylesportsHandler(ILogger<BoylesportsHandler> logger, IScrapingClient scraper, IBoylesportsParser parser)
+        public BoylesportsHandler(ILogger<BoylesportsHandler> logger, IScrapingClient scrapingClient, IBoylesportsParser parser)
         {
             _logger = logger;
-            _scraper = scraper;
+            _scrapingClient = scrapingClient;
             _parser = parser;
         }
 
-        public async Task<ScrapedEvent> Handle(CompoundEventWithMarketDetail @event)
+        public async Task<ScrapedEvent> Handle(MarketDetailWithEvent @event)
         {
             var url = UrlBuilder(@event);
 
-            var html = await _scraper.Scrape(url);
+            var html = _scrapingClient.Scrape(url);
 
             if (string.IsNullOrEmpty(html))
             {
@@ -34,18 +34,17 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
             var scrapedEvent = _parser.BuildScrapedEvent(html, @event);
 
-            Console.WriteLine($"Event={@event.Event.Name} {@event.SportsbookMarket.marketStartTime} successfully scraped!");
-
-            await Task.Delay(500);
+            Console.WriteLine($"Event={@event.EventWithCompetition.Event.Name} " +
+                $"{@event.SportsbookMarket.marketStartTime} successfully scraped!");
 
             return scrapedEvent;
         }
 
-        private static string UrlBuilder(CompoundEventWithMarketDetail compoundObj)
+        private static string UrlBuilder(MarketDetailWithEvent compoundObj)
         {
             string baseUrl = "https://www.boylesports.com/sports/horse-racing/uk-ire-featured"; //e.g. 201023/redcar/13:35
 
-            var name = compoundObj.Event.Venue;
+            var name = compoundObj.EventWithCompetition.Event.Venue;
 
             var date = compoundObj.SportsbookMarket.marketStartTime
                 .ConvertUtcToBritishIrishLocalTime()
@@ -59,6 +58,10 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
             return url;
         }
+
+        public async Task Usage() =>
+            await _scrapingClient.Usage();
+
     }
 }
 

@@ -7,7 +7,7 @@ namespace Betfair.ExchangeComparison.Scraping.Interfaces
 {
     public interface IHtmlParser
     {
-        ScrapedEvent BuildScrapedEvent(string html, CompoundEventWithMarketDetail compoundObj);
+        ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj);
     }
 }
 
