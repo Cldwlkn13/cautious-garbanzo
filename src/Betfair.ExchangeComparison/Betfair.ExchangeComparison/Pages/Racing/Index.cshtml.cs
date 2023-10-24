@@ -72,15 +72,17 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
             SelectListBookmakers.FirstOrDefault(bm => bm.Text == bookmaker.ToString())!.Selected = true;
 
-            if (!IsScrapable.Contains(bookmaker))
+            foreach (var bm in _scrapingControl.SwitchBoard.Keys
+                .Where(b => b != bookmaker))
             {
-                if (_scrapingControl.SwitchBoard[bookmaker])
+                if (_scrapingControl.SwitchBoard[bm])
                 {
-                    Console.WriteLine($"Stopping {bookmaker} scraping!");
-                    _scrapingControl.Stop(bookmaker);
+                    Console.WriteLine($"Stopping {bm} scraping!");
+                    _scrapingControl.Stop(bm);
                 }
             }
-            else if (bookmaker == Bookmaker.Boylesports)
+
+            if (IsScrapable.Contains(bookmaker) && !_scrapingControl.SwitchBoard[bookmaker])
             {
                 Console.WriteLine($"Starting {bookmaker} scraping!");
                 _scrapingControl.Start(bookmaker);
