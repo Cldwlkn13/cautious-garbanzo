@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using Polly;
 using Polly.Retry;
 using RestSharp;
-using static System.Net.WebRequestMethods;
 
 namespace Betfair.ExchangeComparison.Scraping
 {
@@ -69,7 +68,7 @@ namespace Betfair.ExchangeComparison.Scraping
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"SCRAPE_RESPONSE_FAILED url={url} Exception={exception.Message}");
+                Console.WriteLine($"SCRAPE_RESPONSE_COMPLETE_FAILURE url={url} Exception={exception.Message}");
 
                 return string.Empty;
             }
@@ -109,9 +108,9 @@ namespace Betfair.ExchangeComparison.Scraping
                      .WaitAndRetryAsync(_maxRetryAttempts, x => _pauseBetweenFailures,
                          (iRestResponse, timeSpan, retryCount, context) =>
                          {
-                             Console.WriteLine($"SCRAPE_RESPONSE_FAILED " +
+                             Console.WriteLine($"SCRAPE_RESPONSE_FAILED; " +
                                  $"HttpStatusCode={iRestResponse.Result.StatusCode}. " +
-                                 $"Waiting {timeSpan} seconds before retry. " +
+                                 $"Waiting {timeSpan.TotalSeconds} seconds before retry. " +
                                  $"Number attempt {retryCount}. " +
                                  $"Uri={iRestResponse.Result.ResponseUri}; " +
                                  $"RequestResponse={iRestResponse.Result.Content}");
