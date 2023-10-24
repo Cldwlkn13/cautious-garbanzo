@@ -24,7 +24,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         {
             var url = UrlBuilder(@event);
 
-            var html = await _scrapingClient.ScrapeAsync(url);
+            var html = await _scrapingClient.ScrapeAsync(url, jsRender: true, antiBot: false);
 
             if (string.IsNullOrEmpty(html))
             {

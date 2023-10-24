@@ -138,12 +138,34 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                     continue;
                                 }
 
+                                ScrapedMarket mappedScrapedMarket = new ScrapedMarket();
+                                int numberOfPlaces = 0;
+                                int eachWayFraction = 0;
+                                if (IsScrapable.Contains(bookmaker))
+                                {
+                                    if (!_mappingService.TryMapScrapedMarket(mappedScrapedEvent, out mappedScrapedMarket))
+                                    {
+                                        Console.WriteLine($"SCRAPED_MARKET_MAPPING_FAIL; " +
+                                            $"Event={@event.Event.Name}; " +
+                                            $"Market={marketDetail.marketName} {marketDetail.marketStartTime}");
+
+                                        numberOfPlaces = marketDetail.numberOfPlaces;
+                                        eachWayFraction = marketDetail.placeFractionDenominator;
+
+                                    }
+                                    else
+                                    {
+                                        numberOfPlaces = mappedScrapedMarket.ScrapedEachWayTerms.NumberOfPlaces;
+                                        eachWayFraction = mappedScrapedMarket.ScrapedEachWayTerms.EachWayFraction;
+                                    }
+                                }
+
                                 if (!_mappingService.TryMapMarketBook(eventMarketBooks, 1, out MarketBook mappedWinMarketBook))
                                 {
                                     continue;
                                 }
 
-                                if (!_mappingService.TryMapMarketBook(eventMarketBooks, marketDetail.numberOfPlaces, out MarketBook mappedPlaceMarketBook))
+                                if (!_mappingService.TryMapMarketBook(eventMarketBooks, numberOfPlaces, out MarketBook mappedPlaceMarketBook))
                                 {
                                     continue;
                                 }
@@ -155,23 +177,20 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                 foreach (var sportsbookRunner in marketDetail.runnerDetails)
                                 {
                                     var scrapedRunnerIsValid = false;
-                                    ScrapedMarket mappedScrapedMarket = new ScrapedMarket();
                                     ScrapedRunner mappedScrapedRunner = new ScrapedRunner();
 
                                     try
                                     {
                                         if (IsScrapable.Contains(bookmaker))
                                         {
-                                            if (_mappingService.TryMapScrapedMarket(mappedScrapedEvent, out mappedScrapedMarket))
+                                            if (_mappingService.TryMapScrapedRunner(mappedScrapedMarket, sportsbookRunner, out mappedScrapedRunner))
                                             {
-                                                if (_mappingService.TryMapScrapedRunner(mappedScrapedMarket, sportsbookRunner, out mappedScrapedRunner))
+                                                if (mappedScrapedEvent.ScrapedAt > DateTime.UtcNow.AddSeconds(-90))
                                                 {
-                                                    if (mappedScrapedEvent.ScrapedAt > DateTime.UtcNow.AddSeconds(-90))
-                                                    {
-                                                        scrapedRunnerIsValid = true;
-                                                    }
+                                                    scrapedRunnerIsValid = true;
                                                 }
                                             }
+
                                         }
                                     }
                                     catch (System.Exception exception)
