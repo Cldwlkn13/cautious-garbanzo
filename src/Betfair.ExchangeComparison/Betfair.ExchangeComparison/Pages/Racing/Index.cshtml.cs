@@ -159,6 +159,11 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                         eachWayFraction = mappedScrapedMarket.ScrapedEachWayTerms.EachWayFraction;
                                     }
                                 }
+                                else
+                                {
+                                    numberOfPlaces = marketDetail.numberOfPlaces;
+                                    eachWayFraction = marketDetail.placeFractionDenominator;
+                                }
 
                                 if (!_mappingService.TryMapMarketBook(eventMarketBooks, 1, out MarketBook mappedWinMarketBook))
                                 {
@@ -302,9 +307,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                     }
                 }
 
-                var usageModel = IsScrapable.Contains(bookmaker) ?
-                    await _scrapingOrchestrator.Usage() :
-                    new UsageModel();
+                var usageModel = await _scrapingOrchestrator.Usage();
 
                 CatalogViewModel.Markets = marketViewModels;
                 CatalogViewModel.BestWinRunners = bestWinRunners;
