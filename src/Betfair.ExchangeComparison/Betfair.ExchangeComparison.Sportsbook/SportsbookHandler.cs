@@ -35,6 +35,17 @@ public class SportsbookHandler : ISportsbookHandler
         AppKey = Environment.GetEnvironmentVariable("APP_KEY") != null ?
             Environment.GetEnvironmentVariable("APP_KEY")! :
             logins.Value.APP_KEY!;
+
+        if (!SessionValid())
+        {
+            Login();
+
+            var url = _options.Value.UseBetfair ?
+                _options.Value.UrlBetfair :
+                _options.Value.UrlPaddyPower;
+
+            _client = new SportsbookClient(url, AppKey, SessionToken);
+        }
     }
 
     public string SessionToken { get; private set; }
@@ -44,7 +55,7 @@ public class SportsbookHandler : ISportsbookHandler
     private string Username { get; set; }
     private string Password { get; set; }
 
-    public bool Login(string username, string password)
+    public bool Login(string username = "", string password = "")
     {
         var loginResult = _authClient.Login(Username, Password) ??
             throw new NullReferenceException($"Login Failed");
@@ -54,12 +65,6 @@ public class SportsbookHandler : ISportsbookHandler
 
         Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
             $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
-
-        var url = _options.Value.UseBetfair ?
-            _options.Value.UrlBetfair :
-            _options.Value.UrlPaddyPower;
-
-        _client = new SportsbookClient(url, AppKey, SessionToken);
 
         return SessionValid();
     }
@@ -80,33 +85,68 @@ public class SportsbookHandler : ISportsbookHandler
         return eventTypes;
     }
 
-    public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7")
+    public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7", TimeRange? timeRange = null)
     {
-        var competitions = _client?.ListCompetitions(eventTypeId, DateTime.Now, DateTime.Now.AddHours(3)) ??
+        var time = new TimeRange();
+
+        if (timeRange == null)
+        {
+            switch (eventTypeId)
+            {
+                case "7":
+                    time = new TimeRange()
+                    {
+                        From = DateTime.Today,
+                        To = DateTime.Today.AddDays(_options.Value.RacingQueryToDays)
+                    };
+                    break;
+                case "1":
+                    time = new TimeRange()
+                    {
+                        From = DateTime.Now,
+                        To = DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
+                    };
+                    break;
+            }
+        }
+        else
+        {
+            time = timeRange;
+        }
+
+        var competitions = _client?.ListCompetitions(eventTypeId, time) ??
             throw new NullReferenceException($"Competitions null.");
 
         return competitions;
     }
 
-    public IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7")
+    public IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7", TimeRange? timeRange = null)
     {
         var time = new TimeRange();
-        switch (eventTypeId)
+
+        if (timeRange == null)
         {
-            case "7":
-                time = new TimeRange()
-                {
-                    From = DateTime.Today,
-                    To = DateTime.Today.AddDays(_options.Value.RacingQueryToDays)
-                };
-                break;
-            case "1":
-                time = new TimeRange()
-                {
-                    From = DateTime.Now,
-                    To = DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
-                };
-                break;
+            switch (eventTypeId)
+            {
+                case "7":
+                    time = new TimeRange()
+                    {
+                        From = DateTime.Today,
+                        To = DateTime.Today.AddDays(_options.Value.RacingQueryToDays)
+                    };
+                    break;
+                case "1":
+                    time = new TimeRange()
+                    {
+                        From = DateTime.Now,
+                        To = DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
+                    };
+                    break;
+            }
+        }
+        else
+        {
+            time = timeRange;
         }
 
         var events = _client?.ListEventsByEventType(eventTypeId, time) ??
@@ -115,7 +155,7 @@ public class SportsbookHandler : ISportsbookHandler
         return events.Select(e => e.Event);
     }
 
-    public Dictionary<Competition, List<Event>> ListEventsByCompetition(string eventTypeId, IEnumerable<Competition> competitions)
+    public Dictionary<Competition, List<Event>> ListEventsByCompetition(string eventTypeId, IEnumerable<Competition> competitions, TimeRange? timeRange = null)
     {
         var result = new Dictionary<Competition, List<Event>>();
 

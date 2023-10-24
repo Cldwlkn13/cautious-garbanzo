@@ -1,6 +1,7 @@
 ﻿using System;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 
 namespace Betfair.ExchangeComparison
@@ -26,10 +27,7 @@ namespace Betfair.ExchangeComparison
                 {
                     if (_scrapingControl.SwitchBoard[bm])
                     {
-                        var catalog = _catalogService.UpdateCatalog(Sport.Racing)
-                            .Where(e =>
-                                !e.SportsbookMarket.inplay &&
-                                e.SportsbookMarket.marketStatus == "OPEN");
+                        var catalog = _catalogService.UpdateCatalog(Sport.Racing);
 
                         if (catalog.Any())
                         {

@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Exchange.Clients;
+﻿using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Exchange.Clients;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Exchange.Settings;
@@ -33,6 +34,14 @@ namespace Betfair.ExchangeComparison.Exchange
             AppKey = Environment.GetEnvironmentVariable("APP_KEY") != null ?
                 Environment.GetEnvironmentVariable("APP_KEY")! :
                 logins.Value.APP_KEY!;
+
+            if (!SessionValid())
+            {
+                Login();
+
+                _exchangeClient = new ExchangeClient(
+                    _options.Value.Url, AppKey, SessionToken);
+            }
         }
 
         public string SessionToken { get; private set; }
@@ -42,7 +51,7 @@ namespace Betfair.ExchangeComparison.Exchange
         private string Username { get; set; }
         private string Password { get; set; }
 
-        public bool Login(string username, string password)
+        public bool Login(string username = "", string password = "")
         {
             var loginResult = _authClient.Login(Username, Password) ??
                 throw new NullReferenceException($"Login Failed");
@@ -52,9 +61,6 @@ namespace Betfair.ExchangeComparison.Exchange
 
             Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
                 $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
-
-            _exchangeClient = new ExchangeClient(
-                _options.Value.Url, AppKey, SessionToken);
 
             return !string.IsNullOrEmpty(SessionToken);
         }
@@ -75,21 +81,29 @@ namespace Betfair.ExchangeComparison.Exchange
             return eventTypes;
         }
 
-        public IList<EventResult> ListEvents(string eventTypeId = "7")
+        public IList<EventResult> ListEvents(string eventTypeId = "7", TimeRange? timeRange = null)
         {
-            var time = new TimeRange()
+            var time = new TimeRange();
+
+            if (timeRange == null)
             {
-                From = DateTime.Now,
-                To = eventTypeId == "7" ?
+                time = new TimeRange()
+                {
+                    From = DateTime.Now,
+                    To = eventTypeId == "7" ?
                     DateTime.Today.AddDays(_options.Value.RacingQueryToDays) :
                     DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
-            };
+                };
+            }
+            else
+            {
+                time = timeRange;
+            }
 
             var marketFilter = new MarketFilter();
             marketFilter.EventTypeIds = new List<string> { eventTypeId }.ToHashSet();
             marketFilter.MarketStartTime = time;
-            var marketSort = MarketSort.FIRST_TO_START;
-            var maxResults = "1000";
+            marketFilter.MarketCountries = eventTypeId.CountryCodes();
 
             var events = _exchangeClient?.ListEvents(marketFilter) ??
                 throw new NullReferenceException($"Events null.");
@@ -121,34 +135,9 @@ namespace Betfair.ExchangeComparison.Exchange
                 time = timeRange;
             }
 
-            switch (eventTypeId)
-            {
-                case "7":
-                    marketFilter.MarketCountries = new HashSet<string>()
-                    {
-                        "GB",
-                        "IE"
-                    };
-                    marketFilter.MarketTypeCodes = new HashSet<String>()
-                    {
-                        "WIN",
-                        "PLACE",
-                        "OTHER_PLACE"
-                    };
-                    break;
-                case "1":
-                    marketFilter.MarketTypeCodes = new HashSet<String>()
-                    {
-                        "MATCH_ODDS",
-                        "OVER_UNDER_15",
-                        "OVER_UNDER_25",
-                        "OVER_UNDER_35",
-                        "BOTH_TEAMS_TO_SCORE"
-                    };
-                    break;
-            }
-
             marketFilter.MarketStartTime = time;
+            marketFilter.MarketCountries = eventTypeId.CountryCodes();
+            marketFilter.MarketTypeCodes = eventTypeId.MarketTypes();
             var marketSort = MarketSort.FIRST_TO_START;
             var maxResults = "1000";
 
@@ -156,8 +145,6 @@ namespace Betfair.ExchangeComparison.Exchange
             ISet<MarketProjection> marketProjections = new HashSet<MarketProjection>();
             marketProjections.Add(MarketProjection.EVENT);
             marketProjections.Add(MarketProjection.MARKET_DESCRIPTION);
-            //marketProjections.Add(MarketProjection.RUNNER_METADATA);
-            //marketProjections.Add(MarketProjection.RUNNER_DESCRIPTION);
 
             var marketCatalogues = _exchangeClient!.ListMarketCatalogue(
                 marketFilter, marketProjections, marketSort, maxResults);

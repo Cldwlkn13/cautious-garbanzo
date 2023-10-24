@@ -74,6 +74,13 @@
     </div>
 </div>
 
+<div>
+    @if (Model.UsageModel.ApiCreditUsage > 0)
+    {
+        <span class="text-light">Api Usage: @Model.UsageModel.ApiCreditUsage</span>
+    }
+</div>
+
 <div class="row">
     @foreach (var meetingKvp in @Model.Markets.GroupBy(r => r.Parent).OrderBy(v => v.Key.OpenDate))
     {

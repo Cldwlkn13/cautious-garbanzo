@@ -170,7 +170,8 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
                 var call = new JsonRequest { Method = method, Id = 1, Params = args };
                 JsonConvert.Export(call, writer);
             }
-            Console.WriteLine("\nCalling: " + method + " With args: " + JsonConvert.Serialize<IDictionary<string, object>>(args));
+            Console.WriteLine("Calling Exchange: " + method + " With args: " +
+                JsonConvert.Serialize<IDictionary<string, object>>(args));
 
             using (WebResponse response = request.GetResponse())
             using (Stream stream = response.GetResponseStream())

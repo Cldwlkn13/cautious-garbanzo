@@ -72,10 +72,13 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
             SelectListBookmakers.FirstOrDefault(bm => bm.Text == bookmaker.ToString())!.Selected = true;
 
-            if (bookmaker == Bookmaker.Betfair)
+            if (!IsScrapable.Contains(bookmaker))
             {
-                Console.WriteLine($"Stopping Boylesports scraping!");
-                _scrapingControl.Stop(Bookmaker.Boylesports);
+                if (_scrapingControl.SwitchBoard[bookmaker])
+                {
+                    Console.WriteLine($"Stopping {bookmaker} scraping!");
+                    _scrapingControl.Stop(bookmaker);
+                }
             }
             else if (bookmaker == Bookmaker.Boylesports)
             {
@@ -86,8 +89,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             try
             {
                 //build exchange components
-                var t1 = _catalogService.GetSportsbookCatalogue(Sport.Racing);
-                var t2 = _catalogService.GetExchangeCatalogue(Sport.Racing);
+                var t1 = _catalogService.GetSportsbookCatalogue(Sport.Racing, BetfairQueryExtensions.TimeRangeForNextDays(1));
+                var t2 = _catalogService.GetExchangeCatalogue(Sport.Racing, BetfairQueryExtensions.TimeRangeForNextDays(1));
 
                 await Task.WhenAll(new Task[] { t1, t2 });
 
@@ -101,7 +104,6 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                     _scrapingOrchestrator.TryGetScrapedEvents(
                         bookmaker, DateTime.Today, out scrapedEvents);
                 }
-
 
                 foreach (var @event in sportsbookCatalogue.EventsWithMarketCatalogue.Keys)
                 {
@@ -273,7 +275,6 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                             }
                         }
                     }
-
                     catch (System.Exception exception)
                     {
                         Console.WriteLine($"EVENT_COMPARISON_EXCEPTION; " +
@@ -282,9 +283,14 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                     }
                 }
 
+                var usageModel = IsScrapable.Contains(bookmaker) ?
+                    await _scrapingOrchestrator.Usage() :
+                    new UsageModel();
+
                 CatalogViewModel.Markets = marketViewModels;
                 CatalogViewModel.BestWinRunners = bestWinRunners;
                 CatalogViewModel.BestEachWayRunners = bestEachWayRunners;
+                CatalogViewModel.UsageModel = usageModel;
 
                 return Page();
             }
