@@ -93,7 +93,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
 
             var body = JsonConvert.Serialize(obj);
 
-            Console.WriteLine("\nCalling: " + method + " With body: " + body);
+            Console.WriteLine("Calling Sportsbook: " + method + " With body: " + body);
 
             HttpContent content = new StringContent(body, Encoding.UTF8, "application/json");
 
@@ -122,7 +122,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
             return Invoke<List<EventTypeResult>>(LIST_EVENT_TYPES_METHOD, obj);
         }
 
-        public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId, DateTime dateFrom, DateTime dateTo, string locale = null)
+        public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId, TimeRange timeRange, string locale = null)
         {
             var obj = new
             {
@@ -131,11 +131,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
                     MarketFilter = new SportsbookMarketFilter()
                     {
                         EventTypeIds = new HashSet<string>() { eventTypeId },
-                        TimeRange = new TimeRange()
-                        {
-                            From = dateFrom,
-                            To = dateTo
-                        },
+                        TimeRange = timeRange
                     }
                 }
             };

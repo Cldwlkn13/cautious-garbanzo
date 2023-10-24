@@ -60,8 +60,6 @@ namespace Betfair.ExchangeComparison.Handlers
 
                 MaintainCatalogue(bookmaker, scrapedEvent);
             });
-
-            await _boylesportsHandler.Usage();
         }
 
         public bool TryGetScrapedEvents(Bookmaker bookmaker, DateTime dateTime, out List<ScrapedEvent> result)
@@ -115,6 +113,11 @@ namespace Betfair.ExchangeComparison.Handlers
                     scrapedEvent,
                     (k, v) => v = scrapedEvent);
             }
+        }
+
+        public async Task<UsageModel> Usage()
+        {
+            return await _boylesportsHandler.Usage();
         }
 
         private void ClearOldData()

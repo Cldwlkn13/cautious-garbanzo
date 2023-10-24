@@ -5,9 +5,9 @@ namespace Betfair.ExchangeComparison.Domain.Enums
     {
         Unknown,
         Betfair,
-        PaddyPower,
+        //PaddyPower,
         Boylesports,
-        WilliamHill
+        //WilliamHill
     }
 }
 

@@ -6,7 +6,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Interfaces
     public interface ISportsbookClient
     {
         IEnumerable<EventTypeResult> ListEventTypes(MarketFilter marketFilter, string locale = null);
-        IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId, DateTime dateFrom, DateTime dateTo, string locale = null);
+        IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId, TimeRange timeRange, string locale = null);
         IEnumerable<EventResult> ListEventsByEventType(string eventTypeId, TimeRange timeRange);
         IEnumerable<EventResult> ListEventsByCompetition(Competition competition, TimeRange timeRange);
         IEnumerable<MarketTypeResult> ListMarketTypes(string eventTypeId);
