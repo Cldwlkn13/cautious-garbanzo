@@ -16,6 +16,8 @@ namespace Betfair.ExchangeComparison.Exchange.Interfaces
 
         IList<EventResult> ListEvents(MarketFilter marketFilter, string locale = null);
 
+        IList<CompetitionResult> ListCompetitions(MarketFilter marketFilter, string locale = null);
+
         /**
          * calls api-ng to get a list of market catalogues
          * */

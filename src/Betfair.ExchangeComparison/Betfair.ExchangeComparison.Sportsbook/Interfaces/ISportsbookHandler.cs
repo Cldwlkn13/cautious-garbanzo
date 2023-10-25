@@ -1,19 +1,12 @@
-﻿using System;
+﻿using Betfair.ExchangeComparison.Domain.CommonInterfaces;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Sportsbook.Interfaces
 {
-    public interface ISportsbookHandler
+    public interface ISportsbookHandler : IBetfairHandler
     {
-        bool Login(string username = "", string password = "");
-
-        public string SessionToken { get; }
-
-        public string AppKey { get; }
-
-        bool SessionValid();
-
         IEnumerable<EventTypeResult> ListEventTypes();
         IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7", TimeRange? timeRange = null);
         IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7", TimeRange? timeRange = null);

@@ -1,6 +1,7 @@
-﻿using Betfair.ExchangeComparison.Exchange.Interfaces;
+﻿using Betfair.ExchangeComparison.Auth.Interfaces;
+using Betfair.ExchangeComparison.Domain.CustomExceptions;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Exchange.Model;
-using Betfair.ExchangeComparison.Exchange.Settings;
 using Betfair.ExchangeComparison.Sportsbook.Clients;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
@@ -9,83 +10,50 @@ using Microsoft.Extensions.Options;
 
 namespace Betfair.ExchangeComparison.Sportsbook;
 
-public class SportsbookHandler : ISportsbookHandler
+public class BetfairSportsbookHandler : IBetfairSportsbookHandler
 {
-    private readonly IAuthClient _authClient;
     private readonly IOptions<SportsbookSettings> _options;
-    private readonly IOptions<LoginSettings> _logins;
+    private readonly IAuthHandler _authHandler;
     private ISportsbookClient? _client;
 
-    public SportsbookHandler(IAuthClient authClient, IOptions<SportsbookSettings> options, IOptions<LoginSettings> logins)
+    private const Bookmaker _bookmaker = Bookmaker.BetfairSportsbook;
+
+    public BetfairSportsbookHandler(IOptions<SportsbookSettings> options, IAuthHandler authHandler)
     {
-        _authClient = authClient;
+        _authHandler = authHandler;
         _options = options;
-        _logins = logins;
 
-        SessionToken = string.Empty;
-
-        Username = Environment.GetEnvironmentVariable("USERNAME") != null ?
-            Environment.GetEnvironmentVariable("USERNAME")! :
-            logins.Value.USERNAME!;
-
-        Password = Environment.GetEnvironmentVariable("PASSWORD") != null ?
-            Environment.GetEnvironmentVariable("PASSWORD")! :
-            logins.Value.PASSWORD!;
-
-        AppKey = Environment.GetEnvironmentVariable("APP_KEY") != null ?
-            Environment.GetEnvironmentVariable("APP_KEY")! :
-            logins.Value.APP_KEY!;
-
-        if (!SessionValid())
+        if (TryLogin())
         {
-            Login();
-
-            var url = _options.Value.UseBetfair ?
-                _options.Value.UrlBetfair :
-                _options.Value.UrlPaddyPower;
-
-            _client = new SportsbookClient(url, AppKey, SessionToken);
+            _client = new SportsbookClient(
+                _options.Value.UrlBetfair,
+                _authHandler.AppKey,
+                _authHandler.SessionTokens[_bookmaker]);
         }
     }
 
-    public string SessionToken { get; private set; }
-    public DateTime TokenExpiry { get; set; }
-    public string AppKey { get; private set; }
+    public bool TryLogin() =>
+        _authHandler.TryLogin(_bookmaker);
 
-    private string Username { get; set; }
-    private string Password { get; set; }
+    public bool Login(string username = "", string password = "") =>
+        _authHandler.Login(username, password, _bookmaker);
 
-    public bool Login(string username = "", string password = "")
-    {
-        var loginResult = _authClient.Login(Username, Password) ??
-            throw new NullReferenceException($"Login Failed");
-
-        SessionToken = loginResult.Token;
-        TokenExpiry = DateTime.UtcNow.AddHours(6);
-
-        Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
-            $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
-
-        return SessionValid();
-    }
-
-    public bool SessionValid()
-    {
-        return !string.IsNullOrEmpty(SessionToken) &&
-            DateTime.UtcNow < TokenExpiry;
-    }
+    public bool SessionValid() =>
+        _authHandler.SessionValid(_bookmaker);
 
     public IEnumerable<EventTypeResult> ListEventTypes()
     {
         var marketFilter = new MarketFilter();
 
-        var eventTypes = _client?.ListEventTypes(marketFilter) ??
+        var eventTypes = _client?
+                .ListEventTypes(marketFilter) ??
             throw new NullReferenceException($"Event Types null.");
 
         return eventTypes;
     }
 
-    public IEnumerable<CompetitionResult> ListCompetitions(string eventTypeId = "7", TimeRange? timeRange = null)
+    public IEnumerable<CompetitionResult> ListCompetitions(
+        string eventTypeId = "7", TimeRange? timeRange = null)
     {
         var time = new TimeRange();
 
@@ -114,13 +82,15 @@ public class SportsbookHandler : ISportsbookHandler
             time = timeRange;
         }
 
-        var competitions = _client?.ListCompetitions(eventTypeId, time) ??
+        var competitions = _client?
+                .ListCompetitions(eventTypeId, time) ??
             throw new NullReferenceException($"Competitions null.");
 
         return competitions;
     }
 
-    public IEnumerable<Event> ListEventsByEventType(string eventTypeId = "7", TimeRange? timeRange = null)
+    public IEnumerable<Event> ListEventsByEventType(
+        string eventTypeId = "7", TimeRange? timeRange = null)
     {
         var time = new TimeRange();
 
@@ -149,13 +119,15 @@ public class SportsbookHandler : ISportsbookHandler
             time = timeRange;
         }
 
-        var events = _client?.ListEventsByEventType(eventTypeId, time) ??
+        var events = _client?
+                .ListEventsByEventType(eventTypeId, time) ??
             throw new NullReferenceException($"Events null.");
 
         return events.Select(e => e.Event);
     }
 
-    public Dictionary<Competition, List<Event>> ListEventsByCompetition(string eventTypeId, IEnumerable<Competition> competitions, TimeRange? timeRange = null)
+    public Dictionary<Competition, List<Event>> ListEventsByCompetition(
+        string eventTypeId, IEnumerable<Competition> competitions, TimeRange? timeRange = null)
     {
         var result = new Dictionary<Competition, List<Event>>();
 
@@ -180,7 +152,9 @@ public class SportsbookHandler : ISportsbookHandler
 
         foreach (var competition in competitions)
         {
-            var eventsInCompetition = _client?.ListEventsByCompetition(competition, time).Select(e => e.Event) ??
+            var eventsInCompetition = _client?
+                    .ListEventsByCompetition(competition, time)
+                    .Select(e => e.Event) ??
                 throw new NullReferenceException($"Events in Competition={competition.Name} null.");
 
             result.Add(competition, new List<Event>());
@@ -196,13 +170,15 @@ public class SportsbookHandler : ISportsbookHandler
 
     public IEnumerable<MarketTypeResult> ListMarketTypes()
     {
-        var marketTypes = _client?.ListMarketTypes("7") ??
-            throw new NullReferenceException($"Events null.");
+        var marketTypes = _client?
+                .ListMarketTypes("7") ??
+            throw new NullReferenceException($"Market Types null.");
 
         return marketTypes;
     }
 
-    public IEnumerable<MarketCatalogue> ListMarketCatalogues(ISet<string> eventIds, string eventTypeId = "7")
+    public IEnumerable<MarketCatalogue> ListMarketCatalogues(
+        ISet<string> eventIds, string eventTypeId = "7")
     {
         var marketTypes = new List<string>();
 
@@ -223,11 +199,12 @@ public class SportsbookHandler : ISportsbookHandler
                 break;
         }
 
-        var marketCatalogues = _client?.ListMarketCatalogue(new SportsbookMarketFilter()
-        {
-            EventIds = eventIds,
-            MarketTypes = marketTypes.ToArray()
-        },
+        var marketCatalogues = _client?
+            .ListMarketCatalogue(new SportsbookMarketFilter()
+            {
+                EventIds = eventIds,
+                MarketTypes = marketTypes.ToArray()
+            },
         maxResults: "100")
             ??
             throw new NullReferenceException($"Market Catalogues null.");
@@ -237,7 +214,8 @@ public class SportsbookHandler : ISportsbookHandler
 
     public MarketDetails ListPrices(IEnumerable<string> marketIds)
     {
-        var prices = _client?.ListMarketPrices(marketIds) ??
+        var prices = _client?
+                .ListMarketPrices(marketIds) ??
             throw new NullReferenceException($"Prices null.");
 
         return prices;

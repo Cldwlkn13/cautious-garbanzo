@@ -21,7 +21,6 @@ namespace Betfair.ExchangeComparison.Services
 
         public bool TryMapSportsbookMarketDetailsToEvent(IDictionary<EventWithCompetition, IEnumerable<MarketDetail>> sportsbookMarketDetails, EventWithCompetition @event, out IEnumerable<MarketDetail> result)
         {
-
             if (!sportsbookMarketDetails.ContainsKey(@event))
             {
                 result = new List<MarketDetail>();
@@ -35,6 +34,11 @@ namespace Betfair.ExchangeComparison.Services
         public bool TryMapMarketsBooksToSportsbookMarketDetail(KeyValuePair<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> eventWithMarketBooks, MarketDetail marketDetail, out KeyValuePair<DateTime, IList<MarketBook>> result)
         {
             result = new KeyValuePair<DateTime, IList<MarketBook>>();
+
+            if (eventWithMarketBooks.Key == null)
+            {
+                return false;
+            }
 
             if (!eventWithMarketBooks.Value.ContainsKey(marketDetail.marketStartTime))
             {
@@ -55,6 +59,20 @@ namespace Betfair.ExchangeComparison.Services
         public bool TryMapMarketBook(KeyValuePair<DateTime, IList<MarketBook>> marketBooks, int numberOfWinners, out MarketBook result)
         {
             var mappedMarketBook = marketBooks.Value.FirstOrDefault(m => m.NumberOfWinners == numberOfWinners);
+
+            if (mappedMarketBook == null)
+            {
+                result = new MarketBook();
+                return false;
+            }
+
+            result = mappedMarketBook;
+            return true;
+        }
+
+        public bool TryMapMarketBook(KeyValuePair<DateTime, IList<MarketBook>> marketBooks, MarketDetail marketDetail, out MarketBook result)
+        {
+            var mappedMarketBook = marketBooks.Value.FirstOrDefault(m => m.MarketId == marketDetail.linkedMarketId);
 
             if (mappedMarketBook == null)
             {

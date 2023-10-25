@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
+using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Models;
-using Betfair.ExchangeComparison.Services;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,173 +15,168 @@ namespace Betfair.ExchangeComparison.Pages.Football
     public class IndexModel : PageModel
     {
         private readonly IExchangeHandler _exchangeHandler;
-        private readonly ISportsbookHandler _sportsbookHandler;
+        private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
         private readonly ICatalogService _catalogService;
+        private readonly IMappingService _mappingService;
+        private readonly IPricingComparisonHandler _pricingComparisonHandler;
 
         const string EventTypeId = "1";
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
-        public IndexModel(IExchangeHandler exchangeHandler, ISportsbookHandler sportsbookHandler, ICatalogService catalogService)
+        public IndexModel(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, ICatalogService catalogService,
+            IMappingService mappingService, IPricingComparisonHandler pricingComparisonHandler)
         {
             _exchangeHandler = exchangeHandler;
-            _sportsbookHandler = sportsbookHandler;
+            _bfSportsbookHandler = bfSportsbookHandler;
             _catalogService = catalogService;
+            _mappingService = mappingService;
+            _pricingComparisonHandler = pricingComparisonHandler;
 
             CatalogViewModel = new CatalogViewModel();
         }
 
-        public PageResult OnGet()
+        public async Task<PageResult> OnGet()
         {
             var bestWinRunners = new List<BestRunner>();
-
-            var eventDict = _catalogService.GetExchangeEventsWithMarkets(EventTypeId);
-            var marketCatalogues = _catalogService.GetExchangeMarketCatalogues(EventTypeId, eventDict.Keys.ToList());
-            var marketBooks = _catalogService.GetExchangeMarketBooks(marketCatalogues, eventDict);
-
-            var sportsbookEventsWithMarkets = _catalogService.GetSportsbookEventsWithMarkets(EventTypeId);
-            var sportsbookEventsWithPrices = _catalogService.GetSportsbookEventsWithPrices(sportsbookEventsWithMarkets);
-
             var markets = new List<MarketViewModel>();
 
-            foreach (var @event in sportsbookEventsWithPrices.Keys)
+            try
             {
-                try
+                var t1 = _catalogService.GetSportsbookCatalogue(
+                    Sport.Football,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1), Bookmaker.BetfairSportsbook);
+
+                var t2 = _catalogService.GetExchangeCatalogue(
+                    Sport.Football,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+
+                await Task.WhenAll(new Task[] { t1, t2 });
+
+                var sportsbookCatalogue = t1.Result;
+                var exchangeCatalogue = t2.Result;
+
+                foreach (var @event in sportsbookCatalogue.EventsWithMarketCatalogue.Keys)
                 {
-                    var exchangeEventWithMarketBooks = marketBooks.FirstOrDefault(e => e.Key.Id == @event.Event.Id);
-
-                    if (exchangeEventWithMarketBooks.Key == null)
+                    try
                     {
-                        continue;
-                    }
+                        KeyValuePair<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> eventWithMarketBooks = _mappingService.MapEventToMarketBooks(exchangeCatalogue.MarketBooks, @event);
 
-                    var mappedEvent = sportsbookEventsWithPrices[@event];
+                        if (!_mappingService.TryMapSportsbookMarketDetailsToEvent(
+                            sportsbookCatalogue.EventsWithMarketDetails, @event, out IEnumerable<MarketDetail> mappedMarketDetailsForEvent))
+                        {
+                            continue;
+                        }
 
-                    if (mappedEvent == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var marketDetail in mappedEvent)
-                    {
-                        var exchangeMarketBooks = exchangeEventWithMarketBooks.Value
-                            .FirstOrDefault(m => m.Key == marketDetail.marketStartTime);
-
-                        if (exchangeMarketBooks.Value == null) continue;
-
-                        var mappedMarketBook = exchangeMarketBooks.Value
-                            .FirstOrDefault(m => m.MarketId == marketDetail.linkedMarketId);
-
-                        if (mappedMarketBook == null) continue;
-
-                        var winOverround = marketDetail.runnerDetails
-                            .Where(r => r.winRunnerOdds != null && r.winRunnerOdds.@decimal > 0 && r.runnerStatus == "ACTIVE")
-                            .Sum(r => 1 / r.winRunnerOdds.@decimal) * 100;
-
-                        var runners = new List<RunnerViewModel>();
-                        foreach (var sportsbookRunner in marketDetail.runnerDetails)
+                        foreach (var marketDetail in mappedMarketDetailsForEvent.Where(m => m.marketStatus == "OPEN"))
                         {
                             try
                             {
-                                if (sportsbookRunner.runnerStatus != "ACTIVE" ||
-                                    sportsbookRunner.winRunnerOdds == null)
+                                if (!_mappingService.TryMapMarketsBooksToSportsbookMarketDetail(
+                                    eventWithMarketBooks, marketDetail, out KeyValuePair<DateTime, IList<MarketBook>> eventMarketBooks))
                                 {
                                     continue;
                                 }
 
-                                var mappedExchangeWinRunner = mappedMarketBook?.Runners
-                                    .FirstOrDefault(r => r.SelectionId == sportsbookRunner.selectionId);
-
-                                double? bestPinkWin = 0;
-                                double? bestPinkWinSize = 0;
-                                double? bestBlueWin = 0;
-
-                                if (mappedExchangeWinRunner != null)
+                                if (!_mappingService.TryMapMarketBook(eventMarketBooks, marketDetail, out MarketBook mappedWinMarketBook))
                                 {
-                                    if (mappedExchangeWinRunner.ExchangePrices != null)
+                                    continue;
+                                }
+
+                                var winOverround = marketDetail.WinOverround();
+
+                                var runners = new List<RunnerViewModel>();
+                                foreach (var sportsbookRunner in marketDetail.runnerDetails)
+                                {
+                                    try
                                     {
-                                        if (mappedExchangeWinRunner.ExchangePrices.AvailableToLay.Any())
+                                        if (sportsbookRunner.runnerStatus != "ACTIVE" ||
+                                            sportsbookRunner.winRunnerOdds == null)
                                         {
-                                            bestPinkWin = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Price;
-                                            bestPinkWinSize = mappedExchangeWinRunner.ExchangePrices.AvailableToLay[0]?.Size;
+                                            continue;
                                         }
 
-                                        if (mappedExchangeWinRunner.ExchangePrices.AvailableToBack.Any())
+                                        if (!_mappingService.TryMapRunner(mappedWinMarketBook, sportsbookRunner,
+                                            out var mappedExchangeWinRunner))
                                         {
-                                            bestBlueWin = mappedExchangeWinRunner.ExchangePrices.AvailableToBack[0]?.Price;
+                                            continue;
                                         }
+
+                                        var rpo = new RunnerPriceOverview(
+                                                @event,
+                                                marketDetail,
+                                                sportsbookRunner,
+                                                mappedExchangeWinRunner);
+
+
+                                        bestWinRunners = _pricingComparisonHandler.TryAddToBestRunnersWinOnly(bestWinRunners, rpo);
+
+                                        var rvm = new RunnerViewModel()
+                                        {
+                                            SportsbookRunner = sportsbookRunner,
+                                            ExchangeWinRunner = mappedExchangeWinRunner,
+                                            SportsbookWinPrice = sportsbookRunner.winRunnerOdds.@decimal,
+                                            ExpectedExchangeWinPrice = rpo.ExpectedWinPrice,
+                                            WinExpectedValue = rpo.ExpectedValueWin,
+                                            WinnerOddsString = rpo.WinnerOddsString,
+                                        };
+
+                                        runners.Add(rvm);
+                                    }
+                                    catch (System.Exception exception)
+                                    {
+                                        Console.WriteLine($"MARKET_COMPARISON_EXCEPTION; " +
+                                            $"Exception={exception.Message}; " +
+                                            $"Market={marketDetail.marketName} {marketDetail.marketStartTime}; " +
+                                            $"Event={@event.Event.Name}");
                                     }
                                 }
 
-                                var winnerOddsString = $"{sportsbookRunner.winRunnerOdds.numerator}/{sportsbookRunner.winRunnerOdds.denominator}";
+                                var vm = new MarketViewModel(@event.Event);
+                                vm.SportsbookMarket = marketDetail;
+                                vm.Runners = runners.OrderBy(r => r.SportsbookRunner.winRunnerOdds.@decimal);
+                                vm.WinOverround = winOverround;
 
-                                var winSpread = bestPinkWin != null && bestPinkWin > 0 && bestBlueWin != null && bestBlueWin > 0 ? bestPinkWin - bestBlueWin : 0;
-                                var expectedWinPrice = bestPinkWin != null && bestPinkWin > 0 && winSpread != null ? bestPinkWin - (winSpread * 0.03) : 1;
+                                markets.Add(vm);
 
-                                var expectedValueWin = ExpectedValue(sportsbookRunner.winRunnerOdds.@decimal, expectedWinPrice.Value);
-
-                                if (expectedValueWin > -0.03 && expectedWinPrice > 1)
-                                {
-                                    bestWinRunners.Add(new BestRunner()
-                                    {
-                                        Competition = @event.Competition,
-                                        Event = @event.Event,
-                                        MarketDetail = marketDetail,
-                                        SportsbookRunner = sportsbookRunner,
-                                        WinnerOddsString = winnerOddsString,
-                                        ExpectedValueWin = expectedValueWin,
-                                        ExchangeWinBestBlue = bestBlueWin!.Value,
-                                        ExchangeWinBestPink = bestPinkWin!.Value,
-                                        ExchangeWinBestPinkSize = bestPinkWinSize!.Value
-                                    });
-                                }
-
-                                var rvm = new RunnerViewModel()
-                                {
-                                    SportsbookRunner = sportsbookRunner,
-                                    ExchangeWinRunner = mappedExchangeWinRunner,
-                                    SportsbookWinPrice = sportsbookRunner.winRunnerOdds.@decimal,
-                                    ExpectedExchangeWinPrice = expectedWinPrice.Value,
-                                    WinExpectedValue = expectedValueWin,
-                                    WinnerOddsString = winnerOddsString
-                                };
-
-                                runners.Add(rvm);
                             }
                             catch (System.Exception exception)
                             {
-                                var str = "";
+                                Console.WriteLine($"MARKET_COMPARISON_EXCEPTION; " +
+                                    $"Exception={exception.Message}; " +
+                                    $"Market={marketDetail.marketName} {marketDetail.marketStartTime}; " +
+                                    $"Event={@event.Event.Name}");
                             }
                         }
-
-                        var vm = new MarketViewModel(@event.Event);
-                        vm.SportsbookMarket = marketDetail;
-                        vm.Runners = runners.OrderBy(r => r.SportsbookRunner.winRunnerOdds.@decimal);
-                        vm.WinOverround = winOverround;
-
-                        markets.Add(vm);
+                    }
+                    catch (System.Exception exception)
+                    {
+                        Console.WriteLine($"EVENT_COMPARISON_EXCEPTION; " +
+                            $"Exception={exception.Message}; " +
+                            $"Event={@event.Event.Name}");
                     }
                 }
-                catch (System.Exception exception)
-                {
-                    var str = "";
-                }
+
+                CatalogViewModel.Markets = markets;
+                CatalogViewModel.BestWinRunners = bestWinRunners;
+
+                return Page();
             }
+            catch (APINGException apiException)
+            {
+                Console.WriteLine($"APING_EXCEPTION; " +
+                    $"Exception={apiException.Message};" +
+                    $"ErrorCode={apiException.ErrorCode};");
 
-            CatalogViewModel.Markets = markets;
-            CatalogViewModel.BestWinRunners = bestWinRunners;
+                return Page();
+            }
+            catch (System.Exception exception)
+            {
+                Console.WriteLine($"CATALOG_BUILD_EXCEPTION; " +
+                    $"Exception={exception.Message}");
 
-            return Page();
-        }
-
-        private static double ExpectedValue(double sportsbookPrice, double exchangePrice)
-        {
-            return ((sportsbookPrice - 1) * (1 / exchangePrice)) - ((1 - (1 / exchangePrice)));
-        }
-
-        private static double PlacePart(double sportsbookPrice, int denominator)
-        {
-            return denominator == 0 ? ((sportsbookPrice - 1) / 1) + 1 : ((sportsbookPrice - 1) / denominator) + 1;
+                return Page();
+            }
         }
     }
 }

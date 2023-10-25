@@ -1,15 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
 using System.Net;
-using System.IO;
-using Betfair.ExchangeComparison.Exchange.Model;
+using System.Text;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Json;
-using System.Net.Http.Headers;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Betfair.ExchangeComparison.Exchange.Model;
 
 namespace Betfair.ExchangeComparison.Exchange.Clients
 {
@@ -21,6 +14,7 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
         public const string SESSION_TOKEN_HEADER = "X-Authentication";
         public WebHeaderCollection CustomHeaders { get; set; }
         private static readonly string LIST_EVENT_TYPES_METHOD = "SportsAPING/v1.0/listEventTypes";
+        private static readonly string LIST_COMPETITIONS_METHOD = "SportsAPING/v1.0/listCompetitions";
         private static readonly string LIST_EVENTS_METHOD = "SportsAPING/v1.0/listEvents";
         private static readonly string LIST_MARKET_TYPES_METHOD = "SportsAPING/v1.0/listMarketTypes";
         private static readonly string LIST_MARKET_CATALOGUE_METHOD = "SportsAPING/v1.0/listMarketCatalogue";
@@ -90,6 +84,14 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             args[FILTER] = marketFilter;
             args[LOCALE] = locale;
             return Invoke<List<EventTypeResult>>(LIST_EVENT_TYPES_METHOD, args);
+        }
+
+        public IList<CompetitionResult> ListCompetitions(MarketFilter marketFilter, string locale = null)
+        {
+            var args = new Dictionary<string, object>();
+            args[FILTER] = marketFilter;
+            args[LOCALE] = locale;
+            return Invoke<List<CompetitionResult>>(LIST_COMPETITIONS_METHOD, args);
         }
 
         public IList<EventResult> ListEvents(MarketFilter marketFilter, string locale = null)

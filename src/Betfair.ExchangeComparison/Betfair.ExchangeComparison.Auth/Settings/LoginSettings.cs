@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Betfair.ExchangeComparison.Exchange.Settings
+namespace Betfair.ExchangeComparison.Auth.Settings
 {
     public class LoginSettings
     {

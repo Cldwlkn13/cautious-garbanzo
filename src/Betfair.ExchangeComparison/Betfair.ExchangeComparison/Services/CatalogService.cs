@@ -13,7 +13,8 @@ namespace Betfair.ExchangeComparison.Services
     public class CatalogService : ICatalogService
     {
         private readonly IExchangeHandler _exchangeHandler;
-        private readonly ISportsbookHandler _sportsbookHandler;
+        private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
+        private readonly IPaddyPowerSportsbookHandler _ppSportsbookHandler;
 
         public Dictionary<DateTime, Dictionary<Sport, Dictionary<string, Event>>> ExchangeEventStore { get; set; }
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>> ExchangeMarketCatalogueStore { get; set; }
@@ -21,10 +22,11 @@ namespace Betfair.ExchangeComparison.Services
         public Dictionary<DateTime, Dictionary<Sport, IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>>>> SportsbookMarketCatalogueStore { get; private set; }
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>> SportsbookMarketDetailsStore { get; private set; }
 
-        public CatalogService(IExchangeHandler exchangeHandler, ISportsbookHandler sportsbookHandler)
+        public CatalogService(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, IPaddyPowerSportsbookHandler ppSportsbookHandler)
         {
             _exchangeHandler = exchangeHandler;
-            _sportsbookHandler = sportsbookHandler;
+            _bfSportsbookHandler = bfSportsbookHandler;
+            _ppSportsbookHandler = ppSportsbookHandler;
 
             ExchangeEventStore = new Dictionary<DateTime, Dictionary<Sport, Dictionary<string, Event>>>();
             ExchangeMarketCatalogueStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>>();
@@ -33,8 +35,12 @@ namespace Betfair.ExchangeComparison.Services
             SportsbookMarketDetailsStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>>();
         }
 
-        public Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null)
+        public Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
+            var handler = ResolveHandler(bookmaker);
+
+            handler.TryLogin();
+
             TimeRange time = BetfairQueryExtensions.TimeRangeForNextDays(1);
             if (timeRange != null)
             {
@@ -55,6 +61,8 @@ namespace Betfair.ExchangeComparison.Services
 
         public Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport, TimeRange? timeRange = null)
         {
+            _exchangeHandler.TryLogin();
+
             TimeRange time = BetfairQueryExtensions.TimeRangeForNextDays(1);
             if (timeRange != null)
             {
@@ -65,9 +73,10 @@ namespace Betfair.ExchangeComparison.Services
                 .Where(e => e.Value.OpenDate <= time.To)
                 .ToDictionary(x => x.Key, v => v.Value);
 
-            IEnumerable<MarketCatalogue> marketCatalogues = ExchangeMarketCataloguesToday(sport)
-                .Where(e => e.Description.MarketTime <= time.To && e.Description.MarketTime >= time.From)
-                .ToList();
+            IEnumerable<MarketCatalogue> marketCatalogues = ExchangeMarketCataloguesToday(
+                sport, events.Select(e => e.Key))
+                    .Where(e => e.Description.MarketTime <= time.To)
+                    .ToList();
 
             var marketBooks = GetExchangeMarketBooks(marketCatalogues, events);
 
@@ -80,6 +89,62 @@ namespace Betfair.ExchangeComparison.Services
 
             return Task.FromResult(exchangeCatalogue);
         }
+
+        public IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport)
+        {
+            var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
+            handler.TryLogin();
+
+            if (!SportsbookMarketDetailsStore.ContainsKey(DateTime.Today))
+            {
+                var sportsbookEvents = SportsbookMarketCataloguesToday(sport,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+
+                var sportsbookPrices = GetSportsbookEventsWithPrices(sportsbookEvents);
+                var compoundCatalog = BuildCompoundCatalog(sportsbookPrices);
+
+                SportsbookMarketDetailsStore.Add(DateTime.Today,
+                    new Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>()
+                    {
+                        { sport, compoundCatalog }
+                    });
+
+                return compoundCatalog;
+            }
+
+            return SportsbookMarketDetailsStore[DateTime.Today][sport];
+        }
+
+        public IEnumerable<MarketDetailWithEvent> UpdateCatalog(Sport sport)
+        {
+            var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
+            handler.TryLogin();
+
+            if (SportsbookMarketDetailsStore.ContainsKey(DateTime.Today))
+            {
+                var sportsbookEvents = SportsbookMarketCataloguesToday(sport,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+
+                var sportsbookPrices = GetSportsbookEventsWithPrices(sportsbookEvents);
+
+                var compoundCatalog = BuildCompoundCatalog(sportsbookPrices);
+
+                if (SportsbookMarketDetailsStore[DateTime.Today].ContainsKey(sport))
+                {
+                    SportsbookMarketDetailsStore[DateTime.Today][sport] = compoundCatalog;
+                }
+
+                return compoundCatalog;
+            }
+            else
+            {
+                GetCatalog(sport);
+            }
+
+            return SportsbookMarketDetailsStore[DateTime.Today][sport];
+        }
+
+        #region helper methods
 
         public IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> SportsbookMarketCataloguesToday(Sport sport, TimeRange? timeRange = null)
         {
@@ -108,7 +173,9 @@ namespace Betfair.ExchangeComparison.Services
 
             void SportsbookMarketCatalogues()
             {
-                var sportsbookMarketCataloguesToday = GetSportsbookEventsWithMarkets(sport.SportMap(), BetfairQueryExtensions.TimeRangeForNextDays(1));
+                var sportsbookMarketCataloguesToday = GetSportsbookEventsWithMarkets(
+                    sport.SportMap(),
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
 
                 SportsbookMarketCatalogueStore[DateTime.Today][sport] = sportsbookMarketCataloguesToday;
             }
@@ -143,20 +210,38 @@ namespace Betfair.ExchangeComparison.Services
 
             void ExchangeEvents()
             {
-                var exchangeEventsToday = _exchangeHandler.ListEvents(
-                    sport.SportMap(),
-                    BetfairQueryExtensions.TimeRangeForNextWholeDays(1))
-                        .Select(er => er.Event);
+                IEnumerable<Event> exchangeEventsToday = new List<Event>();
+
+                switch (sport)
+                {
+                    case Sport.Football:
+                        var exchangeCompetitionsToday = _exchangeHandler.ListCompetitions(
+                            sport.SportMap(),
+                            BetfairQueryExtensions.TimeRangeForNextDays(1))
+                                .Select(er => er.Competition);
+                        var eventsByCompetition = _exchangeHandler.ListEventsByCompetition(
+                            exchangeCompetitionsToday,
+                            sport.SportMap(),
+                            BetfairQueryExtensions.TimeRangeForNextDays(1));
+                        exchangeEventsToday = eventsByCompetition.SelectMany(e => e.Value);
+                        break;
+
+                    case Sport.Racing:
+                        exchangeEventsToday = _exchangeHandler.ListEvents(
+                            sport.SportMap(),
+                            BetfairQueryExtensions.TimeRangeForNextWholeDays(1))
+                                .Select(er => er.Event);
+                        break;
+                }
 
                 ExchangeEventStore[DateTime.Today][sport] = exchangeEventsToday
                     .ToDictionary(x => x.Id, x => x);
             }
 
             return ExchangeEventStore[DateTime.Today][sport];
-
         }
 
-        public IEnumerable<MarketCatalogue> ExchangeMarketCataloguesToday(Sport sport)
+        public IEnumerable<MarketCatalogue> ExchangeMarketCataloguesToday(Sport sport, IEnumerable<string> eventIds)
         {
             if (!ExchangeMarketCatalogueStore.ContainsKey(DateTime.Today))
             {
@@ -183,10 +268,9 @@ namespace Betfair.ExchangeComparison.Services
 
             void ExchangeMarketCatalogues()
             {
-
-                var exchangeMarketCataloguesToday = _exchangeHandler.ListMarketCatalogues(
+                var exchangeMarketCataloguesToday = GetExchangeMarketCatalogues(
                     sport.SportMap(),
-                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+                    eventIds);
 
                 ExchangeMarketCatalogueStore[DateTime.Today][sport] = exchangeMarketCataloguesToday
                     .ToList();
@@ -293,10 +377,8 @@ namespace Betfair.ExchangeComparison.Services
 
         public IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> GetSportsbookEventsWithMarkets(string eventTypeId, TimeRange? timeRange = null)
         {
-            if (!_sportsbookHandler.SessionValid())
-            {
-                var sbklogin = _sportsbookHandler.Login("", "");
-            }
+            var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
+            handler.TryLogin();
 
             IEnumerable<Event> events = new List<Event>();
             Dictionary<Competition, List<Event>> eventsByCompetition = new Dictionary<Competition, List<Event>>();
@@ -314,12 +396,12 @@ namespace Betfair.ExchangeComparison.Services
             switch (eventTypeId)
             {
                 case "7":
-                    events = _sportsbookHandler.ListEventsByEventType(eventTypeId);
+                    events = _bfSportsbookHandler.ListEventsByEventType(eventTypeId);
                     eventsByCompetition.Add(new Competition(), events.ToList());
                     break;
                 case "1":
-                    var competitions = _sportsbookHandler.ListCompetitions(eventTypeId);
-                    eventsByCompetition = _sportsbookHandler.ListEventsByCompetition(
+                    var competitions = _bfSportsbookHandler.ListCompetitions(eventTypeId);
+                    eventsByCompetition = _bfSportsbookHandler.ListEventsByCompetition(
                         eventTypeId, competitions.Select(c => c.Competition));
                     events = eventsByCompetition.SelectMany(e => e.Value);
                     break;
@@ -348,7 +430,7 @@ namespace Betfair.ExchangeComparison.Services
 
                 foreach (var eventId in eventIds)
                 {
-                    var marketCatalogue = _sportsbookHandler.ListMarketCatalogues(
+                    var marketCatalogue = _bfSportsbookHandler.ListMarketCatalogues(
                         new HashSet<string>
                         {
                             eventId
@@ -369,6 +451,9 @@ namespace Betfair.ExchangeComparison.Services
 
         public Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> GetSportsbookEventsWithPrices(IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> eventsWithMarkets)
         {
+            var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
+            handler.TryLogin();
+
             var result = new Dictionary<EventWithCompetition, IEnumerable<MarketDetail>>();
 
             var marketIds = eventsWithMarkets.SelectMany(m => m.Value)
@@ -380,7 +465,7 @@ namespace Betfair.ExchangeComparison.Services
                 return result;
             }
 
-            var prices = _sportsbookHandler.ListPrices(marketIds);
+            var prices = _bfSportsbookHandler.ListPrices(marketIds);
 
             foreach (var eventwithCompetition in eventsWithMarkets)
             {
@@ -419,63 +504,30 @@ namespace Betfair.ExchangeComparison.Services
 
                 foreach (var market in @event.Value)
                 {
-                    result.Add(new MarketDetailWithEvent { EventWithCompetition = @event.Key, SportsbookMarket = market });
+                    result.Add(new MarketDetailWithEvent
+                    {
+                        EventWithCompetition = @event.Key,
+                        SportsbookMarket = market
+                    }
+                    );
                 }
             }
 
             return result;
         }
 
-
-        public IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport)
+        private ISportsbookHandler ResolveHandler(Bookmaker bookmaker)
         {
-            if (!SportsbookMarketDetailsStore.ContainsKey(DateTime.Today))
+            switch (bookmaker)
             {
-                var sportsbookEvents = SportsbookMarketCataloguesToday(sport,
-                    BetfairQueryExtensions.TimeRangeForNextDays(1));
-
-                var sportsbookPrices = GetSportsbookEventsWithPrices(sportsbookEvents);
-                var compoundCatalog = BuildCompoundCatalog(sportsbookPrices);
-
-                SportsbookMarketDetailsStore.Add(DateTime.Today,
-                    new Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>()
-                    {
-                        { sport, compoundCatalog }
-                    });
-
-                return compoundCatalog;
+                case Bookmaker.PaddyPower:
+                    return _ppSportsbookHandler;
+                default:
+                    return _bfSportsbookHandler;
             }
-
-            return SportsbookMarketDetailsStore[DateTime.Today][sport];
         }
 
-        public IEnumerable<MarketDetailWithEvent> UpdateCatalog(Sport sport)
-        {
-            if (SportsbookMarketDetailsStore.ContainsKey(DateTime.Today))
-            {
-                var sportsbookEvents = SportsbookMarketCataloguesToday(sport,
-                    BetfairQueryExtensions.TimeRangeForNextDays(1));
-
-                var sportsbookPrices = GetSportsbookEventsWithPrices(sportsbookEvents);
-
-                var compoundCatalog = BuildCompoundCatalog(sportsbookPrices);
-
-                if (SportsbookMarketDetailsStore[DateTime.Today].ContainsKey(sport))
-                {
-                    SportsbookMarketDetailsStore[DateTime.Today][sport] = compoundCatalog;
-                }
-
-                return compoundCatalog;
-            }
-            else
-            {
-                GetCatalog(sport);
-            }
-
-            return SportsbookMarketDetailsStore[DateTime.Today][sport];
-        }
-
-
+        #endregion
     }
 }
 

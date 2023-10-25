@@ -12,7 +12,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         {
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.Betfair)
+        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
@@ -61,7 +61,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.Betfair)
+        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;

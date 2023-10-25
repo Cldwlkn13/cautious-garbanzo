@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Configurations;
+﻿using Betfair.ExchangeComparison.Auth.Settings;
+using Betfair.ExchangeComparison.Configurations;
 using Betfair.ExchangeComparison.Data;
 using Betfair.ExchangeComparison.Exchange.Settings;
 using Betfair.ExchangeComparison.Handlers;
@@ -28,6 +29,7 @@ namespace Betfair.ExchangeComparison
             services.ConfigureExchange();
             services.ConfigureSportsbook();
             services.ConfigureScrapers();
+            services.ConfigureAuth();
             services.AddHealthChecks();
             services.AddSignalR();
 

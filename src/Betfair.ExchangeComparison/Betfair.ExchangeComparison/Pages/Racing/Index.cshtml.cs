@@ -21,7 +21,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
     public class IndexModel : PageModel
     {
         private readonly IExchangeHandler _exchangeHandler;
-        private readonly ISportsbookHandler _sportsbookHandler;
+        private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
         private readonly ICatalogService _catalogService;
         private readonly IScrapingOrchestrator _scrapingOrchestrator;
         private readonly IPricingComparisonHandler _pricingComparisonHandler;
@@ -38,10 +38,10 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
         public List<SelectListItem> SelectListBookmakers { get; set; }
 
-        public IndexModel(IExchangeHandler exchangeHandler, ISportsbookHandler sportsbookHandler, ICatalogService catalogService, IScrapingOrchestrator scrapingOrchestrator, IPricingComparisonHandler pricingComparisonHandler, IMappingService mappingService, IScrapingControl scrapingControl)
+        public IndexModel(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, ICatalogService catalogService, IScrapingOrchestrator scrapingOrchestrator, IPricingComparisonHandler pricingComparisonHandler, IMappingService mappingService, IScrapingControl scrapingControl)
         {
             _exchangeHandler = exchangeHandler;
-            _sportsbookHandler = sportsbookHandler;
+            _bfSportsbookHandler = bfSportsbookHandler;
             _catalogService = catalogService;
             _scrapingOrchestrator = scrapingOrchestrator;
             _pricingComparisonHandler = pricingComparisonHandler;
@@ -49,7 +49,11 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             _scrapingControl = scrapingControl;
 
             CatalogViewModel = new CatalogViewModel();
-            SelectListBookmakers = typeof(Bookmaker).SelectList(ignoreCase: Bookmaker.Unknown);
+            SelectListBookmakers = typeof(Bookmaker).SelectList(ignoreCases: new string[] {
+                Bookmaker.BetfairExchange.ToString(),
+                Bookmaker.PaddyPower.ToString(),
+                Bookmaker.Unknown.ToString()
+            });
         }
 
         public async Task<IActionResult> OnGet()
@@ -63,7 +67,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
             if (!Enum.TryParse(typeof(Bookmaker), bookmakerString, out var savedBookmaker))
             {
-                bookmaker = Bookmaker.Betfair;
+                bookmaker = Bookmaker.BetfairSportsbook;
             }
             else
             {
@@ -90,9 +94,13 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
             try
             {
-                //build exchange components
-                var t1 = _catalogService.GetSportsbookCatalogue(Sport.Racing, BetfairQueryExtensions.TimeRangeForNextDays(1));
-                var t2 = _catalogService.GetExchangeCatalogue(Sport.Racing, BetfairQueryExtensions.TimeRangeForNextDays(1));
+                var t1 = _catalogService.GetSportsbookCatalogue(
+                    Sport.Racing,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1), bookmaker);
+
+                var t2 = _catalogService.GetExchangeCatalogue(
+                    Sport.Racing,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
 
                 await Task.WhenAll(new Task[] { t1, t2 });
 
@@ -318,9 +326,18 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                 return Page();
             }
+            catch (APINGException apiException)
+            {
+                Console.WriteLine($"APING_EXCEPTION; " +
+                    $"Exception={apiException.Message};" +
+                    $"ErrorCode={apiException.ErrorCode};");
+
+                return Page();
+            }
             catch (System.Exception exception)
             {
-                Console.WriteLine($"CATALOG_BUILD_EXCEPTION; Exception={exception.Message}");
+                Console.WriteLine($"CATALOG_BUILD_EXCEPTION; " +
+                    $"Exception={exception.Message}");
 
                 return Page();
             }

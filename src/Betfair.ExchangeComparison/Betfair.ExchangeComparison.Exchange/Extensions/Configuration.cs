@@ -9,7 +9,6 @@ namespace Betfair.ExchangeComparison.Configurations
     {
         public static void ConfigureExchange(this IServiceCollection services)
         {
-            services.AddTransient<IAuthClient, AuthClient>();
             services.AddSingleton<IExchangeHandler, ExchangeHandler>();
             services.AddSingleton<IExchangeClient, ExchangeClient>();
         }
