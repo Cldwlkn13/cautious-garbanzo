@@ -15,6 +15,8 @@
 		<None Remove="DomainModel\" />
 		<None Remove="SportsbookModel\" />
 		<None Remove="Enums\" />
+		<None Remove="CommonInterfaces\" />
+		<None Remove="CustomExceptions\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Extensions\" />
@@ -23,6 +25,8 @@
 		<Folder Include="DomainModel\" />
 		<Folder Include="SportsbookModel\" />
 		<Folder Include="Enums\" />
+		<Folder Include="CommonInterfaces\" />
+		<Folder Include="CustomExceptions\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

@@ -8,18 +8,18 @@ namespace Betfair.ExchangeComparison.Interfaces
 {
     public interface ICatalogService
     {
-        Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null);
+        Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook);
         Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport, TimeRange? timeRange = null);
 
         IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport);
         IEnumerable<MarketDetailWithEvent> UpdateCatalog(Sport sport);
 
-        IDictionary<string, Event> GetExchangeEventsWithMarkets(string eventTypeId);
-        IEnumerable<MarketCatalogue> GetExchangeMarketCatalogues(string eventTypeId, IEnumerable<string>? eventIds = null);
-        ConcurrentDictionary<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> GetExchangeMarketBooks(
-            IEnumerable<MarketCatalogue> marketCatalogues, IDictionary<string, Event>? eventDict);
-        IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> GetSportsbookEventsWithMarkets(string eventTypeId, TimeRange? timeRange = null);
-        Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> GetSportsbookEventsWithPrices(IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> eventsWithMarkets);
+        //IDictionary<string, Event> GetExchangeEventsWithMarkets(string eventTypeId);
+        //IEnumerable<MarketCatalogue> GetExchangeMarketCatalogues(string eventTypeId, IEnumerable<string>? eventIds = null);
+        //ConcurrentDictionary<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> GetExchangeMarketBooks(
+        //    IEnumerable<MarketCatalogue> marketCatalogues, IDictionary<string, Event>? eventDict);
+        //IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> GetSportsbookEventsWithMarkets(string eventTypeId, TimeRange? timeRange = null);
+        //Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> GetSportsbookEventsWithPrices(IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> eventsWithMarkets);
 
         public Dictionary<DateTime, Dictionary<Sport, Dictionary<string, Event>>> ExchangeEventStore { get; }
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>> ExchangeMarketCatalogueStore { get; }

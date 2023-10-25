@@ -9,7 +9,8 @@ namespace Betfair.ExchangeComparison.Configurations
     {
         public static void ConfigureSportsbook(this IServiceCollection services)
         {
-            services.AddSingleton<ISportsbookHandler, SportsbookHandler>();
+            services.AddSingleton<IBetfairSportsbookHandler, BetfairSportsbookHandler>();
+            services.AddSingleton<IPaddyPowerSportsbookHandler, PaddyPowerSportsbookHandler>();
             services.AddSingleton<ISportsbookClient, SportsbookClient>();
         }
     }

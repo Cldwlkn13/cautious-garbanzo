@@ -4,9 +4,10 @@ namespace Betfair.ExchangeComparison.Domain.Enums
     public enum Bookmaker
     {
         Unknown,
-        Betfair,
-        //PaddyPower,
+        BetfairSportsbook,
+        PaddyPower,
         Boylesports,
+        BetfairExchange,
         //WilliamHill
     }
 }

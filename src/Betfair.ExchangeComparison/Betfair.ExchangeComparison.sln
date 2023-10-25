@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Auth", "Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj", "{4737A88D-FBFD-487F-8004-4587BE0CFF88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{5EBB98CD-BBB5-42FE-B22F-0EC95E4067B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EBB98CD-BBB5-42FE-B22F-0EC95E4067B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EBB98CD-BBB5-42FE-B22F-0EC95E4067B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

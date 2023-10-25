@@ -25,7 +25,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
             ExchangeWinBestBlue = rpo.BestWinAvailable[Side.BACK].Price;
             ExchangeWinBestPink = rpo.BestWinAvailable[Side.LAY].Price;
             ExchangeWinBestPinkSize = rpo.BestWinAvailable[Side.LAY].Size;
-            ExchangePlaceBestPink = rpo.BestPlaceAvailable[Side.LAY].Price;
+            ExchangePlaceBestPink = rpo.BestPlaceAvailable != null ? rpo.BestPlaceAvailable[Side.LAY].Price : 0;
             ExpectedValueWin = rpo.ExpectedValueWin;
             ExpectedValueEachWay = rpo.ExpectedValueEachWay;
             NumberOfPlaces = rpo.NumberEachWayPlaces;

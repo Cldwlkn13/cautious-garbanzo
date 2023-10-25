@@ -45,6 +45,9 @@
 		<ProjectReference Include="..\Betfair.ExchangeComparison.Scraping\Betfair.ExchangeComparison.Scraping.csproj">
 		  <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
 		</ProjectReference>
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj">
+		  <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Pages\Racing\" />

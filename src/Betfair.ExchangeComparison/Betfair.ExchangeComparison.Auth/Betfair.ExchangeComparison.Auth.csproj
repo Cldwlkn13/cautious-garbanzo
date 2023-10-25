@@ -4,17 +4,23 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<UserSecretsId>bc9330e8-b459-4bb5-b84a-54042ce6ffc5</UserSecretsId>
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="5.0.0" />
+	  <None Remove="Extensions\" />
+	  <None Remove="Clients\" />
+	  <None Remove="Interfaces\" />
+	  <None Remove="Settings\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
+	  <Folder Include="Clients\" />
+	  <Folder Include="Interfaces\" />
+	  <Folder Include="Settings\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj" />
-	  <ProjectReference Include="..\Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj" />
 	</ItemGroup>
 </Project>

@@ -1,4 +1,6 @@
-﻿using Betfair.ExchangeComparison.Domain.Extensions;
+﻿using Betfair.ExchangeComparison.Auth.Interfaces;
+using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Exchange.Clients;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
@@ -9,67 +11,34 @@ namespace Betfair.ExchangeComparison.Exchange
 {
     public class ExchangeHandler : IExchangeHandler
     {
-        private readonly IAuthClient _authClient;
         private readonly IOptions<ExchangeSettings> _options;
-        private readonly IOptions<LoginSettings> _logins;
+        private readonly IAuthHandler _authHandler;
 
         private IExchangeClient? _exchangeClient;
+        private const Bookmaker _bookmaker = Bookmaker.BetfairExchange;
 
-        public ExchangeHandler(IAuthClient authClient, IOptions<ExchangeSettings> options, IOptions<LoginSettings> logins)
+        public ExchangeHandler(IOptions<ExchangeSettings> options, IAuthHandler authHandler)
         {
-            _authClient = authClient;
             _options = options;
-            _logins = logins;
+            _authHandler = authHandler;
 
-            SessionToken = string.Empty;
-
-            Username = Environment.GetEnvironmentVariable("USERNAME") != null ?
-                Environment.GetEnvironmentVariable("USERNAME")! :
-                logins.Value.USERNAME!;
-
-            Password = Environment.GetEnvironmentVariable("PASSWORD") != null ?
-                Environment.GetEnvironmentVariable("PASSWORD")! :
-                logins.Value.PASSWORD!;
-
-            AppKey = Environment.GetEnvironmentVariable("APP_KEY") != null ?
-                Environment.GetEnvironmentVariable("APP_KEY")! :
-                logins.Value.APP_KEY!;
-
-            if (!SessionValid())
+            if (_authHandler.TryLogin(_bookmaker))
             {
-                Login();
-
                 _exchangeClient = new ExchangeClient(
-                    _options.Value.Url, AppKey, SessionToken);
+                    _options.Value.Url,
+                    _authHandler.AppKey,
+                    _authHandler.SessionTokens[_bookmaker]);
             }
         }
 
-        public string SessionToken { get; private set; }
-        public DateTime TokenExpiry { get; set; }
-        public string AppKey { get; private set; }
+        public bool TryLogin() =>
+            _authHandler.TryLogin(_bookmaker);
 
-        private string Username { get; set; }
-        private string Password { get; set; }
+        public bool Login(string username = "", string password = "") =>
+            _authHandler.Login(username, password, _bookmaker);
 
-        public bool Login(string username = "", string password = "")
-        {
-            var loginResult = _authClient.Login(Username, Password) ??
-                throw new NullReferenceException($"Login Failed");
-
-            SessionToken = loginResult.Token;
-            TokenExpiry = DateTime.UtcNow.AddHours(1);
-
-            Console.WriteLine($"SESSION_TOKEN_RENEWED; " +
-                $"ValidTo={TokenExpiry.ToString("dd-MM-yyyy HH:mm")}");
-
-            return !string.IsNullOrEmpty(SessionToken);
-        }
-
-        public bool SessionValid()
-        {
-            return !string.IsNullOrEmpty(SessionToken) &&
-                DateTime.UtcNow < TokenExpiry;
-        }
+        public bool SessionValid() =>
+            _authHandler.SessionValid(_bookmaker);
 
         public IList<EventTypeResult> ListEventTypes()
         {
@@ -81,7 +50,39 @@ namespace Betfair.ExchangeComparison.Exchange
             return eventTypes;
         }
 
-        public IList<EventResult> ListEvents(string eventTypeId = "7", TimeRange? timeRange = null)
+        public IList<CompetitionResult> ListCompetitions
+            (string eventTypeId = "7", TimeRange? timeRange = null)
+        {
+            var time = new TimeRange();
+
+            if (timeRange == null)
+            {
+                time = new TimeRange()
+                {
+                    From = DateTime.Now,
+                    To = eventTypeId == "7" ?
+                    DateTime.Today.AddDays(_options.Value.RacingQueryToDays) :
+                    DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
+                };
+            }
+            else
+            {
+                time = timeRange;
+            }
+
+            var marketFilter = new MarketFilter();
+            marketFilter.EventTypeIds = new List<string> { eventTypeId }.ToHashSet();
+            marketFilter.MarketStartTime = time;
+            marketFilter.MarketCountries = eventTypeId.CountryCodes();
+
+            var result = _exchangeClient?.ListCompetitions(marketFilter) ??
+                throw new NullReferenceException($"Competitions null.");
+
+            return result;
+        }
+
+        public IList<EventResult> ListEvents(
+            string eventTypeId = "7", TimeRange? timeRange = null)
         {
             var time = new TimeRange();
 
@@ -111,7 +112,46 @@ namespace Betfair.ExchangeComparison.Exchange
             return events;
         }
 
-        public IList<MarketCatalogue> ListMarketCatalogues(string eventTypeId = "7", TimeRange? timeRange = null, IEnumerable<string>? eventIds = null)
+        public Dictionary<Competition, IEnumerable<Event>> ListEventsByCompetition(IEnumerable<Competition> competitions,
+                string eventTypeId = "7", TimeRange? timeRange = null)
+        {
+            var result = new Dictionary<Competition, IEnumerable<Event>>();
+
+            var time = new TimeRange();
+
+            if (timeRange == null)
+            {
+                time = new TimeRange()
+                {
+                    From = DateTime.Now,
+                    To = eventTypeId == "7" ?
+                    DateTime.Today.AddDays(_options.Value.RacingQueryToDays) :
+                    DateTime.Now.AddHours(_options.Value.FootballQueryToHours)
+                };
+            }
+            else
+            {
+                time = timeRange;
+            }
+
+            foreach (var competition in competitions)
+            {
+                var marketFilter = new MarketFilter();
+                marketFilter.CompetitionIds = new List<string> { competition.Id }.ToHashSet();
+                marketFilter.MarketStartTime = time;
+                marketFilter.MarketCountries = eventTypeId.CountryCodes();
+
+                var events = _exchangeClient?.ListEvents(marketFilter) ??
+                    throw new NullReferenceException($"Events null.");
+
+                result.Add(competition, events.Select(e => e.Event));
+            }
+
+            return result;
+        }
+
+        public IList<MarketCatalogue> ListMarketCatalogues(
+            string eventTypeId = "7", TimeRange? timeRange = null, IEnumerable<string>? eventIds = null)
         {
             var marketFilter = new MarketFilter();
             marketFilter.EventTypeIds = new List<string> { eventTypeId }.ToHashSet();

@@ -14,7 +14,7 @@ namespace Betfair.ExchangeComparison.Handlers
 
         public List<BestRunner> TryAddToBestRunnersWinOnly(List<BestRunner> bestRunners, RunnerPriceOverview rpo)
         {
-            if (rpo.ExpectedValueWin > -0.03 && rpo.NumberEachWayPlaces > 1 && rpo.ExpectedWinPrice > 1)
+            if (rpo.ExpectedValueWin > -0.03 && rpo.ExpectedWinPrice > 1)
             {
                 bestRunners.Add(new BestRunner(rpo));
             }
