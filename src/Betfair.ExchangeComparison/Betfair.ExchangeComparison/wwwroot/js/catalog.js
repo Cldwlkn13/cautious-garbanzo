@@ -9,6 +9,9 @@
         $.post({
             url: "/Racing",
             data: data,
+            success: function (result) {
+                location.reload();
+            }
         });
     };
 });

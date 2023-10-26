@@ -16,6 +16,11 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         {
             throw new NotImplementedException();
         }
+
+        public ScrapedEvent BuildScrapedEvent(string html)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

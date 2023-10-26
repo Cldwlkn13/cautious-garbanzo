@@ -27,9 +27,30 @@ namespace Betfair.ExchangeComparison.Scraping.Extensions
             return result;
         }
 
-        public static HtmlNodeCollection SelectManyNodes(this HtmlDocument document, string elementType, string attr, string selector)
+        public static HtmlNodeCollection SelectManyNodesContains(this HtmlDocument document, string elementType, string attr, string selector)
         {
             var result = document.DocumentNode.SelectNodes($"//{elementType}[contains(@{attr},'{selector}')]");
+
+            return result;
+        }
+
+        public static HtmlNodeCollection SelectManyNodesContains(this HtmlNode node, string elementType, string attr, string selector)
+        {
+            var result = node.SelectNodes($"//{elementType}[contains(@{attr},'{selector}')]");
+
+            return result;
+        }
+
+        public static HtmlNodeCollection SelectManyNodes(this HtmlDocument document, string elementType, string attr, string selector)
+        {
+            var result = document.DocumentNode.SelectNodes($"//{elementType}[@{attr}='{selector}']");
+
+            return result;
+        }
+
+        public static HtmlNodeCollection SelectManyNodes(this HtmlNode node, string elementType, string attr, string selector)
+        {
+            var result = node.SelectNodes($"//{elementType}[@{attr}='{selector}']");
 
             return result;
         }

@@ -29,7 +29,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         private readonly IScrapingControl _scrapingControl;
 
         const string EventTypeId = "7";
-        private Bookmaker[] IsScrapable = new Bookmaker[] { Bookmaker.Boylesports };
+        private Bookmaker[] IsScrapable = new Bookmaker[] { Bookmaker.Boylesports, Bookmaker.WilliamHill, Bookmaker.Ladbrokes };
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
@@ -49,10 +49,11 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             _scrapingControl = scrapingControl;
 
             CatalogViewModel = new CatalogViewModel();
-            SelectListBookmakers = typeof(Bookmaker).SelectList(ignoreCases: new string[] {
-                Bookmaker.BetfairExchange.ToString(),
-                Bookmaker.PaddyPower.ToString(),
-                Bookmaker.Unknown.ToString()
+            SelectListBookmakers = typeof(Bookmaker).SelectList(cases: new string[] {
+                Bookmaker.BetfairSportsbook.ToString(),
+                Bookmaker.Boylesports.ToString(),
+                Bookmaker.WilliamHill.ToString(),
+                Bookmaker.Ladbrokes.ToString()
             });
         }
 
@@ -76,20 +77,36 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
             SelectListBookmakers.FirstOrDefault(bm => bm.Text == bookmaker.ToString())!.Selected = true;
 
-            foreach (var bm in _scrapingControl.SwitchBoard.Keys
-                .Where(b => b != bookmaker))
+            var provider = MapProviderToBookmaker();
+
+            Provider MapProviderToBookmaker()
             {
-                if (_scrapingControl.SwitchBoard[bm])
+                switch (bookmaker)
                 {
-                    Console.WriteLine($"Stopping {bm} scraping!");
-                    _scrapingControl.Stop(bm);
+                    case Bookmaker.Boylesports:
+                    case Bookmaker.Ladbrokes:
+                    case Bookmaker.WilliamHill:
+                        return Provider.Oddschecker;
+                    default:
+                        return Provider.BetfairSportsbook;
                 }
             }
 
-            if (IsScrapable.Contains(bookmaker) && !_scrapingControl.SwitchBoard[bookmaker])
+            foreach (var prv in _scrapingControl.SwitchBoard.Keys
+                .Where(p => p != provider))
             {
+                if (_scrapingControl.SwitchBoard[prv])
+                {
+                    Console.WriteLine($"Stopping {prv} scraping!");
+                    _scrapingControl.Stop(prv);
+                }
+            }
+
+            if (IsScrapable.Contains(bookmaker) && !_scrapingControl.SwitchBoard[provider])
+            {
+
                 Console.WriteLine($"Starting {bookmaker} scraping!");
-                _scrapingControl.Start(bookmaker);
+                _scrapingControl.Start(provider);
             }
 
             try
@@ -112,7 +129,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                 if (IsScrapable.Contains(bookmaker))
                 {
                     _scrapingOrchestrator.TryGetScrapedEvents(
-                        bookmaker, DateTime.Today, out scrapedEvents);
+                        provider, DateTime.Today, out scrapedEvents);
                 }
 
                 foreach (var @event in sportsbookCatalogue.EventsWithMarketCatalogue.Keys)
@@ -165,8 +182,12 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                     }
                                     else
                                     {
-                                        numberOfPlaces = mappedScrapedMarket.ScrapedEachWayTerms.NumberOfPlaces;
-                                        eachWayFraction = mappedScrapedMarket.ScrapedEachWayTerms.EachWayFraction;
+                                        if (mappedScrapedMarket.ScrapedEachWayTerms != null && mappedScrapedMarket.ScrapedEachWayTerms.TryGetScrapedEachWayTermsByBookmaker(bookmaker, out var scrapedEachWayTerms))
+                                        {
+                                            numberOfPlaces = scrapedEachWayTerms.NumberOfPlaces;
+                                            eachWayFraction = scrapedEachWayTerms.EachWayFraction;
+                                        }
+
                                     }
                                 }
                                 else
@@ -343,11 +364,11 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             }
         }
 
-        public Task<IActionResult> OnPost(RacingFormModel formModel)
+        public async Task<IActionResult> OnPost(RacingFormModel formModel)
         {
             HttpContext.Session.SetString("Bookmaker", formModel.Bookmaker.ToString());
 
-            return OnGet();
+            return await OnGet();
         }
     }
 }

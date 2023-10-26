@@ -1,4 +1,6 @@
 ﻿using System;
+using Betfair.ExchangeComparison.Domain.Enums;
+
 namespace Betfair.ExchangeComparison.Domain.ScrapingModel
 {
     public class ScrapedEachWayTerms
@@ -7,18 +9,20 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
         {
         }
 
-        public ScrapedEachWayTerms(int places, int fraction)
+        public ScrapedEachWayTerms(int places, int fraction, Bookmaker bookmaker)
         {
             NumberOfPlaces = places;
             EachWayFraction = fraction;
+            Bookmaker = bookmaker;
         }
 
+        public Bookmaker Bookmaker { get; set; }
         public int NumberOfPlaces { get; set; }
         public int EachWayFraction { get; set; }
 
         public override string ToString()
         {
-            return $"{NumberOfPlaces} 1/{EachWayFraction}";
+            return $"{Bookmaker} - {NumberOfPlaces} 1/{EachWayFraction}";
         }
     }
 }

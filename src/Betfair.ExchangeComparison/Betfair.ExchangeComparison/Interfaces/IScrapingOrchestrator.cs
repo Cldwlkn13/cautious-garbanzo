@@ -7,11 +7,12 @@ namespace Betfair.ExchangeComparison.Interfaces
 {
     public interface IScrapingOrchestrator
     {
-        Task Orchestrate(IEnumerable<MarketDetailWithEvent> catalog, Bookmaker bookmaker);
-        bool TryGetScrapedEvents(Bookmaker bookmaker, DateTime dateTime, out List<ScrapedEvent> result);
+        Task Orchestrate(IEnumerable<MarketDetailWithEvent> catalog, Provider provider);
+        bool TryGetScrapedEvents(Provider provider, DateTime dateTime, out List<ScrapedEvent> result);
         Task<UsageModel> Usage();
+        //public Dictionary<Provider, bool> SwitchBoard { get; }
 
-        public ConcurrentDictionary<Bookmaker, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>> ScrapedEventsCatalog { get; }
+        public ConcurrentDictionary<Provider, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>> ScrapedEventsCatalog { get; }
     }
 }
 

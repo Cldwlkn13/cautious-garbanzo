@@ -1,15 +1,13 @@
 ﻿using System;
 namespace Betfair.ExchangeComparison.Domain.Enums
 {
-    public enum Bookmaker
+    public enum Provider
     {
         Unknown,
         BetfairSportsbook,
-        PaddyPower,
-        Boylesports,
         BetfairExchange,
-        WilliamHill,
-        Ladbrokes,
+        Oddschecker,
+        Boylesports
     }
 }
 

@@ -14,6 +14,10 @@
 		<None Remove="Extensions\" />
 		<None Remove="Boylesports\Interfaces\" />
 		<None Remove="Settings\" />
+		<None Remove="WilliamHill\" />
+		<None Remove="WilliamHill\Interfaces\" />
+		<None Remove="Oddschecker\" />
+		<None Remove="Oddschecker\Interfaces\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Boylesports\" />
@@ -21,6 +25,10 @@
 		<Folder Include="Extensions\" />
 		<Folder Include="Boylesports\Interfaces\" />
 		<Folder Include="Settings\" />
+		<Folder Include="WilliamHill\" />
+		<Folder Include="WilliamHill\Interfaces\" />
+		<Folder Include="Oddschecker\" />
+		<Folder Include="Oddschecker\Interfaces\" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
