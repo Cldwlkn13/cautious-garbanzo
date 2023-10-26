@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using System.Net;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Scraping.Interfaces;
 using Betfair.ExchangeComparison.Scraping.Settings;
 using Microsoft.Extensions.Logging;
@@ -30,7 +31,7 @@ namespace Betfair.ExchangeComparison.Scraping
                 settings.Value.ZENROWS_API_KEY!;
         }
 
-        public string Scrape(string url)
+        public string ScrapeZenRows(string url)
         {
             var client = new RestClient($"https://api.zenrows.com/v1/?apikey={ZenRowsApiKey}&url={url}");
             var request = new RestRequest();
@@ -50,13 +51,15 @@ namespace Betfair.ExchangeComparison.Scraping
             }
         }
 
-        public async Task<string> ScrapeAsync(string url, bool jsRender = false, bool antiBot = false)
+        public async Task<string> ScrapeZenRowsAsync(string url, Dictionary<string, string> parameters)
         {
             var client = new RestClient($"https://api.zenrows.com/v1/?apikey={ZenRowsApiKey}&url={url}");
             var request = new RestRequest();
 
-            if (jsRender) request.AddParameter("js_render", "true");
-            if (antiBot) request.AddParameter("antibot", "true");
+            foreach (var param in parameters)
+            {
+                request.AddParameter(param.Key, param.Value);
+            }
 
             string html = string.Empty;
             try
@@ -68,13 +71,51 @@ namespace Betfair.ExchangeComparison.Scraping
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"SCRAPE_RESPONSE_COMPLETE_FAILURE url={url} Exception={exception.Message}");
+                Console.WriteLine($"SCRAPE_RESPONSE_COMPLETE_FAILURE url={url} " +
+                    $"Exception={exception.Message}");
 
                 return string.Empty;
             }
         }
 
-        public async Task<UsageModel> Usage()
+        public async Task<string> ScrapeAsync(string url)
+        {
+            var client = new RestClient(url);
+            var request = new RestRequest();
+
+            string html = string.Empty;
+            try
+            {
+                //var result = await RetryPolicy().ExecuteAsync(
+                //     () => client.ExecuteAsync(request));
+
+                var result = await client.ExecuteAsync(request);
+
+                if (result.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Console.WriteLine($"SCRAPE_ASYNC_FAILED; Url={url}; Calling Zenrows.");
+
+                    return await ScrapeZenRowsAsync(url,
+                        new Dictionary<string, string>
+                        {
+                            //{ "js_render", "true" },
+                            //{ "antibot", "true" }
+                            //{ "css_extractor", "{'oddsTable':'div[id=oddsTableContainer]'}" }
+                        });
+                }
+
+                return result.Content == null ? "" : result.Content;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"SCRAPE_RESPONSE_COMPLETE_FAILURE url={url} " +
+                    $"Exception={exception.Message}");
+
+                return string.Empty;
+            }
+        }
+
+        public async Task<UsageModel> ZenRowsUsage()
         {
             var client = new RestClient($"https://api.zenrows.com/v1/usage?apikey={ZenRowsApiKey}");
             var request = new RestRequest();

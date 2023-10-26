@@ -67,16 +67,16 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             MarketDetail = marketDetail;
             Bookmaker = bookmaker;
 
-            if (scrapedRunner.ScrapedPrice != null)
+            if (scrapedRunner.ScrapedPrices != null && scrapedRunner.ScrapedPrices.TryGetScrapedPriceByBookmaker(bookmaker, out var scrapedPrice))
             {
                 SportsbookRunner = new RunnerDetail
                 {
                     selectionName = sportsbookRunner.selectionName,
                     winRunnerOdds = new WinRunnerOdds
                     {
-                        @decimal = (double)scrapedRunner.ScrapedPrice.Decimal,
-                        numerator = scrapedRunner.ScrapedPrice.Numerator,
-                        denominator = scrapedRunner.ScrapedPrice.Denominator
+                        @decimal = (double)scrapedPrice.Decimal,
+                        numerator = scrapedPrice.Numerator,
+                        denominator = scrapedPrice.Denominator
                     }
                 };
             }
@@ -104,10 +104,12 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             VolumeTradedBelowSportsbook = exchangeWinRunner.TradedVolumeBelowSportsbook(
                 SportsbookRunner.winRunnerOdds.@decimal);
 
-            if (scrapedMarket.ScrapedEachWayTerms != null)
+            if (scrapedMarket.ScrapedEachWayTerms != null &&
+                scrapedMarket.ScrapedEachWayTerms.TryGetScrapedEachWayTermsByBookmaker(
+                    bookmaker, out var scrapedEachWayTerms))
             {
-                NumberEachWayPlaces = scrapedMarket.ScrapedEachWayTerms.NumberOfPlaces;
-                EachWayFraction = scrapedMarket.ScrapedEachWayTerms.EachWayFraction;
+                NumberEachWayPlaces = scrapedEachWayTerms.NumberOfPlaces;
+                EachWayFraction = scrapedEachWayTerms.EachWayFraction;
             }
             else
             {
@@ -134,7 +136,6 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
 
                 ExpectedValueEachWay = (ExpectedValueWin + ExpectedValuePlace) + 1;
             }
-
         }
 
         public EventWithCompetition EventWithCompetition { get; set; }

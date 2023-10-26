@@ -21,31 +21,38 @@ namespace Betfair.ExchangeComparison
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var delay = 1000;
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                foreach (var bm in _scrapingControl.SwitchBoard.Keys)
+                foreach (var provider in _scrapingControl.SwitchBoard.Keys)
                 {
-                    if (_scrapingControl.SwitchBoard[bm])
+                    if (_scrapingControl.SwitchBoard[provider])
                     {
-                        var catalog = _catalogService.UpdateCatalog(Sport.Racing);
+                        var catalog = _catalogService.UpdateMarketDetailCatalog(Sport.Racing, 1);
+
+                        if (!catalog.Any())
+                        {
+                            catalog = _catalogService.UpdateMarketDetailCatalog(Sport.Racing, 2);
+                        }
 
                         if (catalog.Any())
                         {
-                            await _scrapingOrchestrator.Orchestrate(catalog, bm);
+                            await _scrapingOrchestrator.Orchestrate(catalog, provider);
+
+                            delay = 10000;
                         }
                         else
                         {
-                            var wait = 60000 * 60;
+                            delay = 60000 * 60;
 
-                            Console.WriteLine($"Worker : ExecuteAsync() Waiting {wait / 60 / 1000} " +
+                            Console.WriteLine($"Worker : ExecuteAsync() Waiting {delay / 60 / 1000} " +
                                 $"minutes before trying again");
-
-                            await Task.Delay(wait, stoppingToken);
                         }
                     }
                 }
 
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(delay, stoppingToken);
             }
         }
     }

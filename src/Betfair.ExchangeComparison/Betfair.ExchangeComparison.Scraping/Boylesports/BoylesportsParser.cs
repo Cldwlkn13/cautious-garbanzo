@@ -1,4 +1,6 @@
-﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+﻿using System.ComponentModel;
+using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces;
@@ -28,7 +30,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
                 var innerMarketNode = GetInnerMarketNode(marketNodeDocument);
                 var innerMarketNodeDocument = innerMarketNode.InnerHtml.LoadDocument();
 
-                var oddsNodes = innerMarketNodeDocument.SelectManyNodes("a", "class", "odds");
+                var oddsNodes = innerMarketNodeDocument.SelectManyNodesContains("a", "class", "odds");
 
                 var scrapedRunners = new List<ScrapedRunner>();
                 foreach (var oddsNode in oddsNodes)
@@ -41,8 +43,10 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
                     {
                         continue;
                     }
-
-                    var scrapedRunner = new ScrapedRunner(name, price);
+                    var scrapedRunner = new ScrapedRunner(name, new List<ScrapedPrice>
+                    {
+                        new ScrapedPrice(price, Bookmaker.Boylesports)
+                    });
                     scrapedRunners.Add(scrapedRunner);
                 }
 
@@ -80,13 +84,13 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         }
 
         // (EW 1/5 1,2,3)
-        private static ScrapedEachWayTerms ExtractEachWayTerms(string? eachWayString)
+        private static List<ScrapedEachWayTerms> ExtractEachWayTerms(string? eachWayString)
         {
             var scrapedEachWayTerms = new ScrapedEachWayTerms();
 
             if (string.IsNullOrEmpty(eachWayString) ||
                 !eachWayString.Contains("/") ||
-                !eachWayString.Contains(",")) return scrapedEachWayTerms;
+                !eachWayString.Contains(",")) return new List<ScrapedEachWayTerms>();
 
             var splitAtFraction = eachWayString.Split("/");
             int.TryParse(splitAtFraction[1].Substring(0, 1), out var fraction);
@@ -96,8 +100,9 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
             scrapedEachWayTerms.EachWayFraction = fraction;
             scrapedEachWayTerms.NumberOfPlaces = places;
+            scrapedEachWayTerms.Bookmaker = Domain.Enums.Bookmaker.Boylesports;
 
-            return scrapedEachWayTerms;
+            return new List<ScrapedEachWayTerms>() { scrapedEachWayTerms };
         }
     }
 }

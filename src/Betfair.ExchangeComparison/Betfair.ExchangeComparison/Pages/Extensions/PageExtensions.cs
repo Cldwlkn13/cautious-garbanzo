@@ -4,12 +4,12 @@ namespace Betfair.ExchangeComparison.Pages.Extensions
 {
     public static class PageExtensions
     {
-        public static List<SelectListItem> SelectList(this Type type, string[] ignoreCases)
+        public static List<SelectListItem> SelectList(this Type type, string[] cases)
         {
             var result = new List<SelectListItem>();
             foreach (var obj in Enum.GetValues(type))
             {
-                if (!ignoreCases.Contains(obj.ToString()))
+                if (cases.Contains(obj.ToString()))
                 {
                     result.Add(new SelectListItem()
                     {

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Betfair.ExchangeComparison.Domain.Enums;
+
 namespace Betfair.ExchangeComparison.Domain.ScrapingModel
 {
     public class ScrapedMarket
@@ -6,23 +9,23 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
         public ScrapedMarket()
         {
             ScrapedRunners = new List<ScrapedRunner>();
-            ScrapedEachWayTerms = new ScrapedEachWayTerms();
+            ScrapedEachWayTerms = new List<ScrapedEachWayTerms>();
         }
 
         public ScrapedMarket(string name)
         {
             Name = name;
             ScrapedRunners = new List<ScrapedRunner>();
-            ScrapedEachWayTerms = new ScrapedEachWayTerms();
+            ScrapedEachWayTerms = new List<ScrapedEachWayTerms>();
         }
 
         public string Name { get; set; }
         public List<ScrapedRunner> ScrapedRunners { get; set; }
-        public ScrapedEachWayTerms ScrapedEachWayTerms { get; set; }
+        public List<ScrapedEachWayTerms> ScrapedEachWayTerms { get; set; }
 
         public override string ToString()
         {
-            return ScrapedEachWayTerms.NumberOfPlaces > 0 ? $"{Name} {ScrapedEachWayTerms.ToString()}" : $"{Name}";
+            return $"{Name}";
         }
     }
 }

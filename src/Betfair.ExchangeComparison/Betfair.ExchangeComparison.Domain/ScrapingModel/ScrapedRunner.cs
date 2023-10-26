@@ -1,27 +1,30 @@
-﻿using System;
-using System.Xml.Linq;
-
-namespace Betfair.ExchangeComparison.Domain.ScrapingModel
+﻿namespace Betfair.ExchangeComparison.Domain.ScrapingModel
 {
     public class ScrapedRunner
     {
         public ScrapedRunner()
         {
-            ScrapedPrice = new ScrapedPrice();
+            ScrapedPrices = new List<ScrapedPrice>();
         }
 
-        public ScrapedRunner(string name, string priceString)
+        public ScrapedRunner(string name)
         {
             Name = name;
-            ScrapedPrice = new ScrapedPrice(priceString);
+            ScrapedPrices = new List<ScrapedPrice>();
+        }
+
+        public ScrapedRunner(string name, IEnumerable<ScrapedPrice> prices)
+        {
+            Name = name;
+            ScrapedPrices = new List<ScrapedPrice>(prices);
         }
 
         public string Name { get; set; }
-        public ScrapedPrice ScrapedPrice { get; set; }
+        public IEnumerable<ScrapedPrice> ScrapedPrices { get; set; }
 
         public override string ToString()
         {
-            return $"{Name} - {ScrapedPrice.ToString()}";
+            return $"{Name}";
         }
     }
 }

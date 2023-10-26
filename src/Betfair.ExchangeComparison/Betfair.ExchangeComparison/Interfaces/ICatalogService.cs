@@ -8,11 +8,10 @@ namespace Betfair.ExchangeComparison.Interfaces
 {
     public interface ICatalogService
     {
-        Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook);
+        Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, int addDays = 1);
         Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport, TimeRange? timeRange = null);
 
-        IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport);
-        IEnumerable<MarketDetailWithEvent> UpdateCatalog(Sport sport);
+        IEnumerable<MarketDetailWithEvent> UpdateMarketDetailCatalog(Sport sport, int addDays = 1);
 
         //IDictionary<string, Event> GetExchangeEventsWithMarkets(string eventTypeId);
         //IEnumerable<MarketCatalogue> GetExchangeMarketCatalogues(string eventTypeId, IEnumerable<string>? eventIds = null);

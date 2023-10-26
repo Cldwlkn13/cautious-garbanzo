@@ -1,5 +1,6 @@
-﻿using System;
-using System.Xml.Linq;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 
 namespace Betfair.ExchangeComparison.Domain.ScrapingModel
 {
@@ -10,8 +11,9 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
             PriceString = "";
         }
 
-        public ScrapedPrice(string priceString)
+        public ScrapedPrice(string priceString, Bookmaker bookmaker)
         {
+            Bookmaker = bookmaker;
             PriceString = "";
 
             if (!string.IsNullOrEmpty(priceString) && priceString.Contains("/"))
@@ -20,6 +22,14 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
             }
         }
 
+        public ScrapedPrice(double price, Bookmaker bookmaker, bool addOne = false)
+        {
+            Bookmaker = bookmaker;
+            PriceString = CompilePriceString((decimal)price);
+            Decimal = (decimal)price;
+        }
+
+        public Bookmaker Bookmaker { get; set; }
         public decimal Decimal { get; set; }
         public string PriceString { get; set; }
         public int Numerator { get; set; }
@@ -45,8 +55,24 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
             {
                 Denominator = denominator > 0 ? denominator : 1;
             }
+        }
 
-            Decimal = GetDecimal();
+        private string CompilePriceString(decimal @decimal)
+        {
+            try
+            {
+                var fraction = (@decimal - 1).RealToFraction();
+
+                Denominator = fraction.D;
+                Numerator = fraction.N;
+            }
+            catch
+            {
+                Denominator = 0;
+                Numerator = 0;
+            }
+
+            return $"{Numerator}/{Denominator}";
         }
 
         private decimal GetDecimal()
@@ -56,7 +82,7 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
 
         public override string ToString()
         {
-            return $"{PriceString}";
+            return $"{Bookmaker} - {PriceString}";
         }
     }
 }

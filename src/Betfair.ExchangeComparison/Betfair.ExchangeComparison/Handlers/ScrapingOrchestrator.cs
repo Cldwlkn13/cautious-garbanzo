@@ -2,55 +2,61 @@
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
+using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces;
 using Betfair.ExchangeComparison.Scraping.Interfaces;
+using Betfair.ExchangeComparison.Scraping.Oddschecker.Interfaces;
+using Betfair.ExchangeComparison.Scraping.WilliamHill.Interfaces;
 
 namespace Betfair.ExchangeComparison.Handlers
 {
     public class ScrapingOrchestrator : IScrapingOrchestrator, IScrapingControl
     {
         private readonly IBoylesportsHandler _boylesportsHandler;
+        private readonly IOddscheckerHandler _oddscheckerHandler;
 
-        public Dictionary<Bookmaker, bool> SwitchBoard { get; private set; }
+        public Dictionary<Provider, bool> SwitchBoard { get; private set; }
 
-        public ScrapingOrchestrator(IBoylesportsHandler boylesportsHandler)
+        public ScrapingOrchestrator(IBoylesportsHandler boylesportsHandler, IOddscheckerHandler oddscheckerHandler)
         {
             _boylesportsHandler = boylesportsHandler;
+            _oddscheckerHandler = oddscheckerHandler;
 
-            SwitchBoard = new Dictionary<Bookmaker, bool>();
-            foreach (var bookmaker in Enum.GetValues(typeof(Bookmaker)))
+            SwitchBoard = new Dictionary<Provider, bool>();
+            foreach (var provider in Enum.GetValues(typeof(Provider)))
             {
-                SwitchBoard.Add((Bookmaker)bookmaker, false);
+                SwitchBoard.Add((Provider)provider, false);
             }
 
-            ScrapedEventsCatalog = new ConcurrentDictionary<Bookmaker, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>>();
+            ScrapedEventsCatalog = new ConcurrentDictionary<Provider, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>>();
         }
 
-        public ConcurrentDictionary<Bookmaker, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>> ScrapedEventsCatalog { get; set; }
+        public ConcurrentDictionary<Provider, ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>> ScrapedEventsCatalog { get; set; }
 
-        public void Start(Bookmaker bookmaker)
+        public void Start(Provider provider)
         {
-            SwitchBoard[bookmaker] = true;
+            SwitchBoard[provider] = true;
         }
 
-        public void Stop(Bookmaker bookmaker)
+        public void Stop(Provider provider)
         {
-            SwitchBoard[bookmaker] = false;
+            SwitchBoard[provider] = false;
         }
 
-        public async Task Orchestrate(IEnumerable<MarketDetailWithEvent> catalog, Bookmaker bookmaker)
+        public async Task Orchestrate(IEnumerable<MarketDetailWithEvent> catalog, Provider provider)
         {
-            if (!ScrapedEventsCatalog.ContainsKey(bookmaker))
+            if (!ScrapedEventsCatalog.ContainsKey(provider))
             {
-                ScrapedEventsCatalog.AddOrUpdate(bookmaker, new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>(),
+                ScrapedEventsCatalog.AddOrUpdate(provider, new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>(),
                     (k, v) => v = new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>());
             }
 
-            IScrapingHandler _handler = ResolveHandler(bookmaker);
+            IScrapingHandler _handler = ResolveHandler(provider);
 
             Parallel.ForEach(catalog, new ParallelOptions { MaxDegreeOfParallelism = 10 }, @event =>
             {
+
                 var scrapedEvent = _handler.Handle(@event).Result;
 
                 if (scrapedEvent.MappedEvent == null)
@@ -58,44 +64,45 @@ namespace Betfair.ExchangeComparison.Handlers
                     return;
                 }
 
-                MaintainCatalogue(bookmaker, scrapedEvent);
+                MaintainCatalogue(provider, scrapedEvent);
+
             });
         }
 
-        public bool TryGetScrapedEvents(Bookmaker bookmaker, DateTime dateTime, out List<ScrapedEvent> result)
+        public bool TryGetScrapedEvents(Provider provider, DateTime dateTime, out List<ScrapedEvent> result)
         {
             result = new List<ScrapedEvent>();
 
-            if (!ScrapedEventsCatalog.ContainsKey(bookmaker))
+            if (!ScrapedEventsCatalog.ContainsKey(provider))
             {
                 return false;
             }
 
-            if (!ScrapedEventsCatalog[bookmaker].ContainsKey(dateTime))
+            if (!ScrapedEventsCatalog[provider].ContainsKey(dateTime))
             {
                 return false;
             }
 
-            result = ScrapedEventsCatalog[bookmaker][dateTime].Values.ToList();
+            result = ScrapedEventsCatalog[provider][dateTime].Values.ToList();
 
             return true;
         }
 
-        private void MaintainCatalogue(Bookmaker bookmaker, ScrapedEvent scrapedEvent)
+        private void MaintainCatalogue(Provider provider, ScrapedEvent scrapedEvent)
         {
             ClearOldData();
 
-            if (ScrapedEventsCatalog[bookmaker].ContainsKey(DateTime.Today))
+            if (ScrapedEventsCatalog[provider].ContainsKey(DateTime.Today))
             {
-                if (ScrapedEventsCatalog[bookmaker][DateTime.Today]
+                if (ScrapedEventsCatalog[provider][DateTime.Today]
                     .ContainsKey($"{scrapedEvent.Name}{scrapedEvent.StartTime.ToString("HHmm")}"))
                 {
-                    ScrapedEventsCatalog[bookmaker][DateTime.Today]
+                    ScrapedEventsCatalog[provider][DateTime.Today]
                         [$"{scrapedEvent.Name}{scrapedEvent.StartTime.ToString("HHmm")}"] = scrapedEvent;
                 }
                 else
                 {
-                    ScrapedEventsCatalog[bookmaker][DateTime.Today]
+                    ScrapedEventsCatalog[provider][DateTime.Today]
                         .AddOrUpdate($"{scrapedEvent.Name}{scrapedEvent.StartTime.ToString("HHmm")}",
                         scrapedEvent,
                         (k, v) => v = scrapedEvent);
@@ -103,12 +110,12 @@ namespace Betfair.ExchangeComparison.Handlers
             }
             else
             {
-                ScrapedEventsCatalog[bookmaker] = new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>();
-                ScrapedEventsCatalog[bookmaker].AddOrUpdate(DateTime.Today,
+                ScrapedEventsCatalog[provider] = new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>();
+                ScrapedEventsCatalog[provider].AddOrUpdate(DateTime.Today,
                     new ConcurrentDictionary<string, ScrapedEvent>() { },
                     (k, v) => v = new ConcurrentDictionary<string, ScrapedEvent>() { });
 
-                ScrapedEventsCatalog[bookmaker][DateTime.Today]
+                ScrapedEventsCatalog[provider][DateTime.Today]
                     .AddOrUpdate($"{scrapedEvent.Name}{scrapedEvent.StartTime.ToString("HHmm")}",
                     scrapedEvent,
                     (k, v) => v = scrapedEvent);
@@ -134,18 +141,21 @@ namespace Betfair.ExchangeComparison.Handlers
                     .Where(k => k.Key >= DateTime.Today)
                     .ToDictionary(k => k.Key, v => v.Value);
 
-                ScrapedEventsCatalog[bm.Key] = new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>(cleanedDictionary);
+                ScrapedEventsCatalog[bm.Key] = new ConcurrentDictionary<DateTime, ConcurrentDictionary<string, ScrapedEvent>>(
+                    cleanedDictionary);
             }
         }
 
-        private IScrapingHandler ResolveHandler(Bookmaker bookmaker)
+        private IScrapingHandler ResolveHandler(Provider provider)
         {
-            switch (bookmaker)
+            switch (provider)
             {
-                case Bookmaker.Boylesports:
+                case Provider.Boylesports:
                     return _boylesportsHandler;
+                case Provider.Oddschecker:
+                    return _oddscheckerHandler;
                 default:
-                    return _boylesportsHandler;
+                    return _oddscheckerHandler;
             }
         }
     }

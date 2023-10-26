@@ -5,9 +5,9 @@ namespace Betfair.ExchangeComparison.Interfaces
 {
     public interface IScrapingControl
     {
-        void Start(Bookmaker bookmaker);
-        void Stop(Bookmaker bookmaker);
-        public Dictionary<Bookmaker, bool> SwitchBoard { get; }
+        void Start(Provider provider);
+        void Stop(Provider provider);
+        public Dictionary<Provider, bool> SwitchBoard { get; }
     }
 }
 
