@@ -44,7 +44,7 @@ namespace Betfair.ExchangeComparison.Auth
             {
                 if (!Login("", "", bookmaker))
                 {
-                    throw new AuthException(bookmaker);
+                    return false;
                 }
             }
 
@@ -71,8 +71,27 @@ namespace Betfair.ExchangeComparison.Auth
                     AppKey,
                     bookmaker);
 
-                if (loginResult == null || string.IsNullOrEmpty(loginResult.Token))
+                if (loginResult == null)
                 {
+                    Console.WriteLine($"LOGIN_FAILED; " +
+                            $"Error=loginResult is null");
+
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(loginResult.Token))
+                {
+                    if (string.IsNullOrEmpty(loginResult.Error))
+                    {
+                        Console.WriteLine($"LOGIN_FAILED; " +
+                            $"Error={loginResult.Error}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"LOGIN_FAILED; " +
+                            $"Error=UNKNOWN");
+                    }
+
                     return false;
                 }
 
@@ -93,7 +112,6 @@ namespace Betfair.ExchangeComparison.Auth
                 {
                     TokenExpiries.Add(bookmaker, DateTime.UtcNow.AddHours(6));
                 }
-
 
                 Console.WriteLine($"SESSION_TOKEN_RENEWED_{bookmaker.ToString().ToUpper()}; " +
                     $"ValidTo={TokenExpiries[bookmaker]
