@@ -59,9 +59,13 @@ namespace Betfair.ExchangeComparison.Services
             return Task.FromResult(sportsbookCatalogue);
         }
 
-        public Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport, TimeRange? timeRange = null)
+        public async Task<ExchangeCatalogue> GetExchangeCatalogue(Sport sport, TimeRange? timeRange = null)
         {
-            _exchangeHandler.TryLogin();
+            if (!_exchangeHandler.TryLogin())
+            {
+                Console.WriteLine($"LOGIN_FAILED");
+                return new ExchangeCatalogue();
+            }
 
             TimeRange time = BetfairQueryExtensions.TimeRangeForNextDays(1);
             if (timeRange != null)
@@ -87,13 +91,17 @@ namespace Betfair.ExchangeComparison.Services
                 MarketBooks = marketBooks
             };
 
-            return Task.FromResult(exchangeCatalogue);
+            return exchangeCatalogue;
         }
 
         public IEnumerable<MarketDetailWithEvent> UpdateMarketDetailCatalog(Sport sport, int addDays = 1)
         {
             var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
-            handler.TryLogin();
+            if (!handler.TryLogin())
+            {
+                Console.WriteLine($"LOGIN_FAILED");
+                return new List<MarketDetailWithEvent>();
+            }
 
             if (SportsbookMarketDetailsStore.ContainsKey(DateTime.Today.AddDays(addDays - 1)))
             {
@@ -123,7 +131,11 @@ namespace Betfair.ExchangeComparison.Services
         public IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport, int addDays = 1)
         {
             var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
-            handler.TryLogin();
+            if (!handler.TryLogin())
+            {
+                Console.WriteLine($"LOGIN_FAILED");
+                return new List<MarketDetailWithEvent>();
+            }
 
             if (!SportsbookMarketDetailsStore.ContainsKey(DateTime.Today.AddDays(addDays - 1)))
             {
