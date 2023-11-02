@@ -1,5 +1,4 @@
-﻿using System;
-using Betfair.ExchangeComparison.Exchange.Model;
+﻿using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Domain.DomainModel
@@ -8,6 +7,8 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
     {
         public SportsbookCatalogue()
         {
+            EventsWithMarketCatalogue = new Dictionary<EventWithCompetition, IEnumerable<MarketCatalogue>>();
+            EventsWithMarketDetails = new Dictionary<EventWithCompetition, IEnumerable<MarketDetail>>();
         }
 
         public IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>> EventsWithMarketCatalogue { get; set; }
