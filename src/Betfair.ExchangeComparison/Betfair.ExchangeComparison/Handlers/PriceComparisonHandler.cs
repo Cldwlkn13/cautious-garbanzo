@@ -1,8 +1,6 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.DomainModel;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Models;
-using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Handlers
 {
@@ -14,7 +12,7 @@ namespace Betfair.ExchangeComparison.Handlers
 
         public List<BestRunner> TryAddToBestRunnersWinOnly(List<BestRunner> bestRunners, RunnerPriceOverview rpo)
         {
-            if (rpo.ExpectedValueWin > -0.03 && rpo.ExpectedWinPrice > 1)
+            if (rpo.ExpectedValueWin > -0.04 && rpo.ExpectedWinPrice > 1)
             {
                 bestRunners.Add(new BestRunner(rpo));
             }

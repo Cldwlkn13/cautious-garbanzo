@@ -183,6 +183,7 @@ namespace Betfair.ExchangeComparison.Exchange
 
             //as an example we requested runner metadata 
             ISet<MarketProjection> marketProjections = new HashSet<MarketProjection>();
+            marketProjections.Add(MarketProjection.COMPETITION);
             marketProjections.Add(MarketProjection.EVENT);
             marketProjections.Add(MarketProjection.MARKET_DESCRIPTION);
 

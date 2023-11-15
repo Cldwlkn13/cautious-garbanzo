@@ -19,6 +19,7 @@ namespace Betfair.ExchangeComparison.Domain.ScrapingModel
             if (!string.IsNullOrEmpty(priceString) && priceString.Contains("/"))
             {
                 SplitPriceString(priceString);
+                Decimal = GetDecimal();
             }
         }
 

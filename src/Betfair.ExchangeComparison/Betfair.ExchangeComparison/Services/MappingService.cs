@@ -101,8 +101,23 @@ namespace Betfair.ExchangeComparison.Services
         public bool TryMapScrapedEvent(List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, MarketDetail md, out ScrapedEvent result)
         {
             var mappedEvent = scrapedEvents.FirstOrDefault(s =>
-                     s.MappedEvent.EventWithCompetition.Event.Venue == ewc.Event.Venue &&
-                     s.MappedEvent.SportsbookMarket.marketStartTime == md.marketStartTime);
+                     s.MappedEventWithCompetition.Event.Venue == ewc.Event.Venue &&
+                     s.ScrapedMarkets.First().MappedMarketDetail.marketStartTime == md.marketStartTime);
+
+            if (mappedEvent == null)
+            {
+                result = new ScrapedEvent();
+                return false;
+            }
+
+            result = mappedEvent;
+            return true;
+        }
+
+        public bool TryMapScrapedEvent(List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, out ScrapedEvent result)
+        {
+            var mappedEvent = scrapedEvents.FirstOrDefault(s =>
+                     s.MappedEventWithCompetition.Event.Name == ewc.Event.Name);
 
             if (mappedEvent == null)
             {
@@ -127,10 +142,30 @@ namespace Betfair.ExchangeComparison.Services
             return true;
         }
 
+        public bool TryMapScrapedMarket(ScrapedEvent scrapedEvent, MarketDetail marketDetail, out ScrapedMarket result)
+        {
+            result = new ScrapedMarket();
+
+            if (!scrapedEvent.ScrapedMarkets.Any())
+            {
+                return false;
+            }
+
+            var mappedResult = scrapedEvent.ScrapedMarkets.FirstOrDefault(m => m.MappedMarketDetail.marketId == marketDetail.marketId);
+
+            if (mappedResult == null)
+            {
+                return false;
+            }
+
+            result = mappedResult;
+            return true;
+        }
+
         public bool TryMapScrapedRunner(ScrapedMarket scrapedMarket, RunnerDetail sportsbookRunner, out ScrapedRunner result)
         {
-            var mappedRunner = scrapedMarket?.ScrapedRunners.FirstOrDefault(r =>
-                  r.Name.ToLower().Replace("'", "") == sportsbookRunner.selectionName.ToLower().Replace("'", ""));
+            var mappedRunner = scrapedMarket?.ScrapedRunners
+                .FirstOrDefault(r => r.MappedRunnerDetail.selectionName == sportsbookRunner.selectionName);
 
             if (mappedRunner == null)
             {

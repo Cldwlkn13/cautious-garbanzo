@@ -1,5 +1,4 @@
-﻿using System;
-namespace Betfair.ExchangeComparison.Domain.Enums
+﻿namespace Betfair.ExchangeComparison.Domain.Enums
 {
     public enum Bookmaker
     {
@@ -10,6 +9,8 @@ namespace Betfair.ExchangeComparison.Domain.Enums
         BetfairExchange,
         WilliamHill,
         Ladbrokes,
+        BoylesportsDirect,
+        WilliamHillDirect
     }
 }
 

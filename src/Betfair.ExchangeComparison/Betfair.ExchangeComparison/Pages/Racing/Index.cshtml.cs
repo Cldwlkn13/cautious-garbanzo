@@ -1,16 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using System.Text;
+using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
-using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Extensions;
 using Betfair.ExchangeComparison.Pages.Model;
 using Betfair.ExchangeComparison.Pages.Models;
-using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,16 +19,23 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 {
     public class IndexModel : PageModel
     {
-        private readonly IExchangeHandler _exchangeHandler;
-        private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
+        //services
         private readonly ICatalogService _catalogService;
-        private readonly IScrapingOrchestrator _scrapingOrchestrator;
+
+        //mapping and comparison
         private readonly IPricingComparisonHandler _pricingComparisonHandler;
         private readonly IMappingService _mappingService;
-        private readonly IScrapingControl _scrapingControl;
 
-        const string EventTypeId = "7";
-        private Bookmaker[] IsScrapable = new Bookmaker[] { Bookmaker.Boylesports, Bookmaker.WilliamHill, Bookmaker.Ladbrokes };
+        //scraping
+        private readonly IScrapingOrchestrator<SportRacing> _scrapingOrchestrator;
+        private readonly IScrapingControl<SportRacing> _scrapingControl;
+
+        private Bookmaker[] isScrapableBookmaker = new Bookmaker[]
+        {
+            Bookmaker.Boylesports,
+            Bookmaker.WilliamHill,
+            Bookmaker.Ladbrokes
+        };
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
@@ -38,10 +44,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
         public List<SelectListItem> SelectListBookmakers { get; set; }
 
-        public IndexModel(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, ICatalogService catalogService, IScrapingOrchestrator scrapingOrchestrator, IPricingComparisonHandler pricingComparisonHandler, IMappingService mappingService, IScrapingControl scrapingControl)
+        public IndexModel(ICatalogService catalogService, IScrapingOrchestrator<SportRacing> scrapingOrchestrator, IPricingComparisonHandler pricingComparisonHandler, IMappingService mappingService, IScrapingControl<SportRacing> scrapingControl)
         {
-            _exchangeHandler = exchangeHandler;
-            _bfSportsbookHandler = bfSportsbookHandler;
             _catalogService = catalogService;
             _scrapingOrchestrator = scrapingOrchestrator;
             _pricingComparisonHandler = pricingComparisonHandler;
@@ -53,7 +57,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                 Bookmaker.BetfairSportsbook.ToString(),
                 Bookmaker.Boylesports.ToString(),
                 Bookmaker.WilliamHill.ToString(),
-                Bookmaker.Ladbrokes.ToString()
+                Bookmaker.Ladbrokes.ToString(),
+                Bookmaker.BoylesportsDirect.ToString(),
             });
         }
 
@@ -63,7 +68,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
             var bestEachWayRunners = new List<BestRunner>();
             var marketViewModels = new List<MarketViewModel>();
 
-            var bookmakerString = HttpContext.Session.GetString("Bookmaker") ?? "Other";
+            var bookmakerString = HttpContext.Session.GetString("Bookmaker-Racing") ?? "Other";
             var bookmaker = Bookmaker.Unknown;
 
             if (!Enum.TryParse(typeof(Bookmaker), bookmakerString, out var savedBookmaker))
@@ -87,6 +92,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                     case Bookmaker.Ladbrokes:
                     case Bookmaker.WilliamHill:
                         return Provider.Oddschecker;
+                    case Bookmaker.BoylesportsDirect:
+                        return Provider.BoylesportsDirect;
                     default:
                         return Provider.BetfairSportsbook;
                 }
@@ -102,7 +109,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                 }
             }
 
-            if (IsScrapable.Contains(bookmaker) && !_scrapingControl.SwitchBoard[provider])
+            if (isScrapableBookmaker.Contains(bookmaker) && !_scrapingControl.SwitchBoard[provider])
             {
 
                 Console.WriteLine($"Starting {bookmaker} scraping!");
@@ -126,7 +133,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                 List<ScrapedEvent> scrapedEvents = new List<ScrapedEvent>();
 
-                if (IsScrapable.Contains(bookmaker))
+                if (isScrapableBookmaker.Contains(bookmaker))
                 {
                     _scrapingOrchestrator.TryGetScrapedEvents(
                         provider, DateTime.Today, out scrapedEvents);
@@ -150,7 +157,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                             try
                             {
                                 var mappedScrapedEvent = new ScrapedEvent();
-                                if (IsScrapable.Contains(bookmaker))
+                                if (isScrapableBookmaker.Contains(bookmaker))
                                 {
                                     if (!_mappingService.TryMapScrapedEvent(scrapedEvents, @event, marketDetail, out mappedScrapedEvent))
                                     {
@@ -168,7 +175,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                                 ScrapedMarket mappedScrapedMarket = new ScrapedMarket();
                                 int numberOfPlaces = 0;
                                 int eachWayFraction = 0;
-                                if (IsScrapable.Contains(bookmaker))
+                                if (isScrapableBookmaker.Contains(bookmaker))
                                 {
                                     if (!_mappingService.TryMapScrapedMarket(mappedScrapedEvent, out mappedScrapedMarket))
                                     {
@@ -217,7 +224,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                                     try
                                     {
-                                        if (IsScrapable.Contains(bookmaker))
+                                        if (isScrapableBookmaker.Contains(bookmaker))
                                         {
                                             if (_mappingService.TryMapScrapedRunner(mappedScrapedMarket, sportsbookRunner, out mappedScrapedRunner))
                                             {
@@ -366,7 +373,7 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
         public async Task<IActionResult> OnPost(RacingFormModel formModel)
         {
-            HttpContext.Session.SetString("Bookmaker", formModel.Bookmaker.ToString());
+            HttpContext.Session.SetString("Bookmaker-Racing", formModel.Bookmaker.ToString());
 
             return await OnGet();
         }

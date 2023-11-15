@@ -4,15 +4,19 @@ using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces;
 using Betfair.ExchangeComparison.Scraping.Interfaces;
+using Betfair.ExchangeComparison.Sportsbook.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports
 {
-    public class BoylesportsHandler : ScrapingHandler, IBoylesportsHandler
+    public class BoylesportsHandler<T> : ScrapingHandler<T>, IBoylesportsHandler<T>
     {
-        public BoylesportsHandler(ILogger<BoylesportsHandler> logger, IScrapingClient scrapingClient, IBoylesportsParser parser) :
-            base(logger, scrapingClient, parser)
+        private readonly IBoylesportsParser<T> _parser;
+
+        public BoylesportsHandler(ILogger<BoylesportsHandler<T>> logger, IScrapingClient scrapingClient, IBoylesportsParser<T> parser) :
+            base(logger, scrapingClient)
         {
+            _parser = parser;
         }
 
         public async Task<ScrapedEvent> Handle(MarketDetailWithEvent @event, Sport sport = Sport.Racing)
@@ -63,6 +67,21 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
         }
 
         public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Sport sport = Sport.Racing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(EventsByCountry ebc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(IEnumerable<MarketDetailWithEvent> events, Sport sport = Sport.Racing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Dictionary<EventWithCompetition, List<MarketDetail>> events, Sport sport = Sport.Racing)
         {
             throw new NotImplementedException();
         }

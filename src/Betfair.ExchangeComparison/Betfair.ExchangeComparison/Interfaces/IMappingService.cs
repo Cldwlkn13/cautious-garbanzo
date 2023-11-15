@@ -18,7 +18,9 @@ namespace Betfair.ExchangeComparison.Interfaces
         bool TryMapMarketBook(KeyValuePair<DateTime, IList<MarketBook>> marketBooks, MarketDetail marketDetail, out MarketBook result);
         bool TryMapRunner(MarketBook marketBook, RunnerDetail sportsbookRunner, out Runner result);
         bool TryMapScrapedEvent(List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, MarketDetail md, out ScrapedEvent result);
+        bool TryMapScrapedEvent(List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, out ScrapedEvent result);
         bool TryMapScrapedMarket(ScrapedEvent scrapedEvent, out ScrapedMarket result);
+        bool TryMapScrapedMarket(ScrapedEvent scrapedEvent, MarketDetail marketDetail, out ScrapedMarket result);
         bool TryMapScrapedRunner(ScrapedMarket scrapedMarket, RunnerDetail sportsbookRunner, out ScrapedRunner result);
     }
 }

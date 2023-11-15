@@ -1,5 +1,4 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Enums;
 
 namespace Betfair.ExchangeComparison.Pages.Model
 {

@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Betfair.ExchangeComparison.Data;
-using Betfair.ExchangeComparison.Exchange;
-using Betfair.ExchangeComparison.Sportsbook;
-using Betfair.ExchangeComparison.Exchange.Settings;
-
-namespace Betfair.ExchangeComparison;
+﻿namespace Betfair.ExchangeComparison;
 
 public class Program
 {

@@ -17,6 +17,11 @@
 		<None Remove="Enums\" />
 		<None Remove="CommonInterfaces\" />
 		<None Remove="CustomExceptions\" />
+		<None Remove="Definitions\" />
+		<None Remove="Definitions\Sport\" />
+		<None Remove="Definitions\Base\" />
+		<None Remove="ScrapingModel\Oddschecker\" />
+		<None Remove="ScrapingModel\WilliamHill\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Extensions\" />
@@ -27,6 +32,11 @@
 		<Folder Include="Enums\" />
 		<Folder Include="CommonInterfaces\" />
 		<Folder Include="CustomExceptions\" />
+		<Folder Include="Definitions\" />
+		<Folder Include="Definitions\Sport\" />
+		<Folder Include="Definitions\Base\" />
+		<Folder Include="ScrapingModel\Oddschecker\" />
+		<Folder Include="ScrapingModel\WilliamHill\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

@@ -3,7 +3,7 @@ using Betfair.ExchangeComparison.Scraping.Interfaces;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces
 {
-    public interface IBoylesportsHandler : IScrapingHandler
+    public interface IBoylesportsHandler<T> : IScrapingHandler<T>
     {
     }
 }

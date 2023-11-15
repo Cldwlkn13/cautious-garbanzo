@@ -34,6 +34,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
             VolumeTradedBelowSportsbook = rpo.VolumeTradedBelowSportsbook;
             ExchangeWinBestPinkRequestedLiability = rpo.BestWinAvailable[Side.LAY].RequestedLiability();
             Bookmaker = rpo.Bookmaker;
+            MappedEventName = rpo.MappedScrapedEventName;
         }
 
         public Competition Competition { get; set; }
@@ -54,6 +55,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double LastPriceTraded { get; set; }
         public double VolumeTradedBelowSportsbook { get; set; }
         public Bookmaker Bookmaker { get; set; }
+        public string MappedEventName { get; set; }
     }
 }
 

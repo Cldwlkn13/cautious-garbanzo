@@ -1,6 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Auth.Interfaces;
 using Betfair.ExchangeComparison.Auth.Settings;
-using Betfair.ExchangeComparison.Domain.CustomExceptions;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Microsoft.Extensions.Options;
 

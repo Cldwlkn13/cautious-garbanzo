@@ -10,6 +10,9 @@ using Betfair.ExchangeComparison.Sportsbook.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Betfair.ExchangeComparison.Workers;
+using Betfair.ExchangeComparison.Domain.Definitions.Sport;
+using Betfair.ExchangeComparison.Processors;
 
 namespace Betfair.ExchangeComparison
 {
@@ -34,8 +37,16 @@ namespace Betfair.ExchangeComparison
             services.AddSignalR();
 
             services.AddSingleton<ICatalogService, CatalogService>();
-            services.AddSingleton<IScrapingOrchestrator, ScrapingOrchestrator>();
-            services.AddSingleton<IScrapingControl, ScrapingOrchestrator>();
+
+            //processors
+            services.AddSingleton<CatalogProcessor>();
+            services.AddSingleton<ScrapingProcessor<SportFootball>>();
+
+            services.AddSingleton<IScrapingOrchestrator<SportFootball>, ScrapingOrchestrator<SportFootball>>();
+            services.AddSingleton<IScrapingControl<SportFootball>, ScrapingOrchestrator<SportFootball>>();
+            services.AddSingleton<IScrapingOrchestrator<SportRacing>, ScrapingOrchestrator<SportRacing>>();
+            services.AddSingleton<IScrapingControl<SportRacing>, ScrapingOrchestrator<SportRacing>>();
+
             services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();
             services.AddSingleton<IMappingService, MappingService>();
 
@@ -62,7 +73,8 @@ namespace Betfair.ExchangeComparison
                 //options.Cookie.IsEssential = false;
             });
 
-            services.AddHostedService<Worker>();
+            services.AddHostedService<RacingWorker>();
+            services.AddHostedService<FootballWorker>();
 
             BindSettings(services);
         }

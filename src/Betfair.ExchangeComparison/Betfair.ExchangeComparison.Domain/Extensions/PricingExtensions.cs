@@ -124,7 +124,7 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
         public static double TradedVolumeBelowSportsbook(this Runner runner, double sportsbookPrice)
         {
             return runner.TradedVolume()
-                 .Where(tv => tv.Price <= sportsbookPrice)
+                 .Where(tv => tv.Price < sportsbookPrice)
                  .Select(ps => ps.Price)
                  .Sum();
         }

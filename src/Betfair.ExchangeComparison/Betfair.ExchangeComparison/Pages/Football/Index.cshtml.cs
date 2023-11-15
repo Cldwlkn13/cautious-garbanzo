@@ -1,37 +1,41 @@
 ﻿using System.Collections.Concurrent;
+using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
-using Betfair.ExchangeComparison.Exchange.Interfaces;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
+using Betfair.ExchangeComparison.Pages.Model;
 using Betfair.ExchangeComparison.Pages.Models;
-using Betfair.ExchangeComparison.Sportsbook.Interfaces;
+using Betfair.ExchangeComparison.Processors;
 using Betfair.ExchangeComparison.Sportsbook.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Betfair.ExchangeComparison.Pages.Football
 {
     public class IndexModel : PageModel
     {
-        private readonly IExchangeHandler _exchangeHandler;
-        private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
-        private readonly ICatalogService _catalogService;
+        private readonly CatalogProcessor _catalogProcessor;
+        private readonly ScrapingProcessor<SportFootball> _scrapingProcessor;
+
+        //mapping and comparison
         private readonly IMappingService _mappingService;
         private readonly IPricingComparisonHandler _pricingComparisonHandler;
 
-        const string EventTypeId = "1";
-
+        [BindProperty]
+        public RacingFormModel FormModel { get; set; }
+        public List<SelectListItem> SelectListBookmakers { get; set; }
         public CatalogViewModel CatalogViewModel { get; set; }
 
-        public IndexModel(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, ICatalogService catalogService,
-            IMappingService mappingService, IPricingComparisonHandler pricingComparisonHandler)
+        public IndexModel(IMappingService mappingService, IPricingComparisonHandler pricingComparisonHandler, CatalogProcessor catalogProcessor, ScrapingProcessor<SportFootball> scrapingProcessor)
         {
-            _exchangeHandler = exchangeHandler;
-            _bfSportsbookHandler = bfSportsbookHandler;
-            _catalogService = catalogService;
+            _catalogProcessor = catalogProcessor;
             _mappingService = mappingService;
             _pricingComparisonHandler = pricingComparisonHandler;
+            _scrapingProcessor = scrapingProcessor;
 
             CatalogViewModel = new CatalogViewModel();
         }
@@ -41,31 +45,44 @@ namespace Betfair.ExchangeComparison.Pages.Football
             var bestWinRunners = new List<BestRunner>();
             var markets = new List<MarketViewModel>();
 
+            var basePageModel = PageProcessor.Process(HttpContext.Session, Sport.Football);
+            SelectListBookmakers = basePageModel.SelectListBookmakers;
+
+            _scrapingProcessor.ProcessStartStops(basePageModel);
+
             try
             {
-                var t1 = _catalogService.GetSportsbookCatalogue(
-                    Sport.Football,
-                    BetfairQueryExtensions.TimeRangeForNextDays(1), Bookmaker.BetfairSportsbook);
+                var baseCatalogModel = await _catalogProcessor.Process();
 
-                var t2 = _catalogService.GetExchangeCatalogue(
-                    Sport.Football,
-                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+                if (!_scrapingProcessor.TryProcessScrapedEvents(
+                    basePageModel, out List<ScrapedEvent> scrapedEvents))
+                {
+                    return Page();
+                }
 
-                await Task.WhenAll(new Task[] { t1, t2 });
-
-                var sportsbookCatalogue = t1.Result;
-                var exchangeCatalogue = t2.Result;
-
-                foreach (var @event in sportsbookCatalogue.EventsWithMarketCatalogue.Keys)
+                foreach (var @event in baseCatalogModel.SportsbookCatalogue.EventsWithMarketCatalogue.Keys)
                 {
                     try
                     {
-                        KeyValuePair<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> eventWithMarketBooks = _mappingService.MapEventToMarketBooks(exchangeCatalogue.MarketBooks, @event);
+                        KeyValuePair<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>> eventWithMarketBooks = _mappingService.MapEventToMarketBooks(
+                            baseCatalogModel.ExchangeCatalogue.MarketBooks, @event);
 
                         if (!_mappingService.TryMapSportsbookMarketDetailsToEvent(
-                            sportsbookCatalogue.EventsWithMarketDetails, @event, out IEnumerable<MarketDetail> mappedMarketDetailsForEvent))
+                            baseCatalogModel.SportsbookCatalogue.EventsWithMarketDetails, @event, out IEnumerable<MarketDetail> mappedMarketDetailsForEvent))
                         {
                             continue;
+                        }
+
+                        var mappedScrapedEvent = new ScrapedEvent();
+                        if (basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
+                        {
+                            if (!_mappingService.TryMapScrapedEvent(scrapedEvents, @event, out mappedScrapedEvent))
+                            {
+                                Console.WriteLine($"SCRAPED_EVENT_MAPPING_FAIL; " +
+                                    $"Event={@event.Event.Name}");
+
+                                continue;
+                            }
                         }
 
                         foreach (var marketDetail in mappedMarketDetailsForEvent.Where(m => m.marketStatus == "OPEN"))
@@ -78,6 +95,17 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                     continue;
                                 }
 
+                                ScrapedMarket mappedScrapedMarket = new ScrapedMarket();
+                                if (basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
+                                {
+                                    if (!_mappingService.TryMapScrapedMarket(mappedScrapedEvent, marketDetail, out mappedScrapedMarket))
+                                    {
+                                        Console.WriteLine($"SCRAPED_MARKET_MAPPING_FAIL; " +
+                                            $"Event={@event.Event.Name}; " +
+                                            $"Market={marketDetail.marketName} {marketDetail.marketStartTime}");
+                                    }
+                                }
+
                                 if (!_mappingService.TryMapMarketBook(eventMarketBooks, marketDetail, out MarketBook mappedWinMarketBook))
                                 {
                                     continue;
@@ -88,6 +116,32 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                 var runners = new List<RunnerViewModel>();
                                 foreach (var sportsbookRunner in marketDetail.runnerDetails)
                                 {
+                                    var scrapedRunnerIsValid = false;
+                                    ScrapedRunner mappedScrapedRunner = new ScrapedRunner();
+
+                                    try
+                                    {
+                                        if (basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
+                                        {
+                                            if (_mappingService.TryMapScrapedRunner(mappedScrapedMarket, sportsbookRunner, out mappedScrapedRunner))
+                                            {
+                                                if (mappedScrapedEvent.ScrapedAt > DateTime.UtcNow.AddSeconds(-90))
+                                                {
+                                                    scrapedRunnerIsValid = true;
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                    catch (System.Exception exception)
+                                    {
+                                        Console.WriteLine($"SCRAPE_MAPPING_EXCEPTION; " +
+                                            $"Exception={exception.Message}; " +
+                                            $"Runner={sportsbookRunner.selectionName}; " +
+                                            $"Market={marketDetail.marketName} {marketDetail.marketStartTime}; " +
+                                            $"Event={@event.Event.Name}");
+                                    }
+
                                     try
                                     {
                                         if (sportsbookRunner.runnerStatus != "ACTIVE" ||
@@ -102,11 +156,29 @@ namespace Betfair.ExchangeComparison.Pages.Football
                                             continue;
                                         }
 
-                                        var rpo = new RunnerPriceOverview(
+                                        var rpo = new RunnerPriceOverview();
+
+                                        if (scrapedRunnerIsValid)
+                                        {
+                                            rpo = new RunnerPriceOverview(
+                                                @event,
+                                                marketDetail,
+                                                mappedScrapedMarket,
+                                                mappedExchangeWinRunner,
+                                                sportsbookRunner,
+                                                mappedScrapedRunner,
+                                                null,
+                                                basePageModel.Bookmaker,
+                                                mappedScrapedEvent);
+                                        }
+                                        else if (!basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
+                                        {
+                                            rpo = new RunnerPriceOverview(
                                                 @event,
                                                 marketDetail,
                                                 sportsbookRunner,
                                                 mappedExchangeWinRunner);
+                                        }
 
 
                                         bestWinRunners = _pricingComparisonHandler.TryAddToBestRunnersWinOnly(bestWinRunners, rpo);
@@ -177,6 +249,15 @@ namespace Betfair.ExchangeComparison.Pages.Football
 
                 return Page();
             }
+        }
+
+        public async Task<IActionResult> OnPost(RacingFormModel formModel)
+        {
+            HttpContext.Session.SetString(
+                "Bookmaker-Football",
+                formModel.Bookmaker.ToString());
+
+            return await OnGet();
         }
     }
 }

@@ -18,6 +18,10 @@
 		<None Remove="WilliamHill\Interfaces\" />
 		<None Remove="Oddschecker\" />
 		<None Remove="Oddschecker\Interfaces\" />
+		<None Remove="Oddschecker\Racing\" />
+		<None Remove="Oddschecker\Football\" />
+		<None Remove="WilliamHill\Football\" />
+		<None Remove="WilliamHill\Racing\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Boylesports\" />
@@ -29,13 +33,18 @@
 		<Folder Include="WilliamHill\Interfaces\" />
 		<Folder Include="Oddschecker\" />
 		<Folder Include="Oddschecker\Interfaces\" />
+		<Folder Include="Oddschecker\Racing\" />
+		<Folder Include="Oddschecker\Football\" />
+		<Folder Include="WilliamHill\Football\" />
+		<Folder Include="WilliamHill\Racing\" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
 		<PackageReference Include="RestSharp" Version="110.2.0" />
 		<PackageReference Include="Polly" Version="8.0.0" />
+		<PackageReference Include="FuzzyStrings.NetStandard" Version="1.0.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj" />
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj" />
 	</ItemGroup>
 </Project>

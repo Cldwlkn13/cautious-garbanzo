@@ -18,7 +18,7 @@ namespace Betfair.ExchangeComparison.Scraping
 
         private string ZenRowsApiKey { get; set; }
 
-        private static int _maxRetryAttempts = 3;
+        private static int _maxRetryAttempts = 5;
         private static TimeSpan _pauseBetweenFailures = TimeSpan.FromSeconds(1);
 
         public ScrapingClient(ILogger<ScrapingClient> logger, IOptions<ScrapingSettings> settings)
@@ -54,6 +54,7 @@ namespace Betfair.ExchangeComparison.Scraping
         public async Task<string> ScrapeZenRowsAsync(string url, Dictionary<string, string> parameters)
         {
             var client = new RestClient($"https://api.zenrows.com/v1/?apikey={ZenRowsApiKey}&url={url}");
+
             var request = new RestRequest();
 
             foreach (var param in parameters)
@@ -64,6 +65,8 @@ namespace Betfair.ExchangeComparison.Scraping
             string html = string.Empty;
             try
             {
+                Console.WriteLine($"Calling ZenRows with Url={url}");
+
                 var result = await RetryPolicy().ExecuteAsync(
                      () => client.ExecuteAsync(request));
 
