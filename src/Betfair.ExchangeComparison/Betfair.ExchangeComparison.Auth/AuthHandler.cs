@@ -80,7 +80,7 @@ namespace Betfair.ExchangeComparison.Auth
 
                 if (string.IsNullOrEmpty(loginResult.Token))
                 {
-                    if (string.IsNullOrEmpty(loginResult.Error))
+                    if (!string.IsNullOrEmpty(loginResult.Error))
                     {
                         Console.WriteLine($"LOGIN_FAILED; " +
                             $"Error={loginResult.Error}");

@@ -7,6 +7,9 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
     {
         public ExchangeCatalogue()
         {
+            EventDictionary = new Dictionary<string, Event>();
+            MarketCatalogues = new List<MarketCatalogue>();
+            MarketBooks = new ConcurrentDictionary<Event, ConcurrentDictionary<DateTime, IList<MarketBook>>>();
         }
 
         public IDictionary<string, Event> EventDictionary { get; set; }
