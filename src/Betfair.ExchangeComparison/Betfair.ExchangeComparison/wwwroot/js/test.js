@@ -166,5 +166,48 @@
             }
         });
     }
+
+    $("#refresh-btn").on('click', function (e) {
+        e.preventDefault();
+        refreshPageTest();
+    });
+
+    function refreshPageTest() {
+        $.get({
+            url: '?handler=Partials',
+            beforeSend: function () {
+                //$("#selected").html('');
+                //$("#loading-selected").show();
+            },
+            success: function (result) {
+                var parser = new DOMParser();
+                var parsed = parser.parseFromString(result, 'text/html');
+                var element = parsed.querySelector('#content-win');
+                $("#content-win").html(element.innerHTML);
+            }
+        });
+    }
+
+    let myBoolean = false;
+    let intervalId;
+    $("#refresh-auto").on('click', function (e) {
+        myBoolean = !myBoolean;
+
+        if (myBoolean) {
+            $("#refresh-auto").removeClass('btn-danger');
+            $("#refresh-auto").addClass('btn-success');
+            $("#refresh-auto").text('Auto Refresh On');
+
+            refreshPageTest();
+            intervalId = setInterval(refreshPageTest, 1000);
+        }
+        else {
+            $("#refresh-auto").removeClass('btn-success');
+            $("#refresh-auto").addClass('btn-danger');
+            $("#refresh-auto").text('Auto Refresh Off');
+
+            clearInterval(intervalId);
+        }
+    });
 })
 

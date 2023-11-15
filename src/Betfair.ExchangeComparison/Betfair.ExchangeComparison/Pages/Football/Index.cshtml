@@ -4,11 +4,22 @@
 }
 
 @{
-    ViewData["Title"] = "Test";
+    ViewData["Title"] = "Football";
 }
 
 <div class="p-3 bg-dark">
     <div id="meetings-container">
+        <div class="row">
+            <div class="col-md-3 m-1">
+                <a href="/football" class="btn btn-warning">Refresh</a>
+            </div>
+            <div class="col-md-6 offset-md-1 m-1">
+                <form method="POST" id="football-form">
+                    <select asp-for="FormModel.Bookmaker" asp-items="@Model.SelectListBookmakers">
+                    </select>
+                </form>
+            </div>
+        </div>
         <div id="meetings">
             @await Html.PartialAsync("/Pages/Shared/Partials/FootballCatalogPartial.cshtml", Model.CatalogViewModel)
         </div>
@@ -17,5 +28,5 @@
 </div>
 
 @*<script type="text/javascript" src="~/js/test.js"></script>*@
-<script type="text/javascript" src="~/js/catalog.js"></script>
+<script type="text/javascript" src="~/js/catalog-football.js"></script>
 

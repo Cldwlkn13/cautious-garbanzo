@@ -6,14 +6,14 @@
                 $("#flash-message").flashMessage("Request to load Meeting Catalog Failed. Please contact support.");
             });</script>
     }*@
-<a href="/football" class="btn btn-warning">Refresh</a>
+
 <div class="row">
     <div class="col-12 mr-1 p-1">
         <div class="row">
             @foreach (var bestRunnerGrouped in Model.BestWinRunners
-            .OrderBy(m => m.MarketDetail.marketType)
-            .ThenBy(m => m.MarketDetail.marketStartTime)
-            .GroupBy(m => m.MarketDetail.marketType))
+    .OrderBy(m => m.MarketDetail.marketType)
+    .ThenBy(m => m.MarketDetail.marketStartTime)
+    .GroupBy(m => m.MarketDetail.marketType))
             {
                 <div class="col-md-2">
                     <div class="m-1 p-1 bg-secondary border rounded">
@@ -22,14 +22,16 @@
 
                         @foreach (var groupedRunnerByCompetition in @bestRunnerGrouped.GroupBy(r => r.Competition.Name))
                         {
-                            <small class="text-light">@groupedRunnerByCompetition.Key</small>
+                            <small class="text-light border border-dark mb-2">@groupedRunnerByCompetition.Key</small>
+
                             @foreach (var groupedRunner in @groupedRunnerByCompetition.GroupBy(r => r.Event.Name))
                             {
                                 <div class="mb-2">
                                     <span class="text-goldenrod text-lg">@groupedRunner.Key</span>
-                                    <span class="text-purple">
+                                    <span class="text-pink">
                                         @groupedRunner.First().MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToString("HH:mm")
                                     </span>
+                                    <small>@groupedRunner.First().MappedEventName</small>
 
                                     @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValueWin))
                                     {
@@ -37,6 +39,8 @@
                                     }
                                 </div>
                             }
+                            <div class="mt-3"></div>
+
                         }
                     </div>
                 </div>

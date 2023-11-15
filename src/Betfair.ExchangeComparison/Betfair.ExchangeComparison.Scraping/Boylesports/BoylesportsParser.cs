@@ -9,13 +9,13 @@ using HtmlAgilityPack;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports
 {
-    public class BoylesportsParser : HtmlParser, IBoylesportsParser
+    public class BoylesportsParser<T> : IBoylesportsParser<T>
     {
         public BoylesportsParser()
         {
         }
 
-        public new ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
+        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
         {
             try
             {
@@ -56,8 +56,8 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
                 scrapedMarket.ScrapedRunners = scrapedRunners;
 
                 var scrapedEvent = new ScrapedEvent();
-                scrapedEvent.MappedEvent = compoundObj;
-                scrapedEvent.Name = compoundObj.EventWithCompetition.Event.Venue;
+                //scrapedEvent.MappedEventWithMarketDetail = compoundObj;
+                scrapedEvent.BetfairName = compoundObj.EventWithCompetition.Event.Venue;
                 scrapedEvent.StartTime = compoundObj.SportsbookMarket.marketStartTime
                     .ConvertUtcToBritishIrishLocalTime();
                 scrapedEvent.ScrapedMarkets.Add(scrapedMarket);
@@ -103,6 +103,11 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
             scrapedEachWayTerms.Bookmaker = Domain.Enums.Bookmaker.Boylesports;
 
             return new List<ScrapedEachWayTerms>() { scrapedEachWayTerms };
+        }
+
+        public ScrapedEvent BuildScrapedEvent(string html)
+        {
+            throw new NotImplementedException();
         }
     }
 }

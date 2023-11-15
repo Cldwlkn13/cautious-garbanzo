@@ -61,8 +61,16 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
+        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent? scrapedEvent = null)
         {
+            if (scrapedEvent != null)
+            {
+                MappedScrapedEventName = scrapedEvent.ScrapedEventName;
+                ewc.Event.Name = scrapedEvent.BetfairName;
+            }
+
+            marketDetail.marketName = scrapedMarket.Name;
+
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
             Bookmaker = bookmaker;
@@ -71,7 +79,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             {
                 SportsbookRunner = new RunnerDetail
                 {
-                    selectionName = sportsbookRunner.selectionName,
+                    selectionName = scrapedRunner.Name,
                     winRunnerOdds = new WinRunnerOdds
                     {
                         @decimal = (double)scrapedPrice.Decimal,
@@ -165,6 +173,9 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public double VolumeTradedBelowSportsbook { get; set; }
 
         public Bookmaker Bookmaker { get; set; }
+
+        public string MappedScrapedEventName { get; set; }
+
     }
 }
 

@@ -8,7 +8,6 @@
 		<UserSecretsId>aspnet-Betfair.ExchangeComparison-43cee6c3-4c32-4f02-a8c0-041bcc9027ed</UserSecretsId>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
 	</PropertyGroup>
-	<PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
 	<PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 	<ItemGroup>
 		<None Remove="Pages\Racing\" />
@@ -18,6 +17,10 @@
 		<None Remove="Services\" />
 		<None Remove="Pages\Model\" />
 		<None Remove="Pages\Extensions\" />
+		<None Remove="Pages\Test\" />
+		<None Remove="Workers\" />
+		<None Remove="TestHtml\" />
+		<None Remove="Processors\" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
@@ -28,6 +31,18 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="test-single-meeting-html.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestHtml\test-meetings-html.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestHtml\test-single-meeting-html.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestHtml\match-football.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="TestHtml\competition-page-html.txt">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
@@ -66,6 +81,10 @@
 		<Folder Include="Services\" />
 		<Folder Include="Pages\Model\" />
 		<Folder Include="Pages\Extensions\" />
+		<Folder Include="Pages\Test\" />
+		<Folder Include="Workers\" />
+		<Folder Include="TestHtml\" />
+		<Folder Include="Processors\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="glabal.json" />

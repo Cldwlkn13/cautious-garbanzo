@@ -1,0 +1,19 @@
+﻿@page
+@model Betfair.ExchangeComparison.Pages.Test.IndexModel
+@{
+}
+<a asp-page-handler="Partials" class="btn btn-warning" id="refresh-btn">Refresh</a>
+<a class="btn btn-danger" id="refresh-auto">Refresh Auto Off</a>
+<div>
+    @await Html.PartialAsync("TestPartial.cshtml", Model)
+    @*<div class="test-wrapper">
+            <div class="content text-light" id="content-win">
+                Some Text
+            </div>
+            <div class="content text-light" id="content-other">
+                Some Other Text
+            </div>
+        </div>*@
+</div>
+
+<script type="text/javascript" src="~/js/test.js"></script>

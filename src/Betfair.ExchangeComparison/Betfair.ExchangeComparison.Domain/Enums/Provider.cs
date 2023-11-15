@@ -7,7 +7,8 @@ namespace Betfair.ExchangeComparison.Domain.Enums
         BetfairSportsbook,
         BetfairExchange,
         Oddschecker,
-        Boylesports
+        BoylesportsDirect,
+        WilliamHillDirect
     }
 }
 

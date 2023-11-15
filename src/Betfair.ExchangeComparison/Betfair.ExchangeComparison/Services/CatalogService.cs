@@ -1,12 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
-using Betfair.ExchangeComparison.Domain.Extensions;
 
 namespace Betfair.ExchangeComparison.Services
 {
@@ -40,12 +40,6 @@ namespace Betfair.ExchangeComparison.Services
             var handler = ResolveHandler(bookmaker);
 
             handler.TryLogin();
-
-            TimeRange time = BetfairQueryExtensions.TimeRangeForNextDays(addDays);
-            if (timeRange != null)
-            {
-                time = timeRange;
-            }
 
             var sportsbookEventsToday = SportsbookMarketCataloguesToday(sport, addDays);
             var sportsbookMarketDetails = GetSportsbookEventsWithPrices(sportsbookEventsToday);
@@ -105,11 +99,11 @@ namespace Betfair.ExchangeComparison.Services
 
             if (SportsbookMarketDetailsStore.ContainsKey(DateTime.Today.AddDays(addDays - 1)))
             {
-                var sportsbookEvents = SportsbookMarketCataloguesToday(sport, addDays);
+                var sportsbookMarketDetails = SportsbookMarketCataloguesToday(sport, addDays);
 
-                var sportsbookPrices = GetSportsbookEventsWithPrices(sportsbookEvents);
+                var sportsbooMarketDetails = GetSportsbookEventsWithPrices(sportsbookMarketDetails);
 
-                var marketDetailsWithEvents = ListMarketDetailsWithEvents(sportsbookPrices);
+                var marketDetailsWithEvents = ListMarketDetailsWithEvents(sportsbooMarketDetails);
 
                 if (SportsbookMarketDetailsStore[DateTime.Today.AddDays(addDays - 1)].ContainsKey(sport))
                 {
@@ -124,6 +118,25 @@ namespace Betfair.ExchangeComparison.Services
             }
 
             return SportsbookMarketDetailsStore[DateTime.Today.AddDays(addDays - 1)][sport];
+        }
+
+        public Dictionary<EventWithCompetition, List<MarketDetail>> UpdateMarketDetailCatalogGroupByEvent(Sport sport, int addDays = 1)
+        {
+            var sportsbookCatalog = UpdateMarketDetailCatalog(sport, addDays);
+
+            var groupedByEventId = sportsbookCatalog.GroupBy(e => e.EventWithCompetition.Event.Name);
+
+            var result = new Dictionary<EventWithCompetition, List<MarketDetail>>();
+
+            foreach (var grp in groupedByEventId)
+            {
+                if (!result.Any(g => g.Key.Event.Id == grp.Key))
+                {
+                    result.Add(grp.First().EventWithCompetition, new List<MarketDetail>(grp.Select(m => m.SportsbookMarket).ToList()));
+                }
+            }
+
+            return result;
         }
 
         #region helper methods

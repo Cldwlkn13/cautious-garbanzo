@@ -1,0 +1,431 @@
+{
+  "entities": {
+    "3559623302": {
+      "ocMarketId": 3559623302,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Match Result and Over/Under 4.5",
+      "marketTypeName": "Match Result and Over/Under 4 5",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623303": {
+      "ocMarketId": 3559623303,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Correct Score",
+      "marketTypeName": "Correct Score",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623308": {
+      "ocMarketId": 3559623308,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Both Teams To Score In Both Halves",
+      "marketTypeName": "Both Teams To Score In Both Halves",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623309": {
+      "ocMarketId": 3559623309,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Total Goals - 1st Half",
+      "marketTypeName": "Total Goals - 1st Half",
+      "marketFilters": [
+        "Score Betting"
+      ]
+    },
+    "3559623311": {
+      "ocMarketId": 3559623311,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Match Result And Both Teams To Score",
+      "marketTypeName": "Match Result And Both Teams To Score",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623313": {
+      "ocMarketId": 3559623313,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Win Market",
+      "marketTypeName": "Win Market",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623316": {
+      "ocMarketId": 3559623316,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Half Time/Full Time",
+      "marketTypeName": "Half Time/Full Time",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623319": {
+      "ocMarketId": 3559623319,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Total Goals Over/Under",
+      "marketTypeName": "Total Goals Over/Under",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623322": {
+      "ocMarketId": 3559623322,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Half Time",
+      "marketTypeName": "Half Time",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623324": {
+      "ocMarketId": 3559623324,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Double Chance",
+      "marketTypeName": "Double Chance",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623326": {
+      "ocMarketId": 3559623326,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Correct Score - 1st Half",
+      "marketTypeName": "Correct Score - 1st Half",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623328": {
+      "ocMarketId": 3559623328,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Score In Both Halves",
+      "marketTypeName": "To Score In Both Halves",
+      "marketFilters": [
+        "Score Betting"
+      ]
+    },
+    "3559623330": {
+      "ocMarketId": 3559623330,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Match Result and Over/Under 2.5",
+      "marketTypeName": "Match Result and Over/Under 2 5",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623332": {
+      "ocMarketId": 3559623332,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Team To Score First",
+      "marketTypeName": "Team To Score First",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623333": {
+      "ocMarketId": 3559623333,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Match Result and Over/Under 3.5",
+      "marketTypeName": "Match Result and Over/Under 3 5",
+      "marketFilters": [
+        "Win Markets"
+      ]
+    },
+    "3559623334": {
+      "ocMarketId": 3559623334,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Both Teams To Score And Over/Under 2.5",
+      "marketTypeName": "Both Teams To Score And Over/Under 2 5",
+      "marketFilters": [
+        "Score Betting"
+      ]
+    },
+    "3559623335": {
+      "ocMarketId": 3559623335,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Win Either Half",
+      "marketTypeName": "To Win Either Half",
+      "marketFilters": [
+        "Win Markets"
+      ]
+    },
+    "3559623336": {
+      "ocMarketId": 3559623336,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Goal In Both Halves",
+      "marketTypeName": "Goal In Both Halves",
+      "marketFilters": [
+        "Score Betting"
+      ]
+    },
+    "3559623338": {
+      "ocMarketId": 3559623338,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Handicaps",
+      "marketTypeName": "Handicaps",
+      "marketFilters": [
+        "Handicap Betting"
+      ]
+    },
+    "3559623339": {
+      "ocMarketId": 3559623339,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Win Both Halves",
+      "marketTypeName": "To Win Both Halves",
+      "marketFilters": [
+        "Win Markets"
+      ]
+    },
+    "3559623341": {
+      "ocMarketId": 3559623341,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Win To Nil",
+      "marketTypeName": "To Win To Nil",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623342": {
+      "ocMarketId": 3559623342,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Both Teams To Score In 2nd Half",
+      "marketTypeName": "Both Teams To Score In 2nd Half",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623343": {
+      "ocMarketId": 3559623343,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Both Teams To Score",
+      "marketTypeName": "Both Teams To Score",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559623346": {
+      "ocMarketId": 3559623346,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Win From Behind",
+      "marketTypeName": "To Win From Behind",
+      "marketFilters": [
+        "Win Markets"
+      ]
+    },
+    "3559623347": {
+      "ocMarketId": 3559623347,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Draw No Bet",
+      "marketTypeName": "Draw No Bet",
+      "marketFilters": [
+        "Win Markets",
+        "Popular Markets"
+      ]
+    },
+    "3559623349": {
+      "ocMarketId": 3559623349,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Both Teams To Score In 1st Half",
+      "marketTypeName": "Both Teams To Score In 1st Half",
+      "marketFilters": [
+        "Score Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559663329": {
+      "ocMarketId": 3559663329,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Total Corners",
+      "marketTypeName": "Total Corners",
+      "marketFilters": [
+        "Stats Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559663331": {
+      "ocMarketId": 3559663331,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Total Corners - 2nd Half",
+      "marketTypeName": "Total Corners - 2nd Half",
+      "marketFilters": [
+        "Stats Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559663333": {
+      "ocMarketId": 3559663333,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Most Corners",
+      "marketTypeName": "Most Corners",
+      "marketFilters": [
+        "Stats Betting"
+      ]
+    },
+    "3559663335": {
+      "ocMarketId": 3559663335,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Total Corners - 1st Half",
+      "marketTypeName": "Total Corners - 1st Half",
+      "marketFilters": [
+        "Stats Betting"
+      ]
+    },
+    "3559663337": {
+      "ocMarketId": 3559663337,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Penalty In Match",
+      "marketTypeName": "Penalty In Match",
+      "marketFilters": [
+        "Stats Betting"
+      ]
+    },
+    "3559680622": {
+      "ocMarketId": 3559680622,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Request-A-Bet-Others",
+      "marketTypeName": "Bet Builders",
+      "marketFilters": [
+        "Bet Builders"
+      ]
+    },
+    "3559688120": {
+      "ocMarketId": 3559688120,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Request-A-Bet",
+      "marketTypeName": "Popular Bet Builders",
+      "marketFilters": [
+        "Bet Builders"
+      ]
+    },
+    "3559698358": {
+      "ocMarketId": 3559698358,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Price Boosts",
+      "marketTypeName": "Price Boosts",
+      "marketFilters": [
+        "Price Boosts"
+      ]
+    },
+    "3559713583": {
+      "ocMarketId": 3559713583,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Score 2 Or More Goals",
+      "marketTypeName": "To Score 2 Or More Goals",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559713597": {
+      "ocMarketId": 3559713597,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Last Goalscorer",
+      "marketTypeName": "Last Goalscorer",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559713601": {
+      "ocMarketId": 3559713601,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Anytime Goalscorer",
+      "marketTypeName": "Anytime Goalscorer",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559713604": {
+      "ocMarketId": 3559713604,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#To Score A Hat-Trick",
+      "marketTypeName": "To Score A Hat-Trick",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559713608": {
+      "ocMarketId": 3559713608,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#Score/Win Double",
+      "marketTypeName": "Score/Win Double",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    },
+    "3559713609": {
+      "ocMarketId": 3559713609,
+      "ocMarketSiblingId": 98691913,
+      "marketName": "Botafogo RJ v Cuiaba EC#First Goalscorer",
+      "marketTypeName": "First Goalscorer",
+      "marketFilters": [
+        "Player Betting",
+        "Popular Markets"
+      ]
+    }
+  },
+  "ids": [
+    3559623313,
+    3559713609,
+    3559623303,
+    3559623316,
+    3559623347,
+    3559623319,
+    3559623322,
+    3559713604,
+    3559713601,
+    3559623311,
+    3559713597,
+    3559623326,
+    3559623343,
+    3559663329,
+    3559713583,
+    3559623324,
+    3559713608,
+    3559623332,
+    3559623341,
+    3559623308,
+    3559623302,
+    3559623349,
+    3559623342,
+    3559623330,
+    3559663331,
+    3559623336,
+    3559663335,
+    3559623333,
+    3559623334,
+    3559688120,
+    3559680622,
+    3559698358,
+    3559623338,
+    3559623328,
+    3559623309,
+    3559623346,
+    3559623339,
+    3559623335,
+    3559663337,
+    3559663333
+  ]
+}

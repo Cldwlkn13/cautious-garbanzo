@@ -3,7 +3,7 @@ using Betfair.ExchangeComparison.Domain.ScrapingModel;
 
 namespace Betfair.ExchangeComparison.Scraping.Interfaces
 {
-    public interface IHtmlParser
+    public interface IHtmlParser<T>
     {
         ScrapedEvent BuildScrapedEvent(string html);
         ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj);
