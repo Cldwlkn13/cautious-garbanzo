@@ -12,28 +12,24 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         {
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
+        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, 
+            Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
             SportsbookRunner = sportsbookRunner;
             Bookmaker = bookmaker;
-
+            ExchangeWinRunner = exchangeWinRunner;
             BestWinAvailable = exchangeWinRunner.BestAvailable();
-
             ExpectedWinPrice = BestWinAvailable.ExpectedPrice(0);
-
-            ExpectedValueWin = SportsbookRunner.winRunnerOdds.@decimal
-                .ExpectedValue(ExpectedWinPrice);
-
+            ExpectedValueWin = SportsbookRunner.winRunnerOdds.@decimal.ExpectedValue(ExpectedWinPrice);
             LastPriceTradedWin = exchangeWinRunner.LastPriceTraded();
 
             WinnerOddsString = new int[]
             {
                     SportsbookRunner.winRunnerOdds.numerator,
                     SportsbookRunner.winRunnerOdds.denominator
-            }
-            .OddsString();
+            }.OddsString();
 
             VolumeTradedBelowSportsbook = exchangeWinRunner.TradedVolumeBelowSportsbook(
                 SportsbookRunner.winRunnerOdds.@decimal);
@@ -43,25 +39,20 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
 
             if (NumberEachWayPlaces > 0 && exchangePlaceRunner != null)
             {
+                ExchangePlaceRunner = exchangePlaceRunner;
                 BestPlaceAvailable = exchangePlaceRunner.BestAvailable();
-
                 LastPriceTradedPlace = exchangePlaceRunner.LastPriceTraded();
-
                 ExpectedPlacePrice = BestPlaceAvailable.ExpectedPrice(0);
-
-                EachWayPlacePart = SportsbookRunner.winRunnerOdds.@decimal
-                    .PlacePart(EachWayFraction);
-
+                EachWayPlacePart = SportsbookRunner.winRunnerOdds.@decimal.PlacePart(EachWayFraction);
                 PlacePartOddsString = EachWayPlacePart.ToString("0.00");
-
-                ExpectedValuePlace = EachWayPlacePart
-                    .ExpectedValue(ExpectedPlacePrice);
-
-                ExpectedValueEachWay = (ExpectedValueWin + ExpectedValuePlace) + 1;
+                ExpectedValuePlace = EachWayPlacePart.ExpectedValue(ExpectedPlacePrice);
+                ExpectedValueEachWay = ((ExpectedValueWin + ExpectedValuePlace) / 2) + 1;
             }
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent? scrapedEvent = null)
+        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, 
+            Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, 
+            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent? scrapedEvent = null)
         {
             if (scrapedEvent != null)
             {
@@ -75,7 +66,8 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             MarketDetail = marketDetail;
             Bookmaker = bookmaker;
 
-            if (scrapedRunner.ScrapedPrices != null && scrapedRunner.ScrapedPrices.TryGetScrapedPriceByBookmaker(bookmaker, out var scrapedPrice))
+            if (scrapedRunner.ScrapedPrices != null && 
+                scrapedRunner.ScrapedPrices.TryGetScrapedPriceByBookmaker(bookmaker, out var scrapedPrice))
             {
                 SportsbookRunner = new RunnerDetail
                 {
@@ -93,21 +85,17 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
                 SportsbookRunner = sportsbookRunner;
             }
 
+            ExchangeWinRunner = exchangeWinRunner;
             BestWinAvailable = exchangeWinRunner.BestAvailable();
-
             ExpectedWinPrice = BestWinAvailable.ExpectedPrice(0);
-
-            ExpectedValueWin = SportsbookRunner.winRunnerOdds.@decimal
-                .ExpectedValue(ExpectedWinPrice);
-
+            ExpectedValueWin = SportsbookRunner.winRunnerOdds.@decimal.ExpectedValue(ExpectedWinPrice);
             LastPriceTradedWin = exchangeWinRunner.LastPriceTraded();
 
             WinnerOddsString = new int[]
             {
                     SportsbookRunner.winRunnerOdds.numerator,
                     SportsbookRunner.winRunnerOdds.denominator
-            }
-            .OddsString();
+            }.OddsString();
 
             VolumeTradedBelowSportsbook = exchangeWinRunner.TradedVolumeBelowSportsbook(
                 SportsbookRunner.winRunnerOdds.@decimal);
@@ -125,23 +113,15 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
                 EachWayFraction = marketDetail.placeFractionDenominator;
             }
 
-
             if (NumberEachWayPlaces > 0 && exchangePlaceRunner != null)
             {
+                ExchangePlaceRunner = exchangePlaceRunner;        
                 BestPlaceAvailable = exchangePlaceRunner.BestAvailable();
-
                 LastPriceTradedPlace = exchangePlaceRunner.LastPriceTraded();
-
                 ExpectedPlacePrice = BestPlaceAvailable.ExpectedPrice(0);
-
-                EachWayPlacePart = SportsbookRunner.winRunnerOdds.@decimal
-                    .PlacePart(EachWayFraction);
-
+                EachWayPlacePart = SportsbookRunner.winRunnerOdds.@decimal.PlacePart(EachWayFraction);
                 PlacePartOddsString = EachWayPlacePart.ToString("0.00");
-
-                ExpectedValuePlace = EachWayPlacePart
-                    .ExpectedValue(ExpectedPlacePrice);
-
+                ExpectedValuePlace = EachWayPlacePart.ExpectedValue(ExpectedPlacePrice);
                 ExpectedValueEachWay = (ExpectedValueWin + ExpectedValuePlace) + 1;
             }
         }
@@ -149,6 +129,9 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public EventWithCompetition EventWithCompetition { get; set; }
         public MarketDetail MarketDetail { get; set; }
         public RunnerDetail SportsbookRunner { get; set; }
+
+        public Runner ExchangeWinRunner { get; set; }
+        public Runner ExchangePlaceRunner { get; set; }
 
         public Dictionary<Side, PriceSize> BestWinAvailable { get; set; }
         public Dictionary<Side, PriceSize> BestPlaceAvailable { get; set; }

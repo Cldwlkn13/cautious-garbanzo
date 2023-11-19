@@ -13,17 +13,42 @@ namespace Betfair.ExchangeComparison.Processors
         public static BasePageModel Process(ISession session, Sport sport)
         {
             var bookmaker = ParseBookmakerFromSession(session, sport);
+            Bookmaker[] bookmakers = new Bookmaker[] { };
+            Bookmaker[] isScrapableBookmakers = new Bookmaker[] { };
 
-            var bookmakers = new Bookmaker[]
+            switch (sport)
             {
-                Bookmaker.BetfairSportsbook,
-                Bookmaker.WilliamHillDirect
-            };
+                case Sport.Football:
+                    bookmakers = new Bookmaker[]
+                    {
+                        Bookmaker.BetfairSportsbook,
+                        Bookmaker.WilliamHillDirect
+                    };
 
-            var isScrapableBookmakers = new Bookmaker[]
-            {
-                Bookmaker.WilliamHillDirect
-            };
+                    isScrapableBookmakers = new Bookmaker[]
+                    {
+                        Bookmaker.WilliamHillDirect
+                    };
+                    break;
+
+                case Sport.Racing:
+                    bookmakers = new Bookmaker[]
+                    {
+                        Bookmaker.BetfairSportsbook,
+                        Bookmaker.WilliamHill,
+                        Bookmaker.Ladbrokes,
+                        Bookmaker.Boylesports
+                    };
+
+                    isScrapableBookmakers = new Bookmaker[]
+                    {
+                        Bookmaker.WilliamHill,
+                        Bookmaker.Ladbrokes,
+                        Bookmaker.Boylesports
+                    };
+                    break;
+            }
+
 
             var model = new BasePageModel(sport, bookmaker, bookmakers, isScrapableBookmakers);
 

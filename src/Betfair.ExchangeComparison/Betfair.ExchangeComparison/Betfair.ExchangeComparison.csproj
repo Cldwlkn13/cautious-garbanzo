@@ -77,7 +77,6 @@
 		<Folder Include="Pages\Racing\" />
 		<Folder Include="Pages\Football\" />
 		<Folder Include="Handlers\" />
-		<Folder Include="Interfaces\" />
 		<Folder Include="Services\" />
 		<Folder Include="Pages\Model\" />
 		<Folder Include="Pages\Extensions\" />

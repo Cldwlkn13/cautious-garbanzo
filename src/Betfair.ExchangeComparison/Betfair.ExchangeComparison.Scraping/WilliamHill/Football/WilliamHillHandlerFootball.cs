@@ -183,6 +183,11 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     continue;
                 }
 
+                if (@event.Key.status == "S")
+                {
+                    continue;
+                }
+
                 var marketMaps = CommonWilliamHillExtensions.WilliamHillMarketTypeMaps();
 
                 var scrapedMarkets = new List<ScrapedMarket>();

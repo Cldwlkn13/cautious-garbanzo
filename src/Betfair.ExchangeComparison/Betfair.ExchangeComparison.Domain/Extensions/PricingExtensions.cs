@@ -1,6 +1,4 @@
-﻿using System;
-using System.Drawing;
-using Betfair.ExchangeComparison.Exchange.Model;
+﻿using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Domain.Extensions

@@ -13,6 +13,7 @@ using Microsoft.Extensions.FileProviders;
 using Betfair.ExchangeComparison.Workers;
 using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Processors;
+using Betfair.ExchangeComparison.Settings;
 
 namespace Betfair.ExchangeComparison
 {
@@ -29,6 +30,7 @@ namespace Betfair.ExchangeComparison
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            //projects
             services.ConfigureExchange();
             services.ConfigureSportsbook();
             services.ConfigureScrapers();
@@ -36,22 +38,30 @@ namespace Betfair.ExchangeComparison
             services.AddHealthChecks();
             services.AddSignalR();
 
+            //compound services
             services.AddSingleton<ICatalogService, CatalogService>();
 
             //processors
-            services.AddSingleton<CatalogProcessor>();
+            services.AddSingleton<ICatalogProcessor, CatalogProcessor>();
             services.AddSingleton<ScrapingProcessor<SportFootball>>();
+            services.AddSingleton<IEventProcessor, EventProcessor>();
+            services.AddSingleton<IMarketProcessor, MarketProcessor>();
+            services.AddSingleton<IRunnerProcessor, RunnerProcessor>();
 
+            //scraping
             services.AddSingleton<IScrapingOrchestrator<SportFootball>, ScrapingOrchestrator<SportFootball>>();
             services.AddSingleton<IScrapingControl<SportFootball>, ScrapingOrchestrator<SportFootball>>();
             services.AddSingleton<IScrapingOrchestrator<SportRacing>, ScrapingOrchestrator<SportRacing>>();
             services.AddSingleton<IScrapingControl<SportRacing>, ScrapingOrchestrator<SportRacing>>();
 
+            //mapping and comparison
             services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();
             services.AddSingleton<IMappingService, MappingService>();
 
+            //settings
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));
             services.Configure<ScrapingSettings>(Configuration.GetSection(nameof(ScrapingSettings)));
+            services.Configure<PriceComparisonSettings>(Configuration.GetSection(nameof(PriceComparisonSettings)));
 
             services.AddDistributedMemoryCache();
 

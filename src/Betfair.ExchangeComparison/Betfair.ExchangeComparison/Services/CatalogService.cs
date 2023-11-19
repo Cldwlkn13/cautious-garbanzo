@@ -35,7 +35,9 @@ namespace Betfair.ExchangeComparison.Services
             SportsbookMarketDetailsStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>>();
         }
 
-        public Task<SportsbookCatalogue> GetSportsbookCatalogue(Sport sport, TimeRange? timeRange = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, int addDays = 1)
+        public Task<SportsbookCatalogue> GetSportsbookCatalogue(
+            Sport sport, TimeRange? timeRange = null, 
+            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, int addDays = 1)
         {
             var handler = ResolveHandler(bookmaker);
 
