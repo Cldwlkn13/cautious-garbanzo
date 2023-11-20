@@ -35,8 +35,6 @@ namespace Betfair.ExchangeComparison.Processors
                     return null;
                 }
 
-
-
                 var winOverround = marketDetail.WinOverround();
                 var placeOverround = hasEachWay ? marketDetail.PlaceOverround() : 0;
 
@@ -136,7 +134,7 @@ namespace Betfair.ExchangeComparison.Processors
             return mappedScrapedMarket;
         }
 
-        private ScrapedEachWayTerms MapEachWayTerms(BasePageModel basePageModel, ScrapedMarket mappedScrapedMarket, MarketDetail marketDetail)
+        private static ScrapedEachWayTerms MapEachWayTerms(BasePageModel basePageModel, ScrapedMarket mappedScrapedMarket, MarketDetail marketDetail)
         {
             if (basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
             {

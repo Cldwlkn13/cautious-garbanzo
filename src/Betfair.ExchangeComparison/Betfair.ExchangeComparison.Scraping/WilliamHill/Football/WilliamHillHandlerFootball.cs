@@ -14,41 +14,16 @@ using Newtonsoft.Json;
 
 namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
 {
-    public class WilliamHillHandlerFootball<T> : ScrapingHandler<T>, IWilliamHillHandler<T>
+    public class WilliamHillHandlerFootball : ScrapingHandler, IWilliamHillHandlerFootball
     {
         private const string BaseUrl = "https://sports.williamhill.com";
-        private IWilliamHillParser<T> _parser;
+        private IWilliamHillParserFootball _parser;
 
-        public WilliamHillHandlerFootball(ILogger<WilliamHillHandlerRacing<T>> logger, IScrapingClient scrapingClient, IWilliamHillParser<T> parser) :
+        public WilliamHillHandlerFootball(ILogger<WilliamHillHandlerFootball> logger, IScrapingClient scrapingClient, IWilliamHillParserFootball parser) :
             base(logger, scrapingClient)
         {
             _parser = parser;
 
-        }
-
-        public async Task<ScrapedEvent> Handle(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ScrapedEvent> Handle(MarketDetailWithEvent @event, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(IEnumerable<MarketDetailWithEvent> mdes, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(EventsByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UsageModel> Usage()
-        {
-            throw new NotImplementedException();
         }
 
         private Dictionary<WhEvent, List<WhMarket>> ListEventsByMarket()
@@ -151,12 +126,8 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
             }
         }
 
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Dictionary<EventWithCompetition, List<MarketDetail>> events, Sport sport = Sport.Racing)
+        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable
+            (Dictionary<EventWithCompetition, List<MarketDetail>> events)
         {
             var apiResults = ListEventsByMarket();
 

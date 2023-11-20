@@ -25,14 +25,8 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Boylesports\" />
-		<Folder Include="Interfaces\" />
-		<Folder Include="Extensions\" />
 		<Folder Include="Boylesports\Interfaces\" />
 		<Folder Include="Settings\" />
-		<Folder Include="WilliamHill\" />
-		<Folder Include="WilliamHill\Interfaces\" />
-		<Folder Include="Oddschecker\" />
-		<Folder Include="Oddschecker\Interfaces\" />
 		<Folder Include="Oddschecker\Racing\" />
 		<Folder Include="Oddschecker\Football\" />
 		<Folder Include="WilliamHill\Football\" />

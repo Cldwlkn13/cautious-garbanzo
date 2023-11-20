@@ -1,16 +1,15 @@
-﻿using Betfair.ExchangeComparison.Domain.Enums;
-using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
 
 namespace Betfair.ExchangeComparison.Processors
 {
-    public class ScrapingProcessor<T>
+    public class ScrapingProcessorRacing
     {
-        private readonly IScrapingOrchestrator<T> _scrapingOrchestrator;
-        private readonly IScrapingControl<T> _scrapingControl;
+        private readonly IScrapingOrchestratorRacing _scrapingOrchestrator;
+        private readonly IScrapingControlRacing _scrapingControl;
 
-        public ScrapingProcessor(IScrapingOrchestrator<T> scrapingOrchestrator, IScrapingControl<T> scrapingControl)
+        public ScrapingProcessorRacing(IScrapingOrchestratorRacing scrapingOrchestrator, IScrapingControlRacing scrapingControl)
         {
             _scrapingOrchestrator = scrapingOrchestrator;
             _scrapingControl = scrapingControl;

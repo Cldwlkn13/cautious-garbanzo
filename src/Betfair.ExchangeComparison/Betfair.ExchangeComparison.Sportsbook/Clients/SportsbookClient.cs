@@ -11,7 +11,6 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
     public class SportsbookClient : HttpClient, ISportsbookClient
     {
         public string EndPoint { get; private set; }
-        private static readonly IDictionary<string, Type> operationReturnTypeMap = new Dictionary<string, Type>();
         public const string APPKEY_HEADER = "X-Application";
         public const string SESSION_TOKEN_HEADER = "X-Authentication";
         public WebHeaderCollection CustomHeaders { get; set; }
@@ -20,47 +19,46 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
         private static readonly string LIST_EVENTS_METHOD = "listEvents";
         private static readonly string LIST_MARKET_TYPES_METHOD = "listMarketTypes";
         private static readonly string LIST_MARKET_CATALOGUE_METHOD = "listMarketCatalogue";
-        private static readonly string LIST_MARKET_BOOK_METHOD = "listMarketBook";
         private static readonly string LIST_MARKET_PRICES_METHOD = "listMarketPrices";
-        private static readonly string PLACE_ORDERS_METHOD = "SportsAPING/v1.0/placeOrders";
-        private static readonly string LIST_MARKET_PROFIT_AND_LOST_METHOD = "SportsAPING/v1.0/listMarketProfitAndLoss";
-        private static readonly string LIST_CURRENT_ORDERS_METHOD = "SportsAPING/v1.0/listCurrentOrders";
-        private static readonly string LIST_CLEARED_ORDERS_METHOD = "SportsAPING/v1.0/listClearedOrders";
-        private static readonly string CANCEL_ORDERS_METHOD = "SportsAPING/v1.0/cancelOrders";
-        private static readonly string REPLACE_ORDERS_METHOD = "SportsAPING/v1.0/replaceOrders";
-        private static readonly string UPDATE_ORDERS_METHOD = "SportsAPING/v1.0/updateOrders";
-        private static readonly string GET_ACCOUNT_FUNDS_METHOD = "AccountAPING/v1.0/getAccountFunds";
-        private static readonly String FILTER = "filter";
-        private static readonly String LOCALE = "locale";
-        private static readonly String WALLET = "wallet";
-        private static readonly String CURRENCY_CODE = "currencyCode";
-        private static readonly String MARKET_PROJECTION = "marketProjection";
-        private static readonly String MATCH_PROJECTION = "matchProjection";
-        private static readonly String ORDER_PROJECTION = "orderProjection";
-        private static readonly String PRICE_PROJECTION = "priceProjection";
-        private static readonly String SORT = "sort";
-        private static readonly String MAX_RESULTS = "maxResults";
-        private static readonly String MARKET_IDS = "marketIds";
-        private static readonly String MARKET_ID = "marketId";
-        private static readonly String INSTRUCTIONS = "instructions";
-        private static readonly String CUSTOMER_REFERENCE = "customerRef";
-        private static readonly String INCLUDE_SETTLED_BETS = "includeSettledBets";
-        private static readonly String INCLUDE_BSP_BETS = "includeBspBets";
-        private static readonly String NET_OF_COMMISSION = "netOfCommission";
-        private static readonly String BET_IDS = "betIds";
-        private static readonly String PLACED_DATE_RANGE = "placedDateRange";
-        private static readonly String ORDER_BY = "orderBy";
-        private static readonly String SORT_DIR = "sortDir";
-        private static readonly String FROM_RECORD = "fromRecord";
-        private static readonly String RECORD_COUNT = "recordCount";
-        private static readonly string BET_STATUS = "betStatus";
-        private static readonly string EVENT_TYPE_IDS = "eventTypeIds";
-        private static readonly string EVENT_IDS = "eventIds";
-        private static readonly string RUNNER_IDS = "runnerIds";
-        private static readonly string SIDE = "side";
-        private static readonly string SETTLED_DATE_RANGE = "settledDateRange";
-        private static readonly string GROUP_BY = "groupBy";
-        private static readonly string INCLUDE_ITEM_DESCRIPTION = "includeItemDescription";
+        //private static readonly string PLACE_ORDERS_METHOD = "SportsAPING/v1.0/placeOrders";
+        //private static readonly string LIST_MARKET_PROFIT_AND_LOST_METHOD = "SportsAPING/v1.0/listMarketProfitAndLoss";
+        //private static readonly string LIST_CURRENT_ORDERS_METHOD = "SportsAPING/v1.0/listCurrentOrders";
+        //private static readonly string LIST_CLEARED_ORDERS_METHOD = "SportsAPING/v1.0/listClearedOrders";
+        //private static readonly string CANCEL_ORDERS_METHOD = "SportsAPING/v1.0/cancelOrders";
+        //private static readonly string REPLACE_ORDERS_METHOD = "SportsAPING/v1.0/replaceOrders";
+        //private static readonly string UPDATE_ORDERS_METHOD = "SportsAPING/v1.0/updateOrders";
+        //private static readonly string GET_ACCOUNT_FUNDS_METHOD = "AccountAPING/v1.0/getAccountFunds";
+        //private static readonly String FILTER = "filter";
+        //private static readonly String LOCALE = "locale";
+        //private static readonly String WALLET = "wallet";
+        //private static readonly String CURRENCY_CODE = "currencyCode";
+        //private static readonly String MARKET_PROJECTION = "marketProjection";
+        //private static readonly String MATCH_PROJECTION = "matchProjection";
+        //private static readonly String ORDER_PROJECTION = "orderProjection";
+        //private static readonly String PRICE_PROJECTION = "priceProjection";
+        //private static readonly String SORT = "sort";
+        //private static readonly String MAX_RESULTS = "maxResults";
+        //private static readonly String MARKET_IDS = "marketIds";
+        //private static readonly String MARKET_ID = "marketId";
+        //private static readonly String INSTRUCTIONS = "instructions";
+        //private static readonly String CUSTOMER_REFERENCE = "customerRef";
+        //private static readonly String INCLUDE_SETTLED_BETS = "includeSettledBets";
+        //private static readonly String INCLUDE_BSP_BETS = "includeBspBets";
+        //private static readonly String NET_OF_COMMISSION = "netOfCommission";
+        //private static readonly String BET_IDS = "betIds";
+        //private static readonly String PLACED_DATE_RANGE = "placedDateRange";
+        //private static readonly String ORDER_BY = "orderBy";
+        //private static readonly String SORT_DIR = "sortDir";
+        //private static readonly String FROM_RECORD = "fromRecord";
+        //private static readonly String RECORD_COUNT = "recordCount";
+        //private static readonly string BET_STATUS = "betStatus";
+        //private static readonly string EVENT_TYPE_IDS = "eventTypeIds";
+        //private static readonly string EVENT_IDS = "eventIds";
+        //private static readonly string RUNNER_IDS = "runnerIds";
+        //private static readonly string SIDE = "side";
+        //private static readonly string SETTLED_DATE_RANGE = "settledDateRange";
+        //private static readonly string GROUP_BY = "groupBy";
+        //private static readonly string INCLUDE_ITEM_DESCRIPTION = "includeItemDescription";
 
         public SportsbookClient()
         {

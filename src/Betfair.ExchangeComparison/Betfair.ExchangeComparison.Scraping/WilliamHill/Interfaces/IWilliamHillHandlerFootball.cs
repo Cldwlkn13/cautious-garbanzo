@@ -2,7 +2,7 @@
 
 namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Interfaces
 {
-    public interface IWilliamHillHandler<T> : IScrapingHandler<T>
+    public interface IWilliamHillHandlerFootball : IScrapingHandlerEnumerable
     {
 
     }

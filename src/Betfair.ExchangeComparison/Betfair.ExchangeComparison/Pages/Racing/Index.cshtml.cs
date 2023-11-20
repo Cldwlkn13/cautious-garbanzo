@@ -15,8 +15,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
     {
         private readonly ICatalogProcessor _catalogProcessor;
         private readonly IEventProcessor _eventProcessor;
-        private readonly ScrapingProcessor<SportFootball> _scrapingProcessor;
-        private readonly IScrapingOrchestrator<SportRacing> _scrapingOrchestrator;
+        private readonly ScrapingProcessorRacing _scrapingProcessor;
+        private readonly IScrapingOrchestratorRacing _scrapingOrchestrator;
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
@@ -24,8 +24,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         public RacingFormModel FormModel { get; set; }
         public List<SelectListItem> SelectListBookmakers { get; set; }
 
-        public IndexModel(IScrapingOrchestrator<SportRacing> scrapingOrchestrator, ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor, 
-            ScrapingProcessor<SportFootball> scrapingProcessor)
+        public IndexModel(IScrapingOrchestratorRacing scrapingOrchestrator, ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor,
+            ScrapingProcessorRacing scrapingProcessor)
         {
             _scrapingOrchestrator = scrapingOrchestrator;
             _catalogProcessor = catalogProcessor;

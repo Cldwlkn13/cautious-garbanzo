@@ -43,16 +43,18 @@ namespace Betfair.ExchangeComparison
 
             //processors
             services.AddSingleton<ICatalogProcessor, CatalogProcessor>();
-            services.AddSingleton<ScrapingProcessor<SportFootball>>();
             services.AddSingleton<IEventProcessor, EventProcessor>();
             services.AddSingleton<IMarketProcessor, MarketProcessor>();
             services.AddSingleton<IRunnerProcessor, RunnerProcessor>();
 
+            services.AddSingleton<ScrapingProcessorFootball>();
+            services.AddSingleton<ScrapingProcessorRacing>();
+
             //scraping
-            services.AddSingleton<IScrapingOrchestrator<SportFootball>, ScrapingOrchestrator<SportFootball>>();
-            services.AddSingleton<IScrapingControl<SportFootball>, ScrapingOrchestrator<SportFootball>>();
-            services.AddSingleton<IScrapingOrchestrator<SportRacing>, ScrapingOrchestrator<SportRacing>>();
-            services.AddSingleton<IScrapingControl<SportRacing>, ScrapingOrchestrator<SportRacing>>();
+            services.AddSingleton<IScrapingOrchestratorFootball, ScrapingOrchestratorFootball>();
+            services.AddSingleton<IScrapingControlFootball, ScrapingOrchestratorFootball>();
+            services.AddSingleton<IScrapingOrchestratorRacing, ScrapingOrchestratorRacing>();
+            services.AddSingleton<IScrapingControlRacing, ScrapingOrchestratorRacing>();
 
             //mapping and comparison
             services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();

@@ -6,16 +6,9 @@ using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Interfaces
 {
-    public interface IScrapingOrchestrator<T>
+    public interface IScrapingOrchestratorFootball
     {
-        Task Orchestrate(IEnumerable<MarketDetailWithEvent> catalog, Provider provider);
-        Task Orchestrate(ExchangeCatalogue catalog, Provider provider);
         Task Orchestrate(Dictionary<EventWithCompetition, List<MarketDetail>> catalog, Provider provider);
-
-        //Task OrchestrateSingleEvents(IEnumerable<MarketDetailWithEvent> catalog, Provider provider);
-
-        //Task OrchestrateEnumerable(IEnumerable<MarketDetailWithEvent> catalog, Provider provider);
-        //Task OrchestrateEnumerable(ExchangeCatalogue catalog, Provider provider);
 
         bool TryGetScrapedEvents(Provider provider, DateTime dateTime, out List<ScrapedEvent> result);
         Task<UsageModel> Usage();

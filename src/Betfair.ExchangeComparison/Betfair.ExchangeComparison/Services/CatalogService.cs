@@ -20,7 +20,7 @@ namespace Betfair.ExchangeComparison.Services
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>> ExchangeMarketCatalogueStore { get; set; }
 
         public Dictionary<DateTime, Dictionary<Sport, IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>>>> SportsbookMarketCatalogueStore { get; private set; }
-        public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>> SportsbookMarketDetailsStore { get; private set; }
+        public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEwc>>> SportsbookMarketDetailsStore { get; private set; }
 
         public CatalogService(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, IPaddyPowerSportsbookHandler ppSportsbookHandler)
         {
@@ -32,7 +32,7 @@ namespace Betfair.ExchangeComparison.Services
             ExchangeMarketCatalogueStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>>();
 
             SportsbookMarketCatalogueStore = new Dictionary<DateTime, Dictionary<Sport, IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>>>>();
-            SportsbookMarketDetailsStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>>();
+            SportsbookMarketDetailsStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEwc>>>();
         }
 
         public Task<SportsbookCatalogue> GetSportsbookCatalogue(
@@ -90,13 +90,13 @@ namespace Betfair.ExchangeComparison.Services
             return exchangeCatalogue;
         }
 
-        public IEnumerable<MarketDetailWithEvent> UpdateMarketDetailCatalog(Sport sport, int addDays = 1)
+        public IEnumerable<MarketDetailWithEwc> UpdateMarketDetailCatalog(Sport sport, int addDays = 1)
         {
             var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
             if (!handler.TryLogin())
             {
                 Console.WriteLine($"LOGIN_FAILED");
-                return new List<MarketDetailWithEvent>();
+                return new List<MarketDetailWithEwc>();
             }
 
             if (SportsbookMarketDetailsStore.ContainsKey(DateTime.Today.AddDays(addDays - 1)))
@@ -143,13 +143,13 @@ namespace Betfair.ExchangeComparison.Services
 
         #region helper methods
 
-        public IEnumerable<MarketDetailWithEvent> GetCatalog(Sport sport, int addDays = 1)
+        public IEnumerable<MarketDetailWithEwc> GetCatalog(Sport sport, int addDays = 1)
         {
             var handler = ResolveHandler(Bookmaker.BetfairSportsbook);
             if (!handler.TryLogin())
             {
                 Console.WriteLine($"LOGIN_FAILED");
-                return new List<MarketDetailWithEvent>();
+                return new List<MarketDetailWithEwc>();
             }
 
             if (!SportsbookMarketDetailsStore.ContainsKey(DateTime.Today.AddDays(addDays - 1)))
@@ -160,7 +160,7 @@ namespace Betfair.ExchangeComparison.Services
                 var marketDetailsWithEvents = ListMarketDetailsWithEvents(sportsbookPrices);
 
                 SportsbookMarketDetailsStore.Add(DateTime.Today.AddDays(addDays - 1),
-                    new Dictionary<Sport, IEnumerable<MarketDetailWithEvent>>()
+                    new Dictionary<Sport, IEnumerable<MarketDetailWithEwc>>()
                     {
                         { sport, marketDetailsWithEvents }
                     });
@@ -519,9 +519,9 @@ namespace Betfair.ExchangeComparison.Services
             return result;
         }
 
-        public IList<MarketDetailWithEvent> ListMarketDetailsWithEvents(Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> eventCatalog)
+        public IList<MarketDetailWithEwc> ListMarketDetailsWithEvents(Dictionary<EventWithCompetition, IEnumerable<MarketDetail>> eventCatalog)
         {
-            var result = new List<MarketDetailWithEvent>();
+            var result = new List<MarketDetailWithEwc>();
 
             foreach (var @event in eventCatalog)
             {
@@ -529,7 +529,7 @@ namespace Betfair.ExchangeComparison.Services
 
                 foreach (var market in @event.Value)
                 {
-                    result.Add(new MarketDetailWithEvent
+                    result.Add(new MarketDetailWithEwc
                     {
                         EventWithCompetition = @event.Key,
                         SportsbookMarket = market

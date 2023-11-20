@@ -1,5 +1,4 @@
-﻿using System;
-namespace Betfair.ExchangeComparison.Exchange.Settings
+﻿namespace Betfair.ExchangeComparison.Exchange.Settings
 {
     public class ExchangeSettings
     {

@@ -76,14 +76,12 @@
 	<ItemGroup>
 		<Folder Include="Pages\Racing\" />
 		<Folder Include="Pages\Football\" />
-		<Folder Include="Handlers\" />
 		<Folder Include="Services\" />
 		<Folder Include="Pages\Model\" />
 		<Folder Include="Pages\Extensions\" />
 		<Folder Include="Pages\Test\" />
 		<Folder Include="Workers\" />
 		<Folder Include="TestHtml\" />
-		<Folder Include="Processors\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="glabal.json" />

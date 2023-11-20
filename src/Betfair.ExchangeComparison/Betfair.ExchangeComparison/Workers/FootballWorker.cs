@@ -1,5 +1,4 @@
-﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
-using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Interfaces;
 
 namespace Betfair.ExchangeComparison.Workers
@@ -7,10 +6,10 @@ namespace Betfair.ExchangeComparison.Workers
     public class FootballWorker : BackgroundService
     {
         private readonly ICatalogService _catalogService;
-        private readonly IScrapingOrchestrator<SportFootball> _scrapingOrchestrator;
-        private readonly IScrapingControl<SportFootball> _scrapingControl;
+        private readonly IScrapingOrchestratorFootball _scrapingOrchestrator;
+        private readonly IScrapingControlFootball _scrapingControl;
 
-        public FootballWorker(ICatalogService catalogService, IScrapingOrchestrator<SportFootball> scrapingOrchestrator, IScrapingControl<SportFootball> scrapingControl)
+        public FootballWorker(ICatalogService catalogService, IScrapingOrchestratorFootball scrapingOrchestrator, IScrapingControlFootball scrapingControl)
         {
             _catalogService = catalogService;
             _scrapingOrchestrator = scrapingOrchestrator;

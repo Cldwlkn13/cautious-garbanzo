@@ -1,12 +1,11 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 
 namespace Betfair.ExchangeComparison.Scraping.Interfaces
 {
-    public interface IHtmlParser<T>
+    public interface IScrapingHandlerSingle
     {
-        ScrapedEvent BuildScrapedEvent(string html);
-        ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj);
+        Task<ScrapedEvent> Handle(MarketDetailWithEwc @event, Sport sport = Sport.Racing);
     }
 }
-

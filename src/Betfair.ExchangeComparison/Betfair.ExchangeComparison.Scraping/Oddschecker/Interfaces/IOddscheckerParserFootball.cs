@@ -1,11 +1,10 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Domain.ScrapingModel.Oddschecker;
-using Betfair.ExchangeComparison.Scraping.Interfaces;
 
 namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Interfaces
 {
-    public interface IOddscheckerParser<T> : IHtmlParser<T>
+    public interface IOddscheckerParserFootball
     {
         Dictionary<string, string> ParseLinksFromCompetitionPageSimple(string html);
         Dictionary<string, string> ParseLinksFromCompetitionPageComplex(string html);

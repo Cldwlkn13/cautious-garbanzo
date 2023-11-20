@@ -9,17 +9,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports
 {
-    public class BoylesportsHandler<T> : ScrapingHandler<T>, IBoylesportsHandler<T>
+    public class BoylesportsHandler : ScrapingHandler, IBoylesportsHandler
     {
-        private readonly IBoylesportsParser<T> _parser;
+        private readonly IBoylesportsParser _parser;
 
-        public BoylesportsHandler(ILogger<BoylesportsHandler<T>> logger, IScrapingClient scrapingClient, IBoylesportsParser<T> parser) :
+        public BoylesportsHandler(ILogger<BoylesportsHandler> logger, IScrapingClient scrapingClient, IBoylesportsParser parser) :
             base(logger, scrapingClient)
         {
             _parser = parser;
         }
 
-        public async Task<ScrapedEvent> Handle(MarketDetailWithEvent @event, Sport sport = Sport.Racing)
+        public async Task<ScrapedEvent> Handle(MarketDetailWithEwc @event, Sport sport = Sport.Racing)
         {
             var url = UrlBuilder(@event);
 
@@ -39,7 +39,7 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
             return scrapedEvent;
         }
 
-        private static string UrlBuilder(MarketDetailWithEvent compoundObj)
+        private static string UrlBuilder(MarketDetailWithEwc compoundObj)
         {
             string baseUrl = "https://www.boylesports.com/sports/horse-racing/uk-ire-featured"; //e.g. 201023/redcar/13:35
 
@@ -60,31 +60,6 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
         public async Task<UsageModel> Usage() =>
             await _scrapingClient.ZenRowsUsage();
-
-        public Task<ScrapedEvent> Handle(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(EventsByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(IEnumerable<MarketDetailWithEvent> events, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Dictionary<EventWithCompetition, List<MarketDetail>> events, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -41,10 +42,19 @@ namespace Betfair.ExchangeComparison.Processors
                     }
 
                     //Get any scraped events, if they exist
-                    var MappedScrapedEvent = MapScrapedEvent(basePageModel, scrapedEvents, ewc);
+                    var MappedScrapedEvent = new ScrapedEvent();
+                    if (basePageModel.Sport == Sport.Football) // we can map football by the event name
+                    {
+                        MappedScrapedEvent = MapScrapedEvent(basePageModel, scrapedEvents, ewc);
+                    }
 
                     foreach (var MarketDetail in MappedMarketDetailsForEvent.Where(m => m.marketStatus == "OPEN"))
                     {
+                        if (basePageModel.Sport == Sport.Racing) //we have to map racing using the race time on the market detail
+                        {
+                            MappedScrapedEvent = MapScrapedEvent(basePageModel, scrapedEvents, ewc, MarketDetail);
+                        }
+
                         var mvm = await _marketProcessor.Process(basePageModel,
                              ewc, MarketDetail, EventWithMarketBooks, baseCatalogModel.HasEachWay, MappedScrapedEvent);
 
@@ -68,18 +78,35 @@ namespace Betfair.ExchangeComparison.Processors
             return result;
         }
 
-        private ScrapedEvent MapScrapedEvent(BasePageModel basePageModel, List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc)
+        private ScrapedEvent? MapScrapedEvent(BasePageModel basePageModel, List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, MarketDetail? marketDetail = null)
         {
             var mappedScrapedEvent = new ScrapedEvent();
             if (basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
             {
-                if (!_mappingService.TryMapScrapedEvent(scrapedEvents, ewc, out mappedScrapedEvent))
+                switch(basePageModel.Sport)
                 {
-                    Console.WriteLine($"SCRAPED_EVENT_MAPPING_FAIL; " +
-                        $"Event={ewc.Event.Name}");
+                    case Sport.Football:
+                        if (!_mappingService.TryMapScrapedEvent(scrapedEvents, ewc, out mappedScrapedEvent))
+                        {
+                            Console.WriteLine($"SCRAPED_EVENT_MAPPING_FAIL; " +
+                                $"Event={ewc.Event.Name}");
 
-                    return new ScrapedEvent();
+                            return null;
+                        }
+                        break;
+
+                    case Sport.Racing:
+                        if (!_mappingService.TryMapScrapedEvent(scrapedEvents, ewc, marketDetail, out mappedScrapedEvent))
+                        {
+                            Console.WriteLine($"SCRAPED_EVENT_MAPPING_FAIL; " +
+                                $"Event={ewc.Event.Name}");
+
+                            return null;
+                        }
+                        break;
                 }
+                
+
             }
             return mappedScrapedEvent;
         }

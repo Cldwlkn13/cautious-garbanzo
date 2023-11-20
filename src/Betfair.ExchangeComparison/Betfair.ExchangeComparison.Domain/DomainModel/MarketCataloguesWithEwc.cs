@@ -2,9 +2,9 @@
 
 namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
-    public class MarketCataloguesWithEvent
+    public class MarketCataloguesWithEwc
     {
-        public MarketCataloguesWithEvent()
+        public MarketCataloguesWithEwc()
         {
             ExchangeMarketCatalogues = new List<MarketCatalogue>();
         }

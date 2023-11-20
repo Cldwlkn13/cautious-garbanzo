@@ -5,22 +5,25 @@ using Betfair.ExchangeComparison.Scraping.Extensions;
 using Betfair.ExchangeComparison.Scraping.Oddschecker.Interfaces;
 using HtmlAgilityPack;
 using Betfair.ExchangeComparison.Domain.ScrapingModel.Oddschecker;
+using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
 {
-    public class OddscheckerParserRacing<T> : IOddscheckerParser<T>
+    public class OddscheckerParserRacing : IOddscheckerParserRacing
     {
         public OddscheckerParserRacing()
         {
         }
 
-        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
+        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEwc marketDetailsWithEwc)
         {
             try
             {
                 var document = html!.LoadDocument();
 
                 var oddsTableNode = GetOddsTableNode(document);
+
+                if (oddsTableNode == null) return new ScrapedEvent();
 
                 var tblFoot = oddsTableNode.SelectSingleNode("//tr[@id='etfEW']");
 
@@ -115,18 +118,25 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
                         prices.Add(new ScrapedPrice(price, bookmaker));
                     }
 
-                    scrapedRunners.Add(new ScrapedRunner(name, prices));
+                    var mappedRunnerDetail = marketDetailsWithEwc.SportsbookMarket.runnerDetails
+                        .FirstOrDefault(r => r.selectionName.ToLower() == name.ToLower());
+
+                    var scrapedRunner = new ScrapedRunner(name, prices);
+                    scrapedRunner.MappedRunnerDetail = mappedRunnerDetail != null ? mappedRunnerDetail : new RunnerDetail();
+                    scrapedRunners.Add(scrapedRunner);
                 }
 
                 var scrapedMarket = new ScrapedMarket();
-                scrapedMarket.Name = compoundObj.SportsbookMarket.marketName;
+                scrapedMarket.Name = marketDetailsWithEwc.SportsbookMarket.marketName;
                 scrapedMarket.ScrapedEachWayTerms = eachWayTerms;
                 scrapedMarket.ScrapedRunners = scrapedRunners;
+                scrapedMarket.MappedMarketDetail = marketDetailsWithEwc.SportsbookMarket;
 
                 var scrapedEvent = new ScrapedEvent();
-                //scrapedEvent.MappedEventWithMarketDetail = compoundObj;
-                scrapedEvent.BetfairName = compoundObj.EventWithCompetition.Event.Venue;
-                scrapedEvent.StartTime = compoundObj.SportsbookMarket.marketStartTime
+                scrapedEvent.MappedEventWithCompetition = marketDetailsWithEwc.EventWithCompetition;
+                scrapedEvent.ScrapedEventName = marketDetailsWithEwc.EventWithCompetition.Event.Name;
+                scrapedEvent.BetfairName = marketDetailsWithEwc.EventWithCompetition.Event.Name;
+                scrapedEvent.StartTime = marketDetailsWithEwc.SportsbookMarket.marketStartTime
                     .ConvertUtcToBritishIrishLocalTime();
                 scrapedEvent.ScrapedMarkets.Add(scrapedMarket);
 
@@ -134,8 +144,8 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
             }
             catch (Exception exception)
             {
-                Console.WriteLine($"Exception={exception} on BuildScrapedEvent; {compoundObj.EventWithCompetition.Event.Name} " +
-                    $"{compoundObj.SportsbookMarket.marketName} {compoundObj.SportsbookMarket.marketStartTime}");
+                Console.WriteLine($"Exception={exception} on BuildScrapedEvent; {marketDetailsWithEwc.EventWithCompetition.Event.Name} " +
+                    $"{marketDetailsWithEwc.SportsbookMarket.marketName} {marketDetailsWithEwc.SportsbookMarket.marketStartTime}");
 
                 return new ScrapedEvent();
             }
@@ -146,37 +156,12 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
             return document.DocumentNode.SelectSingleNode("//div[@id='oddsTableContainer']");
         }
 
-        public ScrapedEvent BuildScrapedEvent(string html)
+        public Dictionary<string, string> ParseLinksFromCompetitionPageSimple(string html)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<string> ParseLinksFromCompetitionPage(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> ParseLinksFromCompetitionPageSimple(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<string> ParseLinksFromCompetitionPageComplex(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ScrapedEvent BuildScrapedEvent(string html, EventByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        Dictionary<string, string> IOddscheckerParser<T>.ParseLinksFromCompetitionPageSimple(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        Dictionary<string, string> IOddscheckerParser<T>.ParseLinksFromCompetitionPageComplex(string html)
+        public Dictionary<string, string> ParseLinksFromCompetitionPageComplex(string html)
         {
             throw new NotImplementedException();
         }
@@ -186,7 +171,17 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
             throw new NotImplementedException();
         }
 
+        public ScrapedEvent BuildScrapedEvent(string html, EventByCountry ebc)
+        {
+            throw new NotImplementedException();
+        }
+
         public ScrapedEvent BuildScrapedEventFromJson(IEnumerable<OcMarket> markets, EventByCountry ebc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ScrapedEvent BuildScrapedEvent(string html)
         {
             throw new NotImplementedException();
         }

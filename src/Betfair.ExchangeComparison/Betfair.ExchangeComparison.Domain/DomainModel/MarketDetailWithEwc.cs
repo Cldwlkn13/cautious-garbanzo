@@ -4,9 +4,9 @@ using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
-    public class MarketDetailWithEvent
+    public class MarketDetailWithEwc
     {
-        public MarketDetailWithEvent()
+        public MarketDetailWithEwc()
         {
         }
 
