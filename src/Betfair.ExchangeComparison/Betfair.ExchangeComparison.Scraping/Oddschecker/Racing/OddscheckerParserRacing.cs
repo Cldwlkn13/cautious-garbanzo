@@ -3,9 +3,8 @@ using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Scraping.Extensions;
 using Betfair.ExchangeComparison.Scraping.Oddschecker.Interfaces;
-using HtmlAgilityPack;
-using Betfair.ExchangeComparison.Domain.ScrapingModel.Oddschecker;
 using Betfair.ExchangeComparison.Sportsbook.Model;
+using HtmlAgilityPack;
 
 namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
 {
@@ -156,35 +155,10 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
             return document.DocumentNode.SelectSingleNode("//div[@id='oddsTableContainer']");
         }
 
-        public Dictionary<string, string> ParseLinksFromCompetitionPageSimple(string html)
-        {
-            throw new NotImplementedException();
-        }
+        //private static List<string> TrackMaps()
+        //{
 
-        public Dictionary<string, string> ParseLinksFromCompetitionPageComplex(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<OcMarketDefinition> BuildMarketDefinitions(string html)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ScrapedEvent BuildScrapedEvent(string html, EventByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ScrapedEvent BuildScrapedEventFromJson(IEnumerable<OcMarket> markets, EventByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ScrapedEvent BuildScrapedEvent(string html)
-        {
-            throw new NotImplementedException();
-        }
+        //}
     }
 }
 

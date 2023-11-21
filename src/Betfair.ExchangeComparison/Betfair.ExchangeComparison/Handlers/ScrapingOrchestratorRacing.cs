@@ -176,13 +176,11 @@ namespace Betfair.ExchangeComparison.Handlers
 
         private IScrapingHandlerSingle ResolveHandler(Provider provider)
         {
-            switch (provider)
+            return provider switch
             {
-                case Provider.Oddschecker:
-                    return _oddscheckerHandler;
-                default:
-                    return _oddscheckerHandler;
-            }
+                Provider.Oddschecker => _oddscheckerHandler,
+                _ => _oddscheckerHandler,
+            };
         }
     }
 }

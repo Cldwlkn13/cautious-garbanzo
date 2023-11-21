@@ -147,7 +147,6 @@ namespace Betfair.ExchangeComparison.Handlers
 
         public async Task<UsageModel> Usage()
         {
-            //turn await _boylesportsHandler.Usage();
             return new UsageModel();
         }
 
@@ -172,15 +171,12 @@ namespace Betfair.ExchangeComparison.Handlers
 
         private IScrapingHandlerEnumerable ResolveHandler(Provider provider)
         {
-            switch (provider)
+            return provider switch
             {
-                case Provider.WilliamHillDirect:
-                    return _williamHillHandler;
-                case Provider.Oddschecker:
-                    return _oddscheckerHandler;
-                default:
-                    return _oddscheckerHandler;
-            }
+                Provider.WilliamHillDirect => _williamHillHandler,
+                Provider.Oddschecker => _oddscheckerHandler,
+                _ => _oddscheckerHandler,
+            };
         }
     }
 }

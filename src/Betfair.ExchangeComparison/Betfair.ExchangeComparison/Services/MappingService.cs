@@ -172,7 +172,9 @@ namespace Betfair.ExchangeComparison.Services
 
         public bool TryMapScrapedEvent(List<ScrapedEvent> scrapedEvents, EventWithCompetition ewc, MarketDetail md, out ScrapedEvent result)
         {
-            var mappedEvent = scrapedEvents.FirstOrDefault(s =>
+            var mappedEvent = scrapedEvents
+                .Where(e => e.ScrapedMarkets.Any())
+                .FirstOrDefault(s =>
                      s.MappedEventWithCompetition.Event.Venue == ewc.Event.Venue &&
                      s.ScrapedMarkets.First().MappedMarketDetail.marketStartTime == md.marketStartTime);
 

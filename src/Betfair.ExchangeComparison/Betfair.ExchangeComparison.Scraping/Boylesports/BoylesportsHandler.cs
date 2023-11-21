@@ -4,7 +4,6 @@ using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces;
 using Betfair.ExchangeComparison.Scraping.Interfaces;
-using Betfair.ExchangeComparison.Sportsbook.Model;
 using Microsoft.Extensions.Logging;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports
