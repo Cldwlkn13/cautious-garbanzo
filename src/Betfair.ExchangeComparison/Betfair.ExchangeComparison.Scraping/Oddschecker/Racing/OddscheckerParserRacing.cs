@@ -154,11 +154,6 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
         {
             return document.DocumentNode.SelectSingleNode("//div[@id='oddsTableContainer']");
         }
-
-        //private static List<string> TrackMaps()
-        //{
-
-        //}
     }
 }
 
