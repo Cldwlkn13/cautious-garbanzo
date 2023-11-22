@@ -49,8 +49,10 @@ namespace Betfair.ExchangeComparison.Processors
                     break;
             }
 
+            var refreshRate = ParseRefreshRateFromSession(session, sport);
+            var refreshIsOn = ParseRefreshIsOnFromSession(session, sport);
 
-            var model = new BasePageModel(sport, bookmaker, bookmakers, isScrapableBookmakers);
+            var model = new BasePageModel(sport, bookmaker, bookmakers, isScrapableBookmakers, refreshRate, refreshIsOn);
 
             return model;
         }
@@ -70,6 +72,30 @@ namespace Betfair.ExchangeComparison.Processors
             }
 
             return bookmaker;
+        }
+
+        private static int ParseRefreshRateFromSession(ISession session, Sport sport)
+        {
+            var sessionRate = session.GetString($"RefreshRate-{sport}") ?? "5";
+
+            if (!int.TryParse(sessionRate, out var result))
+            {
+                return 5;
+            }
+
+            return result;
+        }
+
+        private static bool ParseRefreshIsOnFromSession(ISession session, Sport sport)
+        {
+            var sessionRate = session.GetString($"RefreshIsOn-{sport}") ?? "False";
+
+            if (!bool.TryParse(sessionRate, out var result))
+            {
+                return false;
+            }
+
+            return result;
         }
     }
 }

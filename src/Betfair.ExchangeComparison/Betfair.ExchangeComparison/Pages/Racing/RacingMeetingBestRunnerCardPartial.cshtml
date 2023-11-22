@@ -21,11 +21,11 @@
             {
                 if (winOrEachWay == "Win")
                 {
-                    @await Html.PartialAsync("./BestWinRunnerPartial.cshtml", bestRunner)
+                    @await Html.PartialAsync("/Pages/Shared/Partials/BestWinRunnerPartial.cshtml", bestRunner)
                 }
                 else
                 {
-                    @await Html.PartialAsync("./BestEachWayRunnerPartial.cshtml", bestRunner)
+                    @await Html.PartialAsync("/Pages/Shared/Partials/BestEachWayRunnerPartial.cshtml", bestRunner)
                 }
             }
         }

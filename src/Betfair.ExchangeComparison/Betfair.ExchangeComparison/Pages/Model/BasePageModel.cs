@@ -11,12 +11,17 @@ namespace Betfair.ExchangeComparison.Pages.Model
         public Provider Provider { get; set; }
         public List<SelectListItem> SelectListBookmakers { get; set; }
         public Bookmaker[] IsScrapableBookmaker { get; set; }
+        public int RefreshRateSeconds { get; set; }
+        public bool RefreshIsOn { get; set; }
 
-        public BasePageModel(Sport sport, Bookmaker bookmaker, Bookmaker[] bookmakers, Bookmaker[] scrapableBookmakers)
+        public BasePageModel(Sport sport, Bookmaker bookmaker, Bookmaker[] bookmakers, Bookmaker[] scrapableBookmakers,
+            int refreshRateSeconds, bool refreshIsOn)
         {
             Sport = sport;
             Bookmaker = bookmaker;
             Provider = MapProviderToBookmaker(bookmaker);
+            RefreshRateSeconds = refreshRateSeconds;
+            RefreshIsOn = refreshIsOn;
 
             var bookmakerStrings = bookmakers.Select(b => b.ToString()).ToArray();
             SelectListBookmakers = typeof(Bookmaker).SelectList(bookmakerStrings);

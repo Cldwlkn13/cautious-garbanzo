@@ -1,5 +1,4 @@
-﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
-using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -23,6 +22,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         [BindProperty]
         public RacingFormModel FormModel { get; set; }
         public List<SelectListItem> SelectListBookmakers { get; set; }
+        public int RefreshRate { get; set; }
+        public bool RefreshIsOn { get; set; }
 
         public IndexModel(IScrapingOrchestratorRacing scrapingOrchestrator, ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor,
             ScrapingProcessorRacing scrapingProcessor)
@@ -38,7 +39,10 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         public async Task<IActionResult> OnGet()
         {
             var basePageModel = PageProcessor.Process(HttpContext.Session, Sport.Racing);
+
             SelectListBookmakers = basePageModel.SelectListBookmakers;
+            RefreshRate = basePageModel.RefreshRateSeconds;
+            RefreshIsOn = basePageModel.RefreshIsOn;
 
             _scrapingProcessor.ProcessStartStops(basePageModel);
 
@@ -80,8 +84,76 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         public async Task<IActionResult> OnPost(RacingFormModel formModel)
         {
             HttpContext.Session.SetString("Bookmaker-Racing", formModel.Bookmaker.ToString());
+            HttpContext.Session.SetString("RefreshRate-Racing", formModel.RefreshRateSeconds.ToString());
+            HttpContext.Session.SetString("RefreshIsOn-Racing", formModel.RefreshIsOn.ToString());
 
             return await OnGet();
+        }
+
+        public async Task<PartialViewResult> OnGetRacingCatalog()
+        {
+            CatalogViewModel = await GetCatalogViewModel();
+
+            return PartialView("RacingCatalogPartial", this);
+        }
+
+        [NonAction]
+        public virtual PartialViewResult PartialView(string viewName, object model)
+        {
+            ViewData.Model = model;
+
+            return new PartialViewResult()
+            {
+                ViewName = viewName,
+                ViewData = ViewData,
+                TempData = TempData
+            };
+        }
+
+        private async Task<CatalogViewModel> GetCatalogViewModel()
+        {
+            var result = new CatalogViewModel();
+            var basePageModel = PageProcessor.Process(HttpContext.Session, Sport.Racing);
+
+            SelectListBookmakers = basePageModel.SelectListBookmakers;
+            RefreshRate = basePageModel.RefreshRateSeconds;
+            RefreshIsOn = basePageModel.RefreshIsOn;
+
+            _scrapingProcessor.ProcessStartStops(basePageModel);
+
+            try
+            {
+                var baseCatalogModel = await _catalogProcessor.Process(Sport.Racing);
+
+                if (baseCatalogModel == null)
+                {
+                    //log problem here
+
+                    return result;
+                }
+
+                if (!_scrapingProcessor.TryProcessScrapedEvents(
+                    basePageModel, out List<ScrapedEvent> scrapedEvents))
+                {
+                    //log problem here
+
+                    return result;
+                }
+
+                result = await _eventProcessor.Process(baseCatalogModel, basePageModel, scrapedEvents);
+
+                var usageModel = await _scrapingOrchestrator.Usage();
+                result.UsageModel = usageModel;
+
+                return result;
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine($"PAGE_EXCEPTION; " +
+                    $"Exception={exception.Message}");
+
+                return result;
+            }
         }
     }
 }
