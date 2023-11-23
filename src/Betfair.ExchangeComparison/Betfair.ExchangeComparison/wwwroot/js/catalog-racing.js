@@ -40,7 +40,7 @@
                 var element = parsed.querySelector('#racing-catalog');
                 $("#meetings").html('');
                 $("#meetings").html(element.innerHTML);
-                $(".meeting-card").fadeOut(20).fadeIn(20);
+                $("#last-updated-time").fadeOut(80).fadeIn(80).fadeOut(80).fadeIn(80);
             }
         });
     }
