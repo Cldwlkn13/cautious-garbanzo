@@ -1,5 +1,4 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.DomainModel;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Exchange.Model;
@@ -16,6 +15,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
 
         public BestRunner(RunnerPriceOverview rpo)
         {
+            Sport = rpo.Sport;
             Competition = rpo.EventWithCompetition.Competition;
             Event = rpo.EventWithCompetition.Event;
             MarketDetail = rpo.MarketDetail;
@@ -35,8 +35,10 @@ namespace Betfair.ExchangeComparison.Pages.Models
             ExchangeWinBestPinkRequestedLiability = rpo.BestWinAvailable[Side.LAY].RequestedLiability();
             Bookmaker = rpo.Bookmaker;
             MappedEventName = rpo.MappedScrapedEventName;
+            TimeToStart = rpo.MarketDetail.marketStartTime.TimeToStart();
         }
 
+        public Sport Sport { get; set; }
         public Competition Competition { get; set; }
         public Event Event { get; set; }
         public MarketDetail MarketDetail { get; set; }
@@ -56,6 +58,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double VolumeTradedBelowSportsbook { get; set; }
         public Bookmaker Bookmaker { get; set; }
         public string MappedEventName { get; set; }
+        public TimeSpan TimeToStart { get; set; }
     }
 }
 

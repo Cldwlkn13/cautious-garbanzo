@@ -43,7 +43,7 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
         {
             string baseUrl = "https://www.oddschecker.com/horse-racing"; //2023-10-26-lingfield/13:20/winner
 
-            var name = compoundObj.EventWithCompetition.Event.Venue.ToLower();
+            var name = compoundObj.EventWithCompetition.Event.Venue.Replace(" ", "-").ToLower();
 
             var date = compoundObj.SportsbookMarket.marketStartTime
                 .ConvertUtcToBritishIrishLocalTime()

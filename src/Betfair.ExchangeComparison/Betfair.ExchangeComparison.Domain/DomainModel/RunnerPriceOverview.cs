@@ -8,13 +8,39 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
     public class RunnerPriceOverview
     {
+        public Sport Sport { get; set; }
+        public EventWithCompetition EventWithCompetition { get; set; }
+        public MarketDetail MarketDetail { get; set; }
+        public RunnerDetail SportsbookRunner { get; set; }
+        public Runner ExchangeWinRunner { get; set; }
+        public Runner ExchangePlaceRunner { get; set; }
+        public Dictionary<Side, PriceSize> BestWinAvailable { get; set; }
+        public Dictionary<Side, PriceSize> BestPlaceAvailable { get; set; }
+        public string WinnerOddsString { get; set; }
+        public string PlacePartOddsString { get; set; }
+        public int NumberEachWayPlaces { get; set; }
+        public int EachWayFraction { get; set; }
+        public double EachWayPlacePart { get; set; }
+        public double ExpectedWinPrice { get; set; }
+        public double ExpectedPlacePrice { get; set; }
+        public double ExpectedValueWin { get; set; }
+        public double ExpectedValuePlace { get; set; }
+        public double ExpectedValueEachWay { get; set; }
+        public double LastPriceTradedWin { get; set; }
+        public double LastPriceTradedPlace { get; set; }
+        public double VolumeTradedBelowSportsbook { get; set; }
+        public Bookmaker Bookmaker { get; set; }
+        public string MappedScrapedEventName { get; set; }
+
         public RunnerPriceOverview()
         {
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, 
-            Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, 
+            Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, 
+            Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
+            Sport = sport;
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
             SportsbookRunner = sportsbookRunner;
@@ -50,10 +76,12 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-        public RunnerPriceOverview(EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, 
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, 
             Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, 
-            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent? scrapedEvent = null)
+            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null)
         {
+            Sport = sport;
+
             if (scrapedEvent != null)
             {
                 MappedScrapedEventName = scrapedEvent.ScrapedEventName;
@@ -126,38 +154,6 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-        public EventWithCompetition EventWithCompetition { get; set; }
-        public MarketDetail MarketDetail { get; set; }
-        public RunnerDetail SportsbookRunner { get; set; }
-
-        public Runner ExchangeWinRunner { get; set; }
-        public Runner ExchangePlaceRunner { get; set; }
-
-        public Dictionary<Side, PriceSize> BestWinAvailable { get; set; }
-        public Dictionary<Side, PriceSize> BestPlaceAvailable { get; set; }
-
-        public string WinnerOddsString { get; set; }
-        public string PlacePartOddsString { get; set; }
-
-        public int NumberEachWayPlaces { get; set; }
-        public int EachWayFraction { get; set; }
-        public double EachWayPlacePart { get; set; }
-
-        public double ExpectedWinPrice { get; set; }
-        public double ExpectedPlacePrice { get; set; }
-
-        public double ExpectedValueWin { get; set; }
-        public double ExpectedValuePlace { get; set; }
-        public double ExpectedValueEachWay { get; set; }
-
-        public double LastPriceTradedWin { get; set; }
-        public double LastPriceTradedPlace { get; set; }
-
-        public double VolumeTradedBelowSportsbook { get; set; }
-
-        public Bookmaker Bookmaker { get; set; }
-
-        public string MappedScrapedEventName { get; set; }
 
     }
 }

@@ -176,7 +176,7 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
                 JsonConvert.Export(call, writer);
             }
             Console.WriteLine("Calling Exchange: " + method + " With args: " +
-                JsonConvert.Serialize<IDictionary<string, object>>(args));
+                JsonConvert.Serialize(args));
 
             using (WebResponse response = request.GetResponse())
             using (Stream stream = response.GetResponseStream())

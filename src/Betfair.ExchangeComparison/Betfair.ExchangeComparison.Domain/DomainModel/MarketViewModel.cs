@@ -17,6 +17,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public IEnumerable<RunnerPriceOverview> RunnerPriceOverviews { get; set; }
         public IEnumerable<BestRunner> BestRunners { get; set; }
         public IEnumerable<BestRunner> BestEachWayRunners { get; set; }
+        public TimeSpan TimeToStart { get; set; }
 
         public MarketViewModel(Event parent)
         {

@@ -1,10 +1,15 @@
 ﻿@model Betfair.ExchangeComparison.Pages.Models.BestRunner;
 @{
     var ev = (@Model.ExpectedValueWin + 1);
-    var bgColor = ev <= 0.98 ?
-        "bg-danger" :
-            ev >= 1 || (ev > 0.98 && Model.ExchangeWinBestBlue < Model.SportsbookRunner.winRunnerOdds.@decimal) ? "bg-success" :
-            (ev > 0.98) ? "bg-primary" :
+    var bgColor =
+            (Model.Sport == Domain.Enums.Sport.Racing &&
+                (Model.TimeToStart.Hours > -1 ||
+                 Model.SportsbookRunner.winRunnerOdds.@decimal > 31)) ? "bg-neutral" :
+            ev <= 0.98 ? "bg-danger" :
+            ev >= 1 || (ev >= 0.992 &&
+                Model.ExchangeWinBestBlue < Model.SportsbookRunner.winRunnerOdds.@decimal && 
+                Model.ExchangeWinBestPinkSize > 10) ? "bg-success" :
+    (ev > 0.98) ? "bg-primary" :
             "bg-dark";
 }
 <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">

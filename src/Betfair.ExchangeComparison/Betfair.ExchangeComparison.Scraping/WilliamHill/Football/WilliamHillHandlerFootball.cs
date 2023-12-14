@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
@@ -210,13 +211,20 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     scrapedMarkets.Add(scrapedMarket);
                 }
 
-                var scrapedEvent = new ScrapedEvent(scrapedMarkets);
-                scrapedEvent.MappedEventWithCompetition = mapppedEwc;
-                scrapedEvent.BetfairName = mapppedEwc.Event.Name;
-                scrapedEvent.ScrapedEventName = @event.Key.eventName;
+                try
+                {
+                    var scrapedEvent = new ScrapedEvent(scrapedMarkets);
+                    scrapedEvent.MappedEventWithCompetition = mapppedEwc;
+                    scrapedEvent.BetfairName = mapppedEwc.Event.Name;
+                    scrapedEvent.ScrapedEventName = @event.Key.eventName;
 
-                scrapedEvent.StartTime = mapppedEwc.Event.OpenDate!.Value.ConvertUtcToBritishIrishLocalTime();
-                result.Add(scrapedEvent);
+                    scrapedEvent.StartTime = mapppedEwc.Event.OpenDate!.Value.ConvertUtcToBritishIrishLocalTime();
+                    result.Add(scrapedEvent);
+                }
+                catch(Exception exception)
+                {
+
+                }         
             }
 
             return result;

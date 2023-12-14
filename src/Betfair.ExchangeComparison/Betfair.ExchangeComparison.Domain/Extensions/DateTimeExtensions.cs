@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Betfair.ExchangeComparison.Sportsbook.Model;
+using System;
 namespace Betfair.ExchangeComparison.Domain.Extensions
 {
     public static class DateTimeExtensions
@@ -19,6 +20,11 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
         public static string ToDateTimeString(this DateTime datetime)
         {
             return datetime.ToString("dd/MM/yyyy HH:mm");
+        }
+
+        public static TimeSpan TimeToStart(this DateTime startTime)
+        {
+            return TimeSpan.FromMinutes((DateTime.UtcNow - startTime.ConvertUtcToBritishIrishLocalTime()).TotalMinutes);
         }
     }
 }

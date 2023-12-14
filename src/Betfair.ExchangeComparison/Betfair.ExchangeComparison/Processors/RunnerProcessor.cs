@@ -59,6 +59,7 @@ namespace Betfair.ExchangeComparison.Processors
                 if (scrapedRunnerIsValid)
                 {
                     return new RunnerPriceOverview(
+                        basePageModel.Sport,
                         @event,
                         marketDetail,
                         mappedScrapedMarket,
@@ -72,6 +73,7 @@ namespace Betfair.ExchangeComparison.Processors
                 else if (!basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
                 {
                     return new RunnerPriceOverview(
+                        basePageModel.Sport,
                         @event,
                         marketDetail,
                         sportsbookRunner,

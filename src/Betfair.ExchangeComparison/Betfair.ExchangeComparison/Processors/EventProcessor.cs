@@ -19,7 +19,8 @@ namespace Betfair.ExchangeComparison.Processors
             _marketProcessor = marketProcessor;
         }
 
-        public async Task<CatalogViewModel> Process(BaseCatalogModel baseCatalogModel, BasePageModel basePageModel, List<ScrapedEvent> scrapedEvents)
+        public async Task<CatalogViewModel> Process(BaseCatalogModel baseCatalogModel, BasePageModel basePageModel, 
+            List<ScrapedEvent> scrapedEvents)
         {
             var result = new CatalogViewModel();
            

@@ -105,6 +105,7 @@ namespace Betfair.ExchangeComparison.Processors
                 mvm.RunnerPriceOverviews = runnerPriceOverviews;
                 mvm.BestRunners = bestRunners;
                 mvm.BestEachWayRunners = bestEachWayRunners;
+                mvm.TimeToStart = marketDetail.marketStartTime.TimeToStart();
 
                 return mvm;
             }

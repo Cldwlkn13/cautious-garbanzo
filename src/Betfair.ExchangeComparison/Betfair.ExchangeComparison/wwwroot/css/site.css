@@ -100,3 +100,7 @@ body {
 .text-coral {
     color: Coral;
 }
+
+.bg-neutral {
+    background-color: #696969;
+}
