@@ -14,6 +14,7 @@ using Betfair.ExchangeComparison.Workers;
 using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Processors;
 using Betfair.ExchangeComparison.Settings;
+using Betfair.ExchangeComparison.ExpectedValueModel;
 
 namespace Betfair.ExchangeComparison
 {
@@ -59,6 +60,10 @@ namespace Betfair.ExchangeComparison
             //mapping and comparison
             services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();
             services.AddSingleton<IMappingService, MappingService>();
+
+            //expected value model 
+            services.AddSingleton<IExpectedValueModelFlat, FlatModel>();
+            services.AddSingleton<IExpectedValueModelJumps, JumpsModel>();
 
             //settings
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));

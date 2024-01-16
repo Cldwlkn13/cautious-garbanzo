@@ -11,6 +11,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public Sport Sport { get; set; }
         public EventWithCompetition EventWithCompetition { get; set; }
         public MarketDetail MarketDetail { get; set; }
+        public MarketCatalogue MarketCatalogue { get; set; }
         public RunnerDetail SportsbookRunner { get; set; }
         public Runner ExchangeWinRunner { get; set; }
         public Runner ExchangePlaceRunner { get; set; }
@@ -36,13 +37,15 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         {
         }
 
-        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, RunnerDetail sportsbookRunner, 
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, 
+            MarketDetail marketDetail, MarketCatalogue marketCatalogue, RunnerDetail sportsbookRunner, 
             Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, 
             Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
         {
             Sport = sport;
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
+            MarketCatalogue = marketCatalogue;
             SportsbookRunner = sportsbookRunner;
             Bookmaker = bookmaker;
             ExchangeWinRunner = exchangeWinRunner;
@@ -76,9 +79,9 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, ScrapedMarket scrapedMarket, 
-            Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, Runner? exchangePlaceRunner = null, 
-            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null)
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, MarketCatalogue marketCatalogue, 
+            ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, 
+            Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null)
         {
             Sport = sport;
 
@@ -92,6 +95,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
 
             EventWithCompetition = ewc;
             MarketDetail = marketDetail;
+            MarketCatalogue = marketCatalogue;
             Bookmaker = bookmaker;
 
             if (scrapedRunner.ScrapedPrices != null && 
@@ -154,7 +158,14 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             }
         }
 
-
+        public override string ToString()
+        {
+            return $"{EventWithCompetition.Event.Name} " +
+                $"{MarketCatalogue.MarketName} " +
+                $"{MarketDetail.marketStartTime} " +
+                $"{SportsbookRunner.selectionName} " +
+                $"{SportsbookRunner.winRunnerOdds.@decimal}";
+        }
     }
 }
 

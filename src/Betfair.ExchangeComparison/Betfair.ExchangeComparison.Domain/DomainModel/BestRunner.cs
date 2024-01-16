@@ -19,6 +19,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
             Competition = rpo.EventWithCompetition.Competition;
             Event = rpo.EventWithCompetition.Event;
             MarketDetail = rpo.MarketDetail;
+            MarketCatalogue = rpo.MarketCatalogue;
             SportsbookRunner = rpo.SportsbookRunner;
             WinnerOddsString = rpo.WinnerOddsString;
             PlacePartOddsString = rpo.PlacePartOddsString;
@@ -42,6 +43,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public Competition Competition { get; set; }
         public Event Event { get; set; }
         public MarketDetail MarketDetail { get; set; }
+        public MarketCatalogue MarketCatalogue { get; set; }
         public RunnerDetail SportsbookRunner { get; set; }
         public string WinnerOddsString { get; set; }
         public string PlacePartOddsString { get; set; }
@@ -59,6 +61,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public Bookmaker Bookmaker { get; set; }
         public string MappedEventName { get; set; }
         public TimeSpan TimeToStart { get; set; }
+        public double ExpectedPrice {  get; set; }
     }
 }
 

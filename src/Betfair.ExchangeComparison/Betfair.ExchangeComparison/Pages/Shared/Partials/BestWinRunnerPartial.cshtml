@@ -1,20 +1,41 @@
 ﻿@model Betfair.ExchangeComparison.Pages.Models.BestRunner;
 @{
     var ev = (@Model.ExpectedValueWin + 1);
-    var bgColor =
-            (Model.Sport == Domain.Enums.Sport.Racing &&
-                (Model.TimeToStart.Hours > -1 ||
-                 Model.SportsbookRunner.winRunnerOdds.@decimal > 31)) ? "bg-neutral" :
-            ev <= 0.98 ? "bg-danger" :
-            ev >= 1 || (ev >= 0.992 &&
-                Model.ExchangeWinBestBlue < Model.SportsbookRunner.winRunnerOdds.@decimal && 
-                Model.ExchangeWinBestPinkSize > 10) ? "bg-success" :
-    (ev > 0.98) ? "bg-primary" :
-            "bg-dark";
+    var bgColor = "";
+    var expectedPriceColor = (Model.SportsbookRunner.winRunnerOdds.@decimal > (((Model.ExpectedPrice - 1) * 1.02) + 1)) ?
+        "text-lime" : "text-black";
+
+    var expectedPriceWithoutMargin = (((Model.ExpectedPrice - 1) * 1.02) + 1);
+
+    if (Model.Sport == Domain.Enums.Sport.Racing)
+    {
+        bgColor =
+             (Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes >= -45) ||
+             (Model.SportsbookRunner.winRunnerOdds.@decimal > 31) ? "bg-neutral" :
+        ev <= 0.98 ? "bg-danger" :
+        (Model.ExchangeWinBestBlue > expectedPriceWithoutMargin) ? "bg-midnight" :
+        ev >= 1 || (ev >= 0.992 &&
+            Model.ExchangeWinBestBlue < Model.SportsbookRunner.winRunnerOdds.@decimal &&
+            Model.ExchangeWinBestPinkSize > 10) ? "bg-success" :
+        (ev > 0.98) ? "bg-primary" :
+        "bg-dark";
+    }
+    else
+    {
+        bgColor =
+        ev <= 0.98 ? "bg-danger" :
+        ev >= 1 || (ev >= 0.992 &&
+            Model.ExchangeWinBestBlue < Model.SportsbookRunner.winRunnerOdds.@decimal &&
+            Model.ExchangeWinBestPinkSize > 10) ? "bg-success" :
+        (ev > 0.98) ? "bg-primary" :
+        "bg-dark";
+    }
+
 }
 <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
     @Model.SportsbookRunner.selectionName
     <span class="text-lime"> @Model.WinnerOddsString </span>
+    <span class="@expectedPriceColor">@expectedPriceWithoutMargin.ToString("0.00") </span>
     [
     <span class="text-lightblue">@Model.ExchangeWinBestBlue.ToString("0.00")</span> :
     <span class="text-pink">@Model.ExchangeWinBestPink.ToString("0.00") </span>
@@ -23,5 +44,5 @@
     <span>@ev.ToString("0.0%") </span>
     <small class="text-pink">@Model.LastPriceTraded.ToString("0.00") </small>
     <small class="text-orange">@Model.VolumeTradedBelowSportsbook.ToString("0.00") </small>
-    <small class="text-lightblue">@Model.Bookmaker.ToString().ToLower().Substring(0, 2) </small>
+    <small class="text-lightblue">@Model.Bookmaker.ToString().ToLower().Substring(0, 2) </small>&nbsp
 </div>

@@ -4,17 +4,21 @@ using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
+using System.Linq;
 
 namespace Betfair.ExchangeComparison.Processors
 {
     public class RunnerProcessor : IRunnerProcessor
     {
         private readonly IMappingService _mappingService;
+        private readonly ICatalogService _catalogService;
         
-        public RunnerProcessor(IMappingService mappingService)
+        public RunnerProcessor(IMappingService mappingService, ICatalogService catalogService)
 		{
 			_mappingService = mappingService;
-		}
+            _catalogService = catalogService;
+
+        }
 
         public async Task<RunnerPriceOverview?> Process(BasePageModel basePageModel, EventWithCompetition @event, MarketBook mappedWinMarketBook, 
             MarketDetail marketDetail, RunnerDetail sportsbookRunner, bool hasEachWay,  ScrapedEvent? mappedScrapedEvent = null, 
@@ -33,6 +37,18 @@ namespace Betfair.ExchangeComparison.Processors
                     out var mappedExchangeWinRunner))
                 {
                     //log problem here
+                    return null;
+                }
+
+                var mappedMarketCatalogue = _catalogService.ExchangeMarketCatalogueStore[DateTime.Today][basePageModel.Sport]
+                    .FirstOrDefault(x => x.MarketId == mappedWinMarketBook.MarketId);
+
+                if(mappedMarketCatalogue == null)
+                {
+                    Console.WriteLine(
+                        $"Could not map market Catalogue for " +
+                        $"runner {mappedExchangeWinRunner.SelectionId}");
+
                     return null;
                 }
 
@@ -62,6 +78,7 @@ namespace Betfair.ExchangeComparison.Processors
                         basePageModel.Sport,
                         @event,
                         marketDetail,
+                        mappedMarketCatalogue,
                         mappedScrapedMarket,
                         mappedExchangeWinRunner,
                         sportsbookRunner,
@@ -76,9 +93,10 @@ namespace Betfair.ExchangeComparison.Processors
                         basePageModel.Sport,
                         @event,
                         marketDetail,
+                        mappedMarketCatalogue,
                         sportsbookRunner,
-                        mappedExchangeWinRunner, 
-                        mappedExchangePlaceRunner);
+                        mappedExchangeWinRunner,
+                        mappedExchangePlaceRunner); 
                 }
 
                 return new RunnerPriceOverview();   

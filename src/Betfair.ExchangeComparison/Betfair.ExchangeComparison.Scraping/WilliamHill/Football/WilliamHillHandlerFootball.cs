@@ -406,6 +406,7 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     .Replace("(Mex)", "")
                     .Replace("Reserves", "")
                     .Replace("(Res)", "")
+                    .Replace("-", " ")
                     .ToLower()
                     .Trim()
                     .Replace(" ", "");

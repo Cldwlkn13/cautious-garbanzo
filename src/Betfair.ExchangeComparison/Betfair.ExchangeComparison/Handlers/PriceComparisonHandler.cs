@@ -9,10 +9,15 @@ namespace Betfair.ExchangeComparison.Handlers
     public class PriceComparisonHandler : IPricingComparisonHandler
     {
         private readonly IOptions<PriceComparisonSettings> _settings;
-        
-        public PriceComparisonHandler(IOptions<PriceComparisonSettings> settings)
+        private readonly IExpectedValueModelFlat _expectedValueModelFlat;
+        private readonly IExpectedValueModelJumps _expectedValueModelJumps;
+
+        public PriceComparisonHandler(IOptions<PriceComparisonSettings> settings, IExpectedValueModelFlat expectedValueModelFlat,
+            IExpectedValueModelJumps expectedValueModelJumps)
         {
             _settings = settings;
+            _expectedValueModelFlat = expectedValueModelFlat;
+            _expectedValueModelJumps = expectedValueModelJumps;
         }
 
         public List<BestRunner> TryAddToBestRunnersWinOnly(List<BestRunner> bestRunners, RunnerPriceOverview rpo)
@@ -20,6 +25,8 @@ namespace Betfair.ExchangeComparison.Handlers
             if (rpo.ExpectedValueWin > _settings.Value.MinExpectedValueWin && 
                 rpo.ExpectedWinPrice > 1)
             {
+                var modelParameters = new FlatParams(rpo);
+
                 bestRunners.Add(new BestRunner(rpo));
             }
 
@@ -45,7 +52,27 @@ namespace Betfair.ExchangeComparison.Handlers
             if (rpo.ExpectedValueWin > _settings.Value.MinExpectedValueWin && 
                 rpo.ExpectedWinPrice > 1)
             {
+                double expectedPrice = 0;
+
+                if (rpo.MarketCatalogue.MarketName.Contains("Hrd") || 
+                    rpo.MarketCatalogue.MarketName.Contains("Chs") || 
+                    rpo.MarketCatalogue.MarketName.Contains("NHF"))
+                {
+                    var modelParameters = new JumpsParams(rpo);
+
+                    expectedPrice = _expectedValueModelJumps.ModelOutcome(
+                        modelParameters, rpo);
+                }
+                else
+                {
+                    var modelParameters = new FlatParams(rpo);
+
+                    expectedPrice = _expectedValueModelFlat.ModelOutcome(
+                        modelParameters, rpo);
+                }
+                
                 result = new BestRunner(rpo);
+                result.ExpectedPrice = expectedPrice;
                 return true;
             }
 

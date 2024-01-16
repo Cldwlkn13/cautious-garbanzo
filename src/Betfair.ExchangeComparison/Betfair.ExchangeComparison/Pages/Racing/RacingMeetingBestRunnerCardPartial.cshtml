@@ -13,9 +13,11 @@
         {
             <div class="mt-2">
                 <span class="text-dark">@groupedRunner.Key.ToString("HH:mm")</span> -
+                <span class="text-magenta">@groupedRunner.First().MarketCatalogue.MarketName </span>  -
                 <span class="text-info">@groupedRunner.First().NumberOfPlaces</span>
-                <span class="text-info">1/@groupedRunner.First().PlaceFractionDenominator</span>
-            </div>
+                <span class="text-info">1/@groupedRunner.First().PlaceFractionDenominator</span>&nbsp
+                <span class="text-pink">@groupedRunner.First().MarketDetail.runnerDetails.Count(r => r.runnerStatus == "ACTIVE" && r.runnerOrder < 98)</span>
+            </div> 
 
             @foreach (var bestRunner in @groupedRunner.OrderByDescending(r => r.ExpectedValueWin))
             {
