@@ -10,7 +10,7 @@
     if (Model.Sport == Domain.Enums.Sport.Racing)
     {
         bgColor =
-             (Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes >= -45) ||
+             (Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes >= -45) || Model.TimeToStart.Hours <= -6 ||
              (Model.SportsbookRunner.winRunnerOdds.@decimal > 31) ? "bg-neutral" :
         ev <= 0.98 ? "bg-danger" :
         (Model.ExchangeWinBestBlue > expectedPriceWithoutMargin) ? "bg-midnight" :
