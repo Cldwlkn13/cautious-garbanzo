@@ -24,7 +24,7 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
 
         public static TimeSpan TimeToStart(this DateTime startTime)
         {
-            return TimeSpan.FromMinutes((DateTime.UtcNow - startTime.ConvertUtcToBritishIrishLocalTime()).TotalMinutes);
+            return TimeSpan.FromMinutes((DateTime.Now - startTime.ConvertUtcToBritishIrishLocalTime()).TotalMinutes);
         }
     }
 }
