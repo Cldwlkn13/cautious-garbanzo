@@ -353,7 +353,7 @@ namespace Betfair.ExchangeComparison.Services
                         result = _exchangeHandler.ListMarketCatalogues(eventTypeId).ToList();
                         break;
                     case "1":
-                        foreach (var batch in eventIds.Chunk(20))
+                        foreach (var batch in eventIds.Chunk(10))
                         {
                             var batchedCatalogues = _exchangeHandler.ListMarketCatalogues(eventTypeId, null, batch).ToList();
                             result.AddRange(batchedCatalogues);
@@ -366,7 +366,7 @@ namespace Betfair.ExchangeComparison.Services
             catch (APINGException exception)
             {
                 Console.WriteLine($"APING_EXCEPTION; " +
-                    $"CatalogService : ListMarketCatalogues(); " +
+                    $"CatalogService : GetExchangeMarketCatalogues(); " +
                     $"Exception={exception.Message}; " +
                     $"ErrorCode={exception.ErrorCode}; " +
                     $"ErrorDetails={exception.ErrorDetails};");
