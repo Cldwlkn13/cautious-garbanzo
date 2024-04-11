@@ -9,6 +9,7 @@ using Betfair.ExchangeComparison.Scraping.Oddschecker.Racing;
 using Betfair.ExchangeComparison.Scraping.WilliamHill;
 using Betfair.ExchangeComparison.Scraping.WilliamHill.Football;
 using Betfair.ExchangeComparison.Scraping.WilliamHill.Interfaces;
+using Betfair.ExchangeComparison.Scraping.Zenrows;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Betfair.ExchangeComparison.Configurations
@@ -18,27 +19,22 @@ namespace Betfair.ExchangeComparison.Configurations
         public static void ConfigureScrapers(this IServiceCollection services)
         {
             services.AddTransient<IScrapingClient, ScrapingClient>();
+            services.AddSingleton<IUsageHandler, UsageHandler>();
 
             //Boylesports
-            services.AddSingleton<IBoylesportsHandler<SportRacing>, BoylesportsHandler<SportRacing>>();
-            services.AddSingleton<IBoylesportsParser<SportRacing>, BoylesportsParser<SportRacing>>();
-
-            services.AddSingleton<IBoylesportsHandler<SportFootball>, BoylesportsHandler<SportFootball>>();
-            services.AddSingleton<IBoylesportsParser<SportFootball>, BoylesportsParser<SportFootball>>();
+            services.AddSingleton<IBoylesportsHandler, BoylesportsHandler>();
+            services.AddSingleton<IBoylesportsParser, BoylesportsParser>();
 
             //William Hill
-            services.AddSingleton<IWilliamHillHandler<SportRacing>, WilliamHillHandlerRacing<SportRacing>>();
-            services.AddSingleton<IWilliamHillParser<SportRacing>, WilliamHillParserRacing<SportRacing>>();
-
-            services.AddSingleton<IWilliamHillHandler<SportFootball>, WilliamHillHandlerFootball<SportFootball>>();
-            services.AddSingleton<IWilliamHillParser<SportFootball>, WilliamHillParserFootball<SportFootball>>();
+            services.AddSingleton<IWilliamHillHandlerFootball, WilliamHillHandlerFootball>();
+            services.AddSingleton<IWilliamHillParserFootball, WilliamHillParserFootball>();
 
             //Oddschecker
-            services.AddSingleton<IOddscheckerHandler<SportRacing>, OddscheckerHandlerRacing<SportRacing>>();
-            services.AddSingleton<IOddscheckerParser<SportRacing>, OddscheckerParserRacing<SportRacing>>();
+            services.AddSingleton<IOddscheckerHandlerRacing, OddscheckerHandlerRacing>();
+            services.AddSingleton<IOddscheckerParserRacing, OddscheckerParserRacing>();
 
-            services.AddSingleton<IOddscheckerHandler<SportFootball>, OddscheckerHandlerFootball<SportFootball>>();
-            services.AddSingleton<IOddscheckerParser<SportFootball>, OddscheckerParserFootball<SportFootball>>();
+            services.AddSingleton<IOddscheckerHandlerFootball, OddscheckerHandlerFootball>();
+            services.AddSingleton<IOddscheckerParserFootball, OddscheckerParserFootball>();
 
 
         }

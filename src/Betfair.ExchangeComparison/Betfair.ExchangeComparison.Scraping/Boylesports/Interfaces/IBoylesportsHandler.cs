@@ -1,9 +1,8 @@
-﻿using System;
-using Betfair.ExchangeComparison.Scraping.Interfaces;
+﻿using Betfair.ExchangeComparison.Scraping.Interfaces;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports.Interfaces
 {
-    public interface IBoylesportsHandler<T> : IScrapingHandler<T>
+    public interface IBoylesportsHandler : IScrapingHandlerSingle
     {
     }
 }

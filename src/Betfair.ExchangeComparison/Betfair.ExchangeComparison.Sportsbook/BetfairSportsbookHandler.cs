@@ -1,5 +1,4 @@
 ﻿using Betfair.ExchangeComparison.Auth.Interfaces;
-using Betfair.ExchangeComparison.Domain.CustomExceptions;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Clients;

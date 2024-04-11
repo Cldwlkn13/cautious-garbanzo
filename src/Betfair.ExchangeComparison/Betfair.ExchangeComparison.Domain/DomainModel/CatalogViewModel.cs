@@ -1,5 +1,4 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using Betfair.ExchangeComparison.Domain.ScrapingModel;
 
 namespace Betfair.ExchangeComparison.Pages.Models
 {

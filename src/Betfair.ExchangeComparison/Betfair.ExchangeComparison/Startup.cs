@@ -13,6 +13,10 @@ using Microsoft.Extensions.FileProviders;
 using Betfair.ExchangeComparison.Workers;
 using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Processors;
+using Betfair.ExchangeComparison.Settings;
+using Betfair.ExchangeComparison.ExpectedValueModel;
+using Betfair.ExchangeComparison.Matchbook.Settings;
+using Betfair.ExchangeComparison.Matchbook.Interfaces;
 
 namespace Betfair.ExchangeComparison
 {
@@ -29,29 +33,48 @@ namespace Betfair.ExchangeComparison
             services.AddControllersWithViews();
             services.AddRazorPages();
 
+            //projects
             services.ConfigureExchange();
             services.ConfigureSportsbook();
+            services.ConfigureMatchbook();
             services.ConfigureScrapers();
             services.ConfigureAuth();
             services.AddHealthChecks();
             services.AddSignalR();
 
+            //compound services
             services.AddSingleton<ICatalogService, CatalogService>();
 
             //processors
-            services.AddSingleton<CatalogProcessor>();
-            services.AddSingleton<ScrapingProcessor<SportFootball>>();
+            services.AddSingleton<ICatalogProcessor, CatalogProcessor>();
+            services.AddSingleton<IEventProcessor, EventProcessor>();
+            services.AddSingleton<IMarketProcessor, MarketProcessor>();
+            services.AddSingleton<IRunnerProcessor, RunnerProcessor>();
 
-            services.AddSingleton<IScrapingOrchestrator<SportFootball>, ScrapingOrchestrator<SportFootball>>();
-            services.AddSingleton<IScrapingControl<SportFootball>, ScrapingOrchestrator<SportFootball>>();
-            services.AddSingleton<IScrapingOrchestrator<SportRacing>, ScrapingOrchestrator<SportRacing>>();
-            services.AddSingleton<IScrapingControl<SportRacing>, ScrapingOrchestrator<SportRacing>>();
+            services.AddSingleton<IScrapingProcessor<SportFootball>, ScrapingProcessorFootball>();
+            services.AddSingleton<IScrapingProcessor<SportRacing>, ScrapingProcessorRacing>();
 
+            //scraping
+            services.AddSingleton<IScrapingOrchestratorFootball, ScrapingOrchestratorFootball>();
+            services.AddSingleton<IScrapingControlFootball, ScrapingOrchestratorFootball>();
+            services.AddSingleton<IScrapingOrchestratorRacing, ScrapingOrchestratorRacing>();
+            services.AddSingleton<IScrapingControlRacing, ScrapingOrchestratorRacing>();
+
+            //mapping and comparison
             services.AddSingleton<IPricingComparisonHandler, PriceComparisonHandler>();
             services.AddSingleton<IMappingService, MappingService>();
 
+            //expected value model 
+            services.AddSingleton<IExpectedValueModelFlat, FlatModel>();
+            services.AddSingleton<IExpectedValueModelJumps, JumpsModel>();
+
+            //trading
+            services.AddSingleton<ITradingHandler, TradingHandler>();
+
+            //settings
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));
             services.Configure<ScrapingSettings>(Configuration.GetSection(nameof(ScrapingSettings)));
+            services.Configure<PriceComparisonSettings>(Configuration.GetSection(nameof(PriceComparisonSettings)));
 
             services.AddDistributedMemoryCache();
 
@@ -59,7 +82,7 @@ namespace Betfair.ExchangeComparison
                 throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(connectionString));
+                options.UseSqlServer(connectionString));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -112,7 +135,16 @@ namespace Betfair.ExchangeComparison
 
                 endpoints.MapRazorPages();
             });
-        }
+
+            //using(var scope = app.ApplicationServices.CreateScope())
+            //{
+            //    var matchbookHandler = scope.ServiceProvider.GetService<IMatchbookHandler>();
+            //    Task.Run(matchbookHandler!.PostSessionToken);
+            //    Thread.Sleep(10000);
+            //    Task.Run(matchbookHandler!.GetEvents);
+            //    Thread.Sleep(10000);
+            //}
+        }   
 
         private void BindSettings(IServiceCollection services)
         {
@@ -121,6 +153,12 @@ namespace Betfair.ExchangeComparison
 
             services.Configure<SportsbookSettings>(o =>
                Configuration.GetSection("SportsbookSettings").Bind(o));
+
+            services.Configure<MatchbookSettings>(o =>
+               Configuration.GetSection("MatchbookSettings").Bind(o));
+
+            services.Configure<TradingSettings>(o =>
+                Configuration.GetSection("TradingSettings").Bind(o));
         }
     }
 }

@@ -9,7 +9,6 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
     public class ExchangeClient : HttpClient, IExchangeClient
     {
         public string EndPoint { get; private set; }
-        private static readonly IDictionary<string, Type> operationReturnTypeMap = new Dictionary<string, Type>();
         public const string APPKEY_HEADER = "X-Application";
         public const string SESSION_TOKEN_HEADER = "X-Authentication";
         public WebHeaderCollection CustomHeaders { get; set; }
@@ -102,7 +101,8 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<List<EventResult>>(LIST_EVENTS_METHOD, args);
         }
 
-        public IList<MarketCatalogue> ListMarketCatalogue(MarketFilter marketFilter, ISet<MarketProjection> marketProjections, MarketSort marketSort, string maxResult = "100", string locale = null)
+        public IList<MarketCatalogue> ListMarketCatalogue(MarketFilter marketFilter, ISet<MarketProjection> marketProjections, 
+            MarketSort marketSort, string maxResult = "100", string locale = null)
         {
             var args = new Dictionary<string, object>();
             args[FILTER] = marketFilter;
@@ -121,7 +121,9 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<List<MarketTypeResult>>(LIST_MARKET_TYPES_METHOD, args);
         }
 
-        public IList<MarketBook> ListMarketBook(IList<string> marketIds, PriceProjection priceProjection, OrderProjection? orderProjection = null, MatchProjection? matchProjection = null, string currencyCode = null, string locale = null)
+        public IList<MarketBook> ListMarketBook(IList<string> marketIds, PriceProjection priceProjection,
+            OrderProjection? orderProjection = null, MatchProjection? matchProjection = null, 
+            string currencyCode = null, string locale = null)
         {
             var args = new Dictionary<string, object>();
             args[MARKET_IDS] = marketIds;
@@ -133,7 +135,8 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<List<MarketBook>>(LIST_MARKET_BOOK_METHOD, args);
         }
 
-        public PlaceExecutionReport PlaceOrders(string marketId, string customerRef, IList<PlaceInstruction> placeInstructions, string locale = null)
+        public PlaceExecutionReport PlaceOrders(string marketId, string customerRef, IList<PlaceInstruction> placeInstructions, 
+            string locale = null)
         {
             var args = new Dictionary<string, object>();
 
@@ -173,7 +176,7 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
                 JsonConvert.Export(call, writer);
             }
             Console.WriteLine("Calling Exchange: " + method + " With args: " +
-                JsonConvert.Serialize<IDictionary<string, object>>(args));
+                JsonConvert.Serialize(args));
 
             using (WebResponse response = request.GetResponse())
             using (Stream stream = response.GetResponseStream())
@@ -202,7 +205,8 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return JsonConvert.Deserialize<APINGException>(exceptionData);
         }
 
-        public IList<MarketProfitAndLoss> ListMarketProfitAndLoss(IList<string> marketIds, bool includeSettledBets = false, bool includeBspBets = false, bool netOfCommission = false)
+        public IList<MarketProfitAndLoss> ListMarketProfitAndLoss(IList<string> marketIds, bool includeSettledBets = false, 
+            bool includeBspBets = false, bool netOfCommission = false)
         {
             var args = new Dictionary<string, object>();
             args[MARKET_IDS] = marketIds;
@@ -212,7 +216,9 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<List<MarketProfitAndLoss>>(LIST_MARKET_PROFIT_AND_LOST_METHOD, args);
         }
 
-        public CurrentOrderSummaryReport ListCurrentOrders(ISet<String> betIds, ISet<String> marketIds, OrderProjection? orderProjection = null, TimeRange placedDateRange = null, OrderBy? orderBy = null, SortDir? sortDir = null, int? fromRecord = null, int? recordCount = null)
+        public CurrentOrderSummaryReport ListCurrentOrders(ISet<String> betIds, ISet<String> marketIds, 
+            OrderProjection? orderProjection = null, TimeRange placedDateRange = null, OrderBy? orderBy = null, 
+            SortDir? sortDir = null, int? fromRecord = null, int? recordCount = null)
         {
             var args = new Dictionary<string, object>();
             args[BET_IDS] = betIds;
@@ -227,7 +233,10 @@ namespace Betfair.ExchangeComparison.Exchange.Clients
             return Invoke<CurrentOrderSummaryReport>(LIST_CURRENT_ORDERS_METHOD, args);
         }
 
-        public ClearedOrderSummaryReport ListClearedOrders(BetStatus betStatus, ISet<string> eventTypeIds = null, ISet<string> eventIds = null, ISet<string> marketIds = null, ISet<RunnerId> runnerIds = null, ISet<string> betIds = null, Side? side = null, TimeRange settledDateRange = null, GroupBy? groupBy = null, bool? includeItemDescription = null, String locale = null, int? fromRecord = null, int? recordCount = null)
+        public ClearedOrderSummaryReport ListClearedOrders(BetStatus betStatus, ISet<string> eventTypeIds = null, 
+            ISet<string> eventIds = null, ISet<string> marketIds = null, ISet<RunnerId> runnerIds = null, 
+            ISet<string> betIds = null, Side? side = null, TimeRange settledDateRange = null, GroupBy? groupBy = null, 
+            bool? includeItemDescription = null, String locale = null, int? fromRecord = null, int? recordCount = null)
         {
             var args = new Dictionary<string, object>();
             args[BET_STATUS] = betStatus;

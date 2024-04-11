@@ -175,7 +175,7 @@ namespace Betfair.ExchangeComparison.Exchange
                 time = timeRange;
             }
 
-            marketFilter.MarketStartTime = time;
+            
             marketFilter.MarketCountries = eventTypeId.CountryCodes();
             marketFilter.MarketTypeCodes = eventTypeId.MarketTypes();
             var marketSort = MarketSort.FIRST_TO_START;
@@ -187,10 +187,26 @@ namespace Betfair.ExchangeComparison.Exchange
             marketProjections.Add(MarketProjection.EVENT);
             marketProjections.Add(MarketProjection.MARKET_DESCRIPTION);
 
-            var marketCatalogues = _exchangeClient!.ListMarketCatalogue(
-                marketFilter, marketProjections, marketSort, maxResults);
+            var result = new List<MarketCatalogue>();
 
-            return marketCatalogues;
+            for(int i = 0; i < 12; i++)
+            {
+                var t = new TimeRange();
+                t.From = DateTime.Now.AddHours(i);
+                t.To = DateTime.Now.AddHours(i + 1);
+
+                marketFilter.MarketStartTime = t;
+
+                var marketCatalogues = _exchangeClient!.ListMarketCatalogue(
+                     marketFilter, marketProjections, marketSort, maxResults);
+
+                result.AddRange(marketCatalogues);
+            }
+
+            //var marketCatalogues = _exchangeClient!.ListMarketCatalogue(
+               // marketFilter, marketProjections, marketSort, maxResults);
+
+            return result;
         }
 
         public IList<MarketBook> ListMarketBooks(IList<string> marketIds)

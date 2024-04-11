@@ -1,7 +1,7 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.DomainModel;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
@@ -16,9 +16,11 @@ namespace Betfair.ExchangeComparison.Pages.Models
 
         public BestRunner(RunnerPriceOverview rpo)
         {
+            Sport = rpo.Sport;
             Competition = rpo.EventWithCompetition.Competition;
             Event = rpo.EventWithCompetition.Event;
             MarketDetail = rpo.MarketDetail;
+            MarketCatalogue = rpo.MarketCatalogue;
             SportsbookRunner = rpo.SportsbookRunner;
             WinnerOddsString = rpo.WinnerOddsString;
             PlacePartOddsString = rpo.PlacePartOddsString;
@@ -35,11 +37,16 @@ namespace Betfair.ExchangeComparison.Pages.Models
             ExchangeWinBestPinkRequestedLiability = rpo.BestWinAvailable[Side.LAY].RequestedLiability();
             Bookmaker = rpo.Bookmaker;
             MappedEventName = rpo.MappedScrapedEventName;
+            TimeToStart = rpo.MarketDetail.marketStartTime.TimeToStart();
+            MappedMatchbookRunner = rpo.MappedMatchbookRunner;
+
         }
 
+        public Sport Sport { get; set; }
         public Competition Competition { get; set; }
         public Event Event { get; set; }
         public MarketDetail MarketDetail { get; set; }
+        public MarketCatalogue MarketCatalogue { get; set; }
         public RunnerDetail SportsbookRunner { get; set; }
         public string WinnerOddsString { get; set; }
         public string PlacePartOddsString { get; set; }
@@ -56,6 +63,9 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double VolumeTradedBelowSportsbook { get; set; }
         public Bookmaker Bookmaker { get; set; }
         public string MappedEventName { get; set; }
+        public TimeSpan TimeToStart { get; set; }
+        public double ExpectedPrice {  get; set; }
+        public MatchbookRunner? MappedMatchbookRunner { get; set; }
     }
 }
 

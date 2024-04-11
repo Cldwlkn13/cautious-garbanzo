@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using Betfair.ExchangeComparison.Domain.DomainModel;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
@@ -9,13 +8,13 @@ using HtmlAgilityPack;
 
 namespace Betfair.ExchangeComparison.Scraping.Boylesports
 {
-    public class BoylesportsParser<T> : IBoylesportsParser<T>
+    public class BoylesportsParser : IBoylesportsParser
     {
         public BoylesportsParser()
         {
         }
 
-        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
+        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEwc compoundObj)
         {
             try
             {

@@ -47,11 +47,16 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.12" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.11" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj">
@@ -62,6 +67,7 @@
 			<GlobalPropertiesToRemove>
 			</GlobalPropertiesToRemove>
 		</ProjectReference>
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Matchbook\Betfair.ExchangeComparison.Matchbook.csproj" />
 		<ProjectReference Include="..\Betfair.ExchangeComparison.Sportsbook\Betfair.ExchangeComparison.Sportsbook.csproj">
 			<GlobalPropertiesToRemove>
 			</GlobalPropertiesToRemove>
@@ -76,15 +82,12 @@
 	<ItemGroup>
 		<Folder Include="Pages\Racing\" />
 		<Folder Include="Pages\Football\" />
-		<Folder Include="Handlers\" />
-		<Folder Include="Interfaces\" />
 		<Folder Include="Services\" />
 		<Folder Include="Pages\Model\" />
 		<Folder Include="Pages\Extensions\" />
 		<Folder Include="Pages\Test\" />
 		<Folder Include="Workers\" />
 		<Folder Include="TestHtml\" />
-		<Folder Include="Processors\" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Remove="glabal.json" />

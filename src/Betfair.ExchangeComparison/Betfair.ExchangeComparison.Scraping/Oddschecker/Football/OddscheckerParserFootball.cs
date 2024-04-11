@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Football
 {
-    public class OddscheckerParserFootball<T> : IOddscheckerParser<T>
+    public class OddscheckerParserFootball : IOddscheckerParserFootball
     {
         public OddscheckerParserFootball()
         {
@@ -272,7 +272,7 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Football
             //}
         }
 
-        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEvent compoundObj)
+        public ScrapedEvent BuildScrapedEvent(string html, MarketDetailWithEwc compoundObj)
         {
             throw new NotImplementedException();
         }

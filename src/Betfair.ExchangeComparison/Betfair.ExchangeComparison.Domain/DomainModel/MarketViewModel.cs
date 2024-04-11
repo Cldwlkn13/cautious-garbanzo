@@ -1,5 +1,6 @@
-﻿using Betfair.ExchangeComparison.Domain.Extensions;
-using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
@@ -14,6 +15,11 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double WinOverround { get; set; }
         public double EachWayPlaceOverround { get; set; }
         public string ComparisonSource { get; set; }
+        public IEnumerable<RunnerPriceOverview> RunnerPriceOverviews { get; set; }
+        public IEnumerable<BestRunner> BestRunners { get; set; }
+        public IEnumerable<BestRunner> BestEachWayRunners { get; set; }
+        public TimeSpan TimeToStart { get; set; }
+        public MatchbookEvent? MappedMatchbookEvent { get; set; }
 
         public MarketViewModel(Event parent)
         {
@@ -21,6 +27,10 @@ namespace Betfair.ExchangeComparison.Pages.Models
             SportsbookMarket = new MarketDetail();
             ExchangeMarketBooks = new List<MarketBook>();
             Runners = new List<RunnerViewModel>();
+            RunnerPriceOverviews = new List<RunnerPriceOverview>();
+            BestRunners = new List<BestRunner>();
+            BestEachWayRunners = new List<BestRunner>();
+            MappedMatchbookEvent = new MatchbookEvent();
         }
 
         public override string ToString()

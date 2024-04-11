@@ -1,5 +1,4 @@
-﻿using System;
-namespace Betfair.ExchangeComparison.Sportsbook.Settings
+﻿namespace Betfair.ExchangeComparison.Sportsbook.Settings
 {
     public class SportsbookSettings
     {

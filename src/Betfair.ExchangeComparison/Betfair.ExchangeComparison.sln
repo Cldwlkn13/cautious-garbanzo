@@ -1,24 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 25.0.1705.4
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison", "Betfair.ExchangeComparison\Betfair.ExchangeComparison.csproj", "{EC5DDA5F-0383-497A-8652-825995EFBBA5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison", "Betfair.ExchangeComparison\Betfair.ExchangeComparison.csproj", "{EC5DDA5F-0383-497A-8652-825995EFBBA5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Domain", "Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj", "{5816FED4-4BB4-4440-967A-79542E0FA99E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Domain", "Betfair.ExchangeComparison.Domain\Betfair.ExchangeComparison.Domain.csproj", "{5816FED4-4BB4-4440-967A-79542E0FA99E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Exchange", "Betfair.ExchangeComparison.Exchange\Betfair.ExchangeComparison.Exchange.csproj", "{3A2067AE-1983-45F8-B740-C6F0B3CA783F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Exchange", "Betfair.ExchangeComparison.Exchange\Betfair.ExchangeComparison.Exchange.csproj", "{3A2067AE-1983-45F8-B740-C6F0B3CA783F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Sportsbook", "Betfair.ExchangeComparison.Sportsbook\Betfair.ExchangeComparison.Sportsbook.csproj", "{98A4ACBD-314A-4C2E-A0AB-8C5B57A9AB7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Sportsbook", "Betfair.ExchangeComparison.Sportsbook\Betfair.ExchangeComparison.Sportsbook.csproj", "{98A4ACBD-314A-4C2E-A0AB-8C5B57A9AB7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Scraping", "Betfair.ExchangeComparison.Scraping\Betfair.ExchangeComparison.Scraping.csproj", "{5EBB98CD-BBB5-42FE-B22F-0EC95E4067B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Scraping", "Betfair.ExchangeComparison.Scraping\Betfair.ExchangeComparison.Scraping.csproj", "{5EBB98CD-BBB5-42FE-B22F-0EC95E4067B0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9B416BD-C1DD-4BFC-AB19-299EB41B55FE}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Auth", "Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj", "{4737A88D-FBFD-487F-8004-4587BE0CFF88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Auth", "Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj", "{4737A88D-FBFD-487F-8004-4587BE0CFF88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Matchbook", "Betfair.ExchangeComparison.Matchbook\Betfair.ExchangeComparison.Matchbook.csproj", "{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4737A88D-FBFD-487F-8004-4587BE0CFF88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
@@ -14,41 +15,16 @@ using Newtonsoft.Json;
 
 namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
 {
-    public class WilliamHillHandlerFootball<T> : ScrapingHandler<T>, IWilliamHillHandler<T>
+    public class WilliamHillHandlerFootball : ScrapingHandler, IWilliamHillHandlerFootball
     {
         private const string BaseUrl = "https://sports.williamhill.com";
-        private IWilliamHillParser<T> _parser;
+        private IWilliamHillParserFootball _parser;
 
-        public WilliamHillHandlerFootball(ILogger<WilliamHillHandlerRacing<T>> logger, IScrapingClient scrapingClient, IWilliamHillParser<T> parser) :
+        public WilliamHillHandlerFootball(ILogger<WilliamHillHandlerFootball> logger, IScrapingClient scrapingClient, IWilliamHillParserFootball parser) :
             base(logger, scrapingClient)
         {
             _parser = parser;
 
-        }
-
-        public async Task<ScrapedEvent> Handle(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ScrapedEvent> Handle(MarketDetailWithEvent @event, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(IEnumerable<MarketDetailWithEvent> mdes, Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(EventsByCountry ebc)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<UsageModel> Usage()
-        {
-            throw new NotImplementedException();
         }
 
         private Dictionary<WhEvent, List<WhMarket>> ListEventsByMarket()
@@ -151,12 +127,8 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
             }
         }
 
-        public Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Sport sport = Sport.Racing)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable(Dictionary<EventWithCompetition, List<MarketDetail>> events, Sport sport = Sport.Racing)
+        public async Task<IEnumerable<ScrapedEvent>> HandleEnumerable
+            (Dictionary<EventWithCompetition, List<MarketDetail>> events)
         {
             var apiResults = ListEventsByMarket();
 
@@ -179,6 +151,11 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     out var mapppedEwc,
                     minDistance: 10,
                     splitter: " v "))
+                {
+                    continue;
+                }
+
+                if (@event.Key.status == "S")
                 {
                     continue;
                 }
@@ -234,13 +211,20 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     scrapedMarkets.Add(scrapedMarket);
                 }
 
-                var scrapedEvent = new ScrapedEvent(scrapedMarkets);
-                scrapedEvent.MappedEventWithCompetition = mapppedEwc;
-                scrapedEvent.BetfairName = mapppedEwc.Event.Name;
-                scrapedEvent.ScrapedEventName = @event.Key.eventName;
+                try
+                {
+                    var scrapedEvent = new ScrapedEvent(scrapedMarkets);
+                    scrapedEvent.MappedEventWithCompetition = mapppedEwc;
+                    scrapedEvent.BetfairName = mapppedEwc.Event.Name;
+                    scrapedEvent.ScrapedEventName = @event.Key.eventName;
 
-                scrapedEvent.StartTime = mapppedEwc.Event.OpenDate!.Value.ConvertUtcToBritishIrishLocalTime();
-                result.Add(scrapedEvent);
+                    scrapedEvent.StartTime = mapppedEwc.Event.OpenDate!.Value.ConvertUtcToBritishIrishLocalTime();
+                    result.Add(scrapedEvent);
+                }
+                catch(Exception exception)
+                {
+
+                }         
             }
 
             return result;
@@ -422,6 +406,7 @@ namespace Betfair.ExchangeComparison.Scraping.WilliamHill.Football
                     .Replace("(Mex)", "")
                     .Replace("Reserves", "")
                     .Replace("(Res)", "")
+                    .Replace("-", " ")
                     .ToLower()
                     .Trim()
                     .Replace(" ", "");

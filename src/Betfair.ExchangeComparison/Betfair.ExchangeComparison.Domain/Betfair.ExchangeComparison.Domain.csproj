@@ -24,10 +24,8 @@
 		<None Remove="ScrapingModel\WilliamHill\" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Extensions\" />
 		<Folder Include="ScrapingModel\" />
 		<Folder Include="ExchangeModel\" />
-		<Folder Include="DomainModel\" />
 		<Folder Include="SportsbookModel\" />
 		<Folder Include="Enums\" />
 		<Folder Include="CommonInterfaces\" />

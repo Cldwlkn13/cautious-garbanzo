@@ -1,9 +1,8 @@
-﻿using System;
-using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Enums;
 
 namespace Betfair.ExchangeComparison.Interfaces
 {
-    public interface IScrapingControl<T>
+    public interface IScrapingControl
     {
         void Start(Provider provider);
         void Stop(Provider provider);
@@ -12,4 +11,3 @@ namespace Betfair.ExchangeComparison.Interfaces
         public Dictionary<Provider, DateTime> Expiries { get; }
     }
 }
-

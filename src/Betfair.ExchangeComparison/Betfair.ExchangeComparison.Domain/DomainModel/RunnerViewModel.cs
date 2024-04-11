@@ -1,4 +1,6 @@
-﻿using Betfair.ExchangeComparison.Exchange.Model;
+﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Matchbook;
+using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
 namespace Betfair.ExchangeComparison.Pages.Models
@@ -16,10 +18,33 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double PlaceExpectedValue { get; set; }
         public double EachWayExpectedValue { get; set; }
         public string WinnerOddsString { get; set; }
+        public MatchbookRunner MappedMatchbookRunner { get; set; }
 
         public RunnerViewModel()
         {
             SportsbookRunner = new RunnerDetail();
+        }
+
+        public RunnerViewModel(RunnerPriceOverview rpo)
+        {
+            SportsbookRunner = rpo.SportsbookRunner;
+            SportsbookWinPrice = rpo.SportsbookRunner.winRunnerOdds.@decimal;
+            ExpectedExchangeWinPrice = rpo.ExpectedWinPrice;
+            ExpectedExchangePlacePrice = rpo.ExpectedPlacePrice;
+            WinExpectedValue = rpo.ExpectedValueWin;
+            PlaceExpectedValue = rpo.ExpectedValuePlace;
+            EachWayExpectedValue = rpo.ExpectedValueEachWay;
+            WinnerOddsString = rpo.WinnerOddsString;
+
+            if(rpo.ExchangeWinRunner != null)
+            {
+                ExchangeWinRunner = rpo.ExchangeWinRunner;
+            }
+
+            if (rpo.ExchangePlaceRunner != null)
+            {
+                ExchangePlaceRunner = rpo.ExchangePlaceRunner;
+            }
         }
 
         public override string ToString()

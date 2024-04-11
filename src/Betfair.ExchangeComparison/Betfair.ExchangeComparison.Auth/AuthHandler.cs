@@ -24,9 +24,9 @@ namespace Betfair.ExchangeComparison.Auth
             SessionTokens = new Dictionary<Bookmaker, string>();
             TokenExpiries = new Dictionary<Bookmaker, DateTime>();
 
-            Username = Environment.GetEnvironmentVariable("USERNAME") != null ?
-                Environment.GetEnvironmentVariable("USERNAME")! :
-                logins.Value.USERNAME!;
+            Username = Environment.GetEnvironmentVariable("BETFAIR_USERNAME") != null ?
+                Environment.GetEnvironmentVariable("BETFAIR_USERNAME")! :
+                logins.Value.BETFAIR_USERNAME!;
 
             Password = Environment.GetEnvironmentVariable("PASSWORD") != null ?
                 Environment.GetEnvironmentVariable("PASSWORD")! :

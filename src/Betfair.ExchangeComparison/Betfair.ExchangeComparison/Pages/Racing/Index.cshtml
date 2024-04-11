@@ -10,17 +10,27 @@
         <div class="row">
             <div class="col-md-3 m-1">
                 <a href="/racing" class="btn btn-warning">Refresh</a>
+                @*<a asp-page-handler="RacingCatalog" class="btn btn-warning" id="refresh-btn-racing">Refresh Test</a>*@
+                <a class="btn btn-danger" id="refresh-auto-racing">Refresh Auto Off</a>
             </div>
             <div class="col-md-6 offset-md-1 m-1">
                 <form method="POST" id="racing-form">
-                    <select asp-for="FormModel.Bookmaker" asp-items="@Model.SelectListBookmakers">
-                    </select>
-                    @*<button class="btn btn-sm btn-warning ml-2" type="submit">Change!</button>*@
+                    <span>
+                        <label asp-for="FormModel.Bookmaker" class="text-light d-md-inline d-none">Selected Bookmaker </label>
+                        <select asp-for="FormModel.Bookmaker" asp-items="@Model.SelectListBookmakers">
+                        </select>
+                    </span>
+                    <span class="m-3">
+                        @*<button class="btn btn-sm btn-warning ml-2" type="submit">Change!</button>*@
+                        <label asp-for="FormModel.RefreshRateSeconds" class="text-light d-md-inline d-none">Refresh Rate </label>
+                        <input type="number" asp-for="FormModel.RefreshRateSeconds" value="@Model.RefreshRate" style="width:50px" step="5" min="5" max="60" />
+                    </span>
+                    <input type="hidden" asp-for="FormModel.RefreshIsOn" value="@Model.RefreshIsOn" />
                 </form>
             </div>
         </div>
         <div id="meetings">
-            @await Html.PartialAsync("/Pages/Shared/Partials/RacingCatalogPartial.cshtml", Model.CatalogViewModel)
+            @await Html.PartialAsync("RacingCatalogPartial.cshtml", Model)
         </div>
         @*<div id="loading-meetings" class="m-3"><img src="~/spinner.gif" alt="Loading" /></div>*@
     </div>
