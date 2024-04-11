@@ -1,6 +1,7 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
@@ -24,7 +25,8 @@ namespace Betfair.ExchangeComparison.Processors
         }
 
         public async Task<MarketViewModel?> Process(BasePageModel basePageModel, EventWithCompetition ewc, MarketDetail marketDetail, 
-            EventWithMarketBooks eventWithMarketBooks, bool hasEachWay, ScrapedEvent? mappedScrapedEvent = null)
+            EventWithMarketBooks eventWithMarketBooks, bool hasEachWay, ScrapedEvent? mappedScrapedEvent = null, 
+            MatchbookEvent? mappedMatchbookEvent = null)
         {
             try
             {
@@ -41,6 +43,10 @@ namespace Betfair.ExchangeComparison.Processors
                 ScrapedMarket mappedScrapedMarket = mappedScrapedEvent != null ? 
                     MapScrapedMarket(basePageModel, mappedScrapedEvent, marketDetail, ewc) : 
                     new ScrapedMarket();
+
+                MatchbookMarket mappedMatchbookWinMarket = mappedMatchbookEvent != null ?
+                    MapMatchbookWinMarket(mappedMatchbookEvent) :
+                    new MatchbookMarket();
 
                 int numberOfPlaces = 0;
                 int eachWayFraction = 0;
@@ -78,7 +84,7 @@ namespace Betfair.ExchangeComparison.Processors
                 {
                     var runnerPriceOverview = await _runnerProcessor.Process(
                         basePageModel, ewc, mappedWinMarketBook, marketDetail, sportsbookRunner, hasEachWay,
-                        mappedScrapedEvent, mappedScrapedMarket, mappedPlaceMarketBook);
+                        mappedScrapedEvent, mappedScrapedMarket, mappedPlaceMarketBook, mappedMatchbookWinMarket);
 
                     if (runnerPriceOverview == null || runnerPriceOverview.Bookmaker == Bookmaker.Unknown) continue;
 
@@ -106,6 +112,7 @@ namespace Betfair.ExchangeComparison.Processors
                 mvm.BestRunners = bestRunners;
                 mvm.BestEachWayRunners = bestEachWayRunners;
                 mvm.TimeToStart = marketDetail.marketStartTime.TimeToStart();
+                mvm.MappedMatchbookEvent = mappedMatchbookEvent;
 
                 return mvm;
             }
@@ -151,7 +158,15 @@ namespace Betfair.ExchangeComparison.Processors
                 marketDetail.numberOfPlaces, 
                 marketDetail.placeFractionDenominator, 
                 basePageModel.Bookmaker);
+        }
 
+        private static MatchbookMarket MapMatchbookWinMarket(MatchbookEvent matchbookEvent)
+        {
+            return matchbookEvent.Markets.FirstOrDefault(m => m.Name == "WIN") ??
+                new MatchbookMarket()
+                {
+                    Runners = new List<MatchbookRunner>()
+                };
         }
     }
 }

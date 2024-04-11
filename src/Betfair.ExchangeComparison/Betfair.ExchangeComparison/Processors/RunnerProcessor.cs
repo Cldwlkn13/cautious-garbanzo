@@ -1,4 +1,7 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
@@ -22,7 +25,7 @@ namespace Betfair.ExchangeComparison.Processors
 
         public async Task<RunnerPriceOverview?> Process(BasePageModel basePageModel, EventWithCompetition @event, MarketBook mappedWinMarketBook, 
             MarketDetail marketDetail, RunnerDetail sportsbookRunner, bool hasEachWay,  ScrapedEvent? mappedScrapedEvent = null, 
-            ScrapedMarket? mappedScrapedMarket = null, MarketBook? mappedPlaceMarketBook = null)
+            ScrapedMarket? mappedScrapedMarket = null, MarketBook? mappedPlaceMarketBook = null, MatchbookMarket? mappedMatchbookMarket = null)
         {
             try
             {
@@ -72,6 +75,8 @@ namespace Betfair.ExchangeComparison.Processors
                         out mappedScrapedRunner);
                 }
 
+                _ = TryMapMatchbookRunner(sportsbookRunner, mappedMatchbookMarket, out var mappedMatchbookRunner);   
+
                 if (scrapedRunnerIsValid)
                 {
                     return new RunnerPriceOverview(
@@ -85,7 +90,8 @@ namespace Betfair.ExchangeComparison.Processors
                         mappedScrapedRunner,
                         mappedExchangePlaceRunner,
                         basePageModel.Bookmaker,
-                        mappedScrapedEvent);
+                        mappedScrapedEvent,
+                        mappedMatchbookRunner);
                 }
                 else if (!basePageModel.IsScrapableBookmaker.Contains(basePageModel.Bookmaker))
                 {
@@ -96,7 +102,9 @@ namespace Betfair.ExchangeComparison.Processors
                         mappedMarketCatalogue,
                         sportsbookRunner,
                         mappedExchangeWinRunner,
-                        mappedExchangePlaceRunner); 
+                        mappedExchangePlaceRunner,
+                        Bookmaker.BetfairSportsbook,
+                        mappedMatchbookRunner); 
                 }
 
                 return new RunnerPriceOverview();   
@@ -142,6 +150,27 @@ namespace Betfair.ExchangeComparison.Processors
 
                 return false;
             }
+        }
+
+        private bool TryMapMatchbookRunner(RunnerDetail sportsbookRunner, MatchbookMarket? matchbookMarket, out MatchbookRunner result)
+        {
+            if (matchbookMarket == null)
+            {
+                result = new MatchbookRunner();
+                return false;
+            }
+
+            var mappedRunner = matchbookMarket.Runners.FirstOrDefault(r => 
+            r.Name.CleanRunnerName().Replace(" ", "").ToLower() == sportsbookRunner.selectionName.Replace(" ", "").ToLower());
+
+            if(mappedRunner ==  null)
+            {
+                result = new MatchbookRunner();
+                return false;
+            }
+
+            result = mappedRunner;
+            return true;
         }
 	}
 }

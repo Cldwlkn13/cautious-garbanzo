@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
@@ -248,6 +249,36 @@ namespace Betfair.ExchangeComparison.Services
             }
 
             result = mappedRunner;
+            return true;
+        }
+
+        public bool TryMapMatchbookEvents(List<MatchbookEvent> matchbookEvents, EventWithCompetition ewc, out List<MatchbookEvent> result)
+        {
+            var mappedEvents = matchbookEvents.Where(s =>
+                 s.Name.ToLower().Contains(ewc.Event.Venue.ToLower()));
+
+            if (mappedEvents == null)
+            {
+                result = new List<MatchbookEvent>();
+                return false;
+            }
+
+            result = mappedEvents.ToList();
+            return true;
+        }
+
+        public bool TryMapMatchbookEventToMarketDetail(List<MatchbookEvent> matchbookEvents, MarketDetail marketDetail, out MatchbookEvent result)
+        {
+            var mappedEvent = matchbookEvents.FirstOrDefault(s =>
+                 s.Start == marketDetail.marketStartTime);
+
+            if (mappedEvent == null)
+            {
+                result = new MatchbookEvent();
+                return false;
+            }
+
+            result = mappedEvent;
             return true;
         }
     }

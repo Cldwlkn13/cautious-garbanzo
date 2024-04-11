@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
@@ -17,6 +18,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double PlaceExpectedValue { get; set; }
         public double EachWayExpectedValue { get; set; }
         public string WinnerOddsString { get; set; }
+        public MatchbookRunner MappedMatchbookRunner { get; set; }
 
         public RunnerViewModel()
         {

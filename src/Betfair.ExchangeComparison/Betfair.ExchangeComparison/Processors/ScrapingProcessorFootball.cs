@@ -1,10 +1,11 @@
-﻿using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
 
 namespace Betfair.ExchangeComparison.Processors
 {
-    public class ScrapingProcessorFootball
+    public class ScrapingProcessorFootball : IScrapingProcessor<SportFootball>
     {
         private readonly IScrapingOrchestratorFootball _scrapingOrchestrator;
         private readonly IScrapingControlFootball _scrapingControl;

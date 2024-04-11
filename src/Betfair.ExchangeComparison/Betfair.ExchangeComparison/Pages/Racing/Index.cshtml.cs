@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -14,8 +15,9 @@ namespace Betfair.ExchangeComparison.Pages.Racing
     {
         private readonly ICatalogProcessor _catalogProcessor;
         private readonly IEventProcessor _eventProcessor;
-        private readonly ScrapingProcessorRacing _scrapingProcessor;
+        private readonly IScrapingProcessor<SportRacing> _scrapingProcessor;
         private readonly IScrapingOrchestratorRacing _scrapingOrchestrator;
+        private readonly ITradingHandler _tradingHandler;
 
         public CatalogViewModel CatalogViewModel { get; set; }
 
@@ -25,13 +27,14 @@ namespace Betfair.ExchangeComparison.Pages.Racing
         public int RefreshRate { get; set; }
         public bool RefreshIsOn { get; set; }
 
-        public IndexModel(IScrapingOrchestratorRacing scrapingOrchestrator, ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor,
-            ScrapingProcessorRacing scrapingProcessor)
+        public IndexModel(IScrapingOrchestratorRacing scrapingOrchestrator, ICatalogProcessor catalogProcessor, 
+            IEventProcessor eventProcessor, IScrapingProcessor<SportRacing> scrapingProcessor, ITradingHandler tradingHandler)
         {
             _scrapingOrchestrator = scrapingOrchestrator;
             _catalogProcessor = catalogProcessor;
             _eventProcessor = eventProcessor;
             _scrapingProcessor = scrapingProcessor;
+            _tradingHandler = tradingHandler;
 
             CatalogViewModel = new CatalogViewModel();
         }
@@ -69,6 +72,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                 var usageModel = await _scrapingOrchestrator.Usage();
                 CatalogViewModel.UsageModel = usageModel;
+
+                await _tradingHandler.TradeCatalogue(CatalogViewModel);
 
                 return Page();
             }
@@ -144,6 +149,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
 
                 var usageModel = await _scrapingOrchestrator.Usage();
                 result.UsageModel = usageModel;
+
+                await _tradingHandler.TradeCatalogue(result);
 
                 return result;
             }

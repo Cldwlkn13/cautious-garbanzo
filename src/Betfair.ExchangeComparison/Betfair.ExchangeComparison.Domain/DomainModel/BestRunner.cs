@@ -1,6 +1,7 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 
@@ -37,6 +38,8 @@ namespace Betfair.ExchangeComparison.Pages.Models
             Bookmaker = rpo.Bookmaker;
             MappedEventName = rpo.MappedScrapedEventName;
             TimeToStart = rpo.MarketDetail.marketStartTime.TimeToStart();
+            MappedMatchbookRunner = rpo.MappedMatchbookRunner;
+
         }
 
         public Sport Sport { get; set; }
@@ -62,6 +65,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public string MappedEventName { get; set; }
         public TimeSpan TimeToStart { get; set; }
         public double ExpectedPrice {  get; set; }
+        public MatchbookRunner? MappedMatchbookRunner { get; set; }
     }
 }
 

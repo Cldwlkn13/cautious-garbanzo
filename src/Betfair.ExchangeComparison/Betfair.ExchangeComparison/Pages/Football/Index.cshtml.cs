@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Domain.Enums;
+﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
+using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -14,14 +15,15 @@ namespace Betfair.ExchangeComparison.Pages.Football
     {
         private readonly ICatalogProcessor _catalogProcessor;
         private readonly IEventProcessor _eventProcessor;
-        private readonly ScrapingProcessorFootball _scrapingProcessor;
+        private readonly IScrapingProcessor<SportFootball> _scrapingProcessor;
 
         [BindProperty]
         public FootballFormModel FormModel { get; set; }
         public List<SelectListItem> SelectListBookmakers { get; set; }
         public CatalogViewModel CatalogViewModel { get; set; }
 
-        public IndexModel(ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor, ScrapingProcessorFootball scrapingProcessor)
+        public IndexModel(ICatalogProcessor catalogProcessor, IEventProcessor eventProcessor, 
+            IScrapingProcessor<SportFootball> scrapingProcessor)
         {
             _catalogProcessor = catalogProcessor;
             _eventProcessor = eventProcessor;

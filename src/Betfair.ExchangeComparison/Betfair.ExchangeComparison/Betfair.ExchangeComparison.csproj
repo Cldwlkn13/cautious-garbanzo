@@ -67,6 +67,7 @@
 			<GlobalPropertiesToRemove>
 			</GlobalPropertiesToRemove>
 		</ProjectReference>
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Matchbook\Betfair.ExchangeComparison.Matchbook.csproj" />
 		<ProjectReference Include="..\Betfair.ExchangeComparison.Sportsbook\Betfair.ExchangeComparison.Sportsbook.csproj">
 			<GlobalPropertiesToRemove>
 			</GlobalPropertiesToRemove>

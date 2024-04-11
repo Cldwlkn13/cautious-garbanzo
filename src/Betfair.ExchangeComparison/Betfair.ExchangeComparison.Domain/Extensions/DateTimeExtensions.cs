@@ -10,11 +10,18 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
             return TimeZoneInfo.ConvertTimeFromUtc(dateTime, BritishZone);
         }
 
-        public static long ToEpochTime(this DateTime dateTime)
+        public static long ToEpochTimeMs(this DateTime dateTime)
         {
             var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             var offSeTimeSpan = dateTime.ToUniversalTime() - origin;
             return (long)Math.Floor(offSeTimeSpan.TotalMilliseconds);
+        }
+
+        public static long ToEpochTimeSeconds(this DateTime dateTime)
+        {
+            var origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var offSeTimeSpan = dateTime.ToUniversalTime() - origin;
+            return (long)Math.Floor(offSeTimeSpan.TotalSeconds);
         }
 
         public static string ToDateTimeString(this DateTime datetime)

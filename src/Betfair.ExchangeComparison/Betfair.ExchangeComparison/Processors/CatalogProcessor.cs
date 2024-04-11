@@ -27,15 +27,21 @@ namespace Betfair.ExchangeComparison.Processors
                     sport,
                     BetfairQueryExtensions.TimeRangeForNextDays(1));
 
-                await Task.WhenAll(new Task[] { t1, t2 });
+                var t3 = _catalogService.GetMatchbookCatalogue(
+                    sport,
+                    BetfairQueryExtensions.TimeRangeForNextDays(1));
+
+                await Task.WhenAll(new Task[] { t1, t2, t3 });
 
                 var sportsbookCatalogue = t1.Result;
                 var exchangeCatalogue = t2.Result;
+                var matchbookCatalogue = t3.Result;
 
                 return new BaseCatalogModel()
                 {
                     SportsbookCatalogue = sportsbookCatalogue,
                     ExchangeCatalogue = exchangeCatalogue,
+                    MatchbookCatalogue = matchbookCatalogue,
                     HasEachWay = sport == Sport.Racing ? true : false
                 };
             }

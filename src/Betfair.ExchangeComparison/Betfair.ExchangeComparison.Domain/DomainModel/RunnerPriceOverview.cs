@@ -1,5 +1,6 @@
 ﻿using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
@@ -32,6 +33,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public double VolumeTradedBelowSportsbook { get; set; }
         public Bookmaker Bookmaker { get; set; }
         public string MappedScrapedEventName { get; set; }
+        public MatchbookRunner? MappedMatchbookRunner { get; set; }
 
         public RunnerPriceOverview()
         {
@@ -40,7 +42,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, 
             MarketDetail marketDetail, MarketCatalogue marketCatalogue, RunnerDetail sportsbookRunner, 
             Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, 
-            Bookmaker bookmaker = Bookmaker.BetfairSportsbook)
+            Bookmaker bookmaker = Bookmaker.BetfairSportsbook, MatchbookRunner? mappedMatchbookRunner = null)
         {
             Sport = sport;
             EventWithCompetition = ewc;
@@ -77,11 +79,14 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
                 ExpectedValuePlace = EachWayPlacePart.ExpectedValue(ExpectedPlacePrice);
                 ExpectedValueEachWay = ((ExpectedValueWin + ExpectedValuePlace) / 2) + 1;
             }
+
+            MappedMatchbookRunner = mappedMatchbookRunner == null ? new MatchbookRunner() : mappedMatchbookRunner;
         }
 
         public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, MarketCatalogue marketCatalogue, 
             ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, 
-            Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null)
+            Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null,
+            MatchbookRunner? mappedMatchbookRunner = null)
         {
             Sport = sport;
 
@@ -156,6 +161,8 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
                 ExpectedValuePlace = EachWayPlacePart.ExpectedValue(ExpectedPlacePrice);
                 ExpectedValueEachWay = (ExpectedValueWin + ExpectedValuePlace) + 1;
             }
+
+            MappedMatchbookRunner = mappedMatchbookRunner == null ? new MatchbookRunner() : mappedMatchbookRunner;
         }
 
         public override string ToString()

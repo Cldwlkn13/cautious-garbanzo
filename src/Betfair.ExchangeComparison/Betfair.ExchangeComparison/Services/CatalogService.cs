@@ -2,11 +2,14 @@
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
+using Betfair.ExchangeComparison.Matchbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
+using Sport = Betfair.ExchangeComparison.Domain.Enums.Sport;
 
 namespace Betfair.ExchangeComparison.Services
 {
@@ -15,6 +18,7 @@ namespace Betfair.ExchangeComparison.Services
         private readonly IExchangeHandler _exchangeHandler;
         private readonly IBetfairSportsbookHandler _bfSportsbookHandler;
         private readonly IPaddyPowerSportsbookHandler _ppSportsbookHandler;
+        private readonly IMatchbookHandler _matchbookHandler;
 
         public Dictionary<DateTime, Dictionary<Sport, Dictionary<string, Event>>> ExchangeEventStore { get; set; }
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>> ExchangeMarketCatalogueStore { get; set; }
@@ -22,11 +26,13 @@ namespace Betfair.ExchangeComparison.Services
         public Dictionary<DateTime, Dictionary<Sport, IDictionary<EventWithCompetition, IEnumerable<MarketCatalogue>>>> SportsbookMarketCatalogueStore { get; private set; }
         public Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketDetailWithEwc>>> SportsbookMarketDetailsStore { get; private set; }
 
-        public CatalogService(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, IPaddyPowerSportsbookHandler ppSportsbookHandler)
+        public CatalogService(IExchangeHandler exchangeHandler, IBetfairSportsbookHandler bfSportsbookHandler, 
+            IPaddyPowerSportsbookHandler ppSportsbookHandler, IMatchbookHandler matchbookHandler)
         {
             _exchangeHandler = exchangeHandler;
             _bfSportsbookHandler = bfSportsbookHandler;
             _ppSportsbookHandler = ppSportsbookHandler;
+            _matchbookHandler = matchbookHandler;
 
             ExchangeEventStore = new Dictionary<DateTime, Dictionary<Sport, Dictionary<string, Event>>>();
             ExchangeMarketCatalogueStore = new Dictionary<DateTime, Dictionary<Sport, IEnumerable<MarketCatalogue>>>();
@@ -88,6 +94,15 @@ namespace Betfair.ExchangeComparison.Services
             };
 
             return exchangeCatalogue;
+        }
+
+        public async Task<List<MatchbookEvent>> GetMatchbookCatalogue(Domain.Enums.Sport sport, TimeRange? timeRange = null)
+        {
+            await _matchbookHandler.GetSessionToken(true);
+
+            var events = await _matchbookHandler.GetEvents();
+
+            return events;
         }
 
         public IEnumerable<MarketDetailWithEwc> UpdateMarketDetailCatalog(Sport sport, int addDays = 1)

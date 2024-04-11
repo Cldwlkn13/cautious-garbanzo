@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
@@ -30,7 +31,8 @@ namespace Betfair.ExchangeComparison.Interfaces
         bool TryMapScrapedMarket(ScrapedEvent scrapedEvent, MarketDetail marketDetail, out ScrapedMarket result);
         bool TryMapScrapedRunner(ScrapedMarket scrapedMarket, RunnerDetail sportsbookRunner, out ScrapedRunner result);
 
-
+        bool TryMapMatchbookEvents(List<MatchbookEvent> matchbookEvents, EventWithCompetition ewc, out List<MatchbookEvent> result);
+        bool TryMapMatchbookEventToMarketDetail(List<MatchbookEvent> matchbookEvents, MarketDetail marketDetail, out MatchbookEvent result);
     }
 }
 

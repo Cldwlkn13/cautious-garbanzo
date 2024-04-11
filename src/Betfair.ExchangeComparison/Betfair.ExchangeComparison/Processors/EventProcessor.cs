@@ -1,5 +1,6 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -49,6 +50,9 @@ namespace Betfair.ExchangeComparison.Processors
                         MappedScrapedEvent = MapScrapedEvent(basePageModel, scrapedEvents, ewc);
                     }
 
+                    _ = _mappingService.TryMapMatchbookEvents(baseCatalogModel.MatchbookCatalogue, ewc, 
+                        out List<MatchbookEvent> matchbookEventsAtVenue);
+
                     foreach (var MarketDetail in MappedMarketDetailsForEvent.Where(m => m.marketStatus == "OPEN"))
                     {
                         if (basePageModel.Sport == Sport.Racing) //we have to map racing using the race time on the market detail
@@ -56,8 +60,11 @@ namespace Betfair.ExchangeComparison.Processors
                             MappedScrapedEvent = MapScrapedEvent(basePageModel, scrapedEvents, ewc, MarketDetail);
                         }
 
+                        _ = _mappingService.TryMapMatchbookEventToMarketDetail(matchbookEventsAtVenue, MarketDetail,
+                            out MatchbookEvent mappedMatchbookEvent);
+
                         var mvm = await _marketProcessor.Process(basePageModel,
-                             ewc, MarketDetail, EventWithMarketBooks, baseCatalogModel.HasEachWay, MappedScrapedEvent);
+                             ewc, MarketDetail, EventWithMarketBooks, baseCatalogModel.HasEachWay, MappedScrapedEvent, mappedMatchbookEvent);
 
                         if (mvm == null) continue;
 
