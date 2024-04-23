@@ -31,11 +31,25 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
         }
     }
 
-    public bool TryLogin() =>
-        _authHandler.TryLogin(_bookmaker);
+    public bool TryLogin()
+    {
+        var isLoginSuccessful = _authHandler.TryLogin(_bookmaker);
+        _client = new SportsbookClient(
+            _options.Value.UrlBetfair,
+            _authHandler.AppKey,
+            _authHandler.SessionTokens[_bookmaker]);
+        return isLoginSuccessful;
+    }
 
-    public bool Login(string username = "", string password = "") =>
-        _authHandler.Login(username, password, _bookmaker);
+    public bool Login(string username = "", string password = "")
+    {
+        var isLoginSuccessful = _authHandler.Login(username, password, _bookmaker);
+        _client = new SportsbookClient(
+           _options.Value.UrlBetfair,
+            _authHandler.AppKey,
+            _authHandler.SessionTokens[_bookmaker]);
+        return isLoginSuccessful;
+    }
 
     public bool SessionValid() =>
         _authHandler.SessionValid(_bookmaker);
@@ -44,11 +58,23 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
     {
         var marketFilter = new MarketFilter();
 
-        var eventTypes = _client?
+        try
+        {
+            var eventTypes = _client?
                 .ListEventTypes(marketFilter) ??
-            throw new NullReferenceException($"Event Types null.");
+                throw new NullReferenceException($"Event Types null.");
 
-        return eventTypes;
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListEventTypes)} " +
+                $"Returning {eventTypes.Count()} Event Types!");
+
+            return eventTypes;
+        }
+        catch (System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListEventTypes)} {exception}");
+            return Enumerable.Empty<EventTypeResult>();
+        }
     }
 
     public IEnumerable<CompetitionResult> ListCompetitions(
@@ -81,11 +107,23 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
             time = timeRange;
         }
 
-        var competitions = _client?
+        try
+        {
+            var competitions = _client?
                 .ListCompetitions(eventTypeId, time) ??
-            throw new NullReferenceException($"Competitions null.");
+                throw new NullReferenceException($"Competitions null.");
 
-        return competitions;
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListCompetitions)} " +
+                $"Returning {competitions.Count()} Competitions!");
+
+            return competitions;
+        }
+        catch(System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListCompetitions)} {exception}");
+            return new CompetitionResult[0];
+        }
     }
 
     public IEnumerable<Event> ListEventsByEventType(
@@ -118,11 +156,25 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
             time = timeRange;
         }
 
-        var events = _client?
+        try
+        {
+            var events = _client?
                 .ListEventsByEventType(eventTypeId, time) ??
-            throw new NullReferenceException($"Events null.");
+                throw new NullReferenceException($"Events null.");
 
-        return events.Select(e => e.Event);
+            var response = events?.Select(e => e.Event) ?? new List<Event>();
+
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListEventsByEventType)} " +
+                $"Returning {response.Count()} Events!");
+
+            return response;
+        }
+        catch (System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListEventsByEventType)} {exception}");
+            return Enumerable.Empty<Event>();
+        }
     }
 
     public Dictionary<Competition, List<Event>> ListEventsByCompetition(
@@ -151,10 +203,21 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
 
         foreach (var competition in competitions)
         {
-            var eventsInCompetition = _client?
+            IEnumerable<Event> eventsInCompetition = new List<Event>();
+
+            try
+            {
+                eventsInCompetition = _client?
                     .ListEventsByCompetition(competition, time)
                     .Select(e => e.Event) ??
-                throw new NullReferenceException($"Events in Competition={competition.Name} null.");
+                    throw new NullReferenceException($"Events in Competition={competition.Name} null.");
+            }
+            catch (System.Exception exception)
+            {
+                Console.WriteLine($"{nameof(ListEventsByCompetition)} {exception}");
+            }
+
+            if (!eventsInCompetition.Any()) continue;
 
             result.Add(competition, new List<Event>());
 
@@ -164,16 +227,32 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
             }
         }
 
+        Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            $"Action={nameof(ListEventsByCompetition)} " +
+            $"Returning {result.Count()} Competitions With Events!");
+
         return result;
     }
 
     public IEnumerable<MarketTypeResult> ListMarketTypes()
     {
-        var marketTypes = _client?
-                .ListMarketTypes("7") ??
-            throw new NullReferenceException($"Market Types null.");
+        try
+        {
+            var marketTypes = _client?
+                 .ListMarketTypes("7") ??
+                    throw new NullReferenceException($"Market Types null.");
 
-        return marketTypes;
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListMarketTypes)} " +
+                $"Returning {marketTypes.Count()} Market Types!");
+
+            return marketTypes;
+        }
+        catch (System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListMarketTypes)} {exception}");
+            return Enumerable.Empty<MarketTypeResult>();
+        }
     }
 
     public IEnumerable<MarketCatalogue> ListMarketCatalogues(
@@ -198,26 +277,50 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                 break;
         }
 
-        var marketCatalogues = _client?
-            .ListMarketCatalogue(new SportsbookMarketFilter()
-            {
-                EventIds = eventIds,
-                MarketTypes = marketTypes.ToArray()
-            },
-        maxResults: "100")
-            ??
-            throw new NullReferenceException($"Market Catalogues null.");
+        try
+        {
+            var marketCatalogues = _client?
+                .ListMarketCatalogue(new SportsbookMarketFilter()
+                {
+                    EventIds = eventIds,
+                    MarketTypes = marketTypes.ToArray()
+                },
+            maxResults: "100")
+                ??
+                throw new NullReferenceException($"Market Catalogues null.");
 
-        return marketCatalogues;
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListMarketCatalogues)} " +
+                $"Returning {marketCatalogues.Count()} Market Catalogues!");
+
+            return marketCatalogues;
+        }
+        catch (System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListMarketCatalogues)} {exception}");
+            return Enumerable.Empty<MarketCatalogue>();
+        }
     }
 
     public MarketDetails ListPrices(IEnumerable<string> marketIds)
     {
-        var prices = _client?
+        try
+        {
+            var prices = _client?
                 .ListMarketPrices(marketIds) ??
-            throw new NullReferenceException($"Prices null.");
+                throw new NullReferenceException($"Prices null.");
 
-        return prices;
+            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+                $"Action={nameof(ListPrices)} " +
+                $"Returning {prices.marketDetails.Count()} Market Details!");
+
+            return prices;
+        }
+        catch (System.Exception exception)
+        {
+            Console.WriteLine($"{nameof(ListPrices)} {exception}");
+            return new MarketDetails();
+        }
     }
 }
 

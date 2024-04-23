@@ -1,5 +1,6 @@
 ﻿using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -35,7 +36,8 @@ namespace Betfair.ExchangeComparison.Processors
 
                 var sportsbookCatalogue = t1.Result;
                 var exchangeCatalogue = t2.Result;
-                var matchbookCatalogue = t3.Result;
+                //var matchbookCatalogue = t3.Result;
+                var matchbookCatalogue = new List<MatchbookEvent>();
 
                 return new BaseCatalogModel()
                 {

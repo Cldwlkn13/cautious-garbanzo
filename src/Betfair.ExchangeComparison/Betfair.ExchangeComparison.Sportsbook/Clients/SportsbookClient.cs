@@ -68,17 +68,17 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
         {
             EndPoint = endPoint + "/rest/v1.0/";
 
-            base.BaseAddress = new Uri(EndPoint);
+            BaseAddress = new Uri(EndPoint);
 
-            base.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             if (appKey != null)
             {
-                base.DefaultRequestHeaders.TryAddWithoutValidation(APPKEY_HEADER, appKey);
+                DefaultRequestHeaders.TryAddWithoutValidation(APPKEY_HEADER, appKey);
             }
             if (sessionToken != null)
             {
-                base.DefaultRequestHeaders.TryAddWithoutValidation(SESSION_TOKEN_HEADER, sessionToken);
+                DefaultRequestHeaders.TryAddWithoutValidation(SESSION_TOKEN_HEADER, sessionToken);
             }
         }
 

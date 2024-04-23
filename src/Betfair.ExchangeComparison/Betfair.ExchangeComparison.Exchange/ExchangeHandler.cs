@@ -31,11 +31,25 @@ namespace Betfair.ExchangeComparison.Exchange
             }
         }
 
-        public bool TryLogin() =>
-            _authHandler.TryLogin(_bookmaker);
+        public bool TryLogin()
+        {
+            var isLoginSuccessful = _authHandler.TryLogin(_bookmaker);
+            _exchangeClient = new ExchangeClient(
+                _options.Value.Url,
+                _authHandler.AppKey,
+                _authHandler.SessionTokens[_bookmaker]);
+            return isLoginSuccessful;
+        }
 
-        public bool Login(string username = "", string password = "") =>
-            _authHandler.Login(username, password, _bookmaker);
+        public bool Login(string username = "", string password = "")
+        {
+            var isLoginSuccessful = _authHandler.Login(username, password, _bookmaker);
+            _exchangeClient = new ExchangeClient(
+                _options.Value.Url,
+                _authHandler.AppKey,
+                _authHandler.SessionTokens[_bookmaker]);
+            return isLoginSuccessful;
+        }
 
         public bool SessionValid() =>
             _authHandler.SessionValid(_bookmaker);

@@ -38,6 +38,7 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             {
                 var message = await _httpClient.PostAsync(new Uri($"{EndpointAddress}"), content);
                 var loginResponse = await HandleResponse<LoginResponse>(message);
+                Console.WriteLine($"Session Token Validated! {loginResponse.SessionToken}");
                 return loginResponse.SessionToken;
             }
             catch (Exception exception)
@@ -53,6 +54,7 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             {
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}"));
                 var loginResponse = await HandleResponse<LoginResponse>(message);
+                Console.WriteLine($"Session Token Validated! {loginResponse.SessionToken}");
                 return loginResponse.SessionToken;
             }
             catch (Exception exception)

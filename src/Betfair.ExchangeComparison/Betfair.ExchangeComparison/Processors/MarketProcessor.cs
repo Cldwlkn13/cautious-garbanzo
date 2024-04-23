@@ -162,7 +162,7 @@ namespace Betfair.ExchangeComparison.Processors
 
         private static MatchbookMarket MapMatchbookWinMarket(MatchbookEvent matchbookEvent)
         {
-            return matchbookEvent.Markets.FirstOrDefault(m => m.Name == "WIN") ??
+            return matchbookEvent.Markets?.FirstOrDefault(m => m.Name == "WIN") ??
                 new MatchbookMarket()
                 {
                     Runners = new List<MatchbookRunner>()

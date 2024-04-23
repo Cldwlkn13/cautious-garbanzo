@@ -13,7 +13,7 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
 
         public static MatchbookMarket WinMarket(this MatchbookEvent matchbookEvent)
         {
-            return matchbookEvent.Markets.FirstOrDefault(m => m.Name == "WIN") ?? 
+            return matchbookEvent.Markets?.FirstOrDefault(m => m.Name == "WIN") ?? 
                 new MatchbookMarket();
         }
 

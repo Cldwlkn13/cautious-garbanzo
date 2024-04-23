@@ -79,6 +79,8 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
                     "&currency=EUR" +
                     "&markets-limit=1";
 
+                return new EventsResponse() { Events = new List<MatchbookEvent>() };
+
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}{query}"));
                 var eventsResponse = await HandleResponse<EventsResponse>(message);
                 eventsResponse.Events = eventsResponse.Events.FilterUki();

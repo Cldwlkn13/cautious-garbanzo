@@ -33,26 +33,27 @@ namespace Betfair.ExchangeComparison.Handlers
                 .ToArray();
 
             List<Offer> offers = new List<Offer>();
-            try
-            {
-                if(DateTime.Now > LastRetrievedOffers.AddMinutes(5))
-                {
-                    LastRetrievedOffers = DateTime.Now;
-                    AccountOffers = await _matchbookHandler.GetOffers(allMarketIds);
-                }
-            }
-            catch
-            {
-                Console.WriteLine($"Could not retrieve Offers, exiting TradeCatalogue()");
-                return;
-            }
+            //try
+            //{
+            //    if(DateTime.Now > LastRetrievedOffers.AddMinutes(5))
+            //    {
+            //        LastRetrievedOffers = DateTime.Now;
+            //        AccountOffers = await _matchbookHandler.GetOffers(allMarketIds);
+            //    }
+            //}
+            //catch
+            //{
+            //    Console.WriteLine($"Could not retrieve Offers, exiting TradeCatalogue()");
+            //    return;
+            //}
 
             //foreach (var market in cvm.Markets.Where(m => m.Parent.Venue == "Wolverhampton"))
             foreach (var market in cvm.Markets)
-                {
-                if (market.MappedMatchbookEvent?.Id == default) continue;
+            {
+                if (market.MappedMatchbookEvent == null || market.MappedMatchbookEvent?.Id == default) continue;
 
                 var winMarket = market.MappedMatchbookEvent.WinMarket();
+
                 var marketOffers = offers.Where(o => o.MarketId == winMarket.Id);
 
                 var runnerPositions = new List<MyRunnerPosition>();
@@ -123,40 +124,47 @@ namespace Betfair.ExchangeComparison.Handlers
                     var runnerPosition = marketPosition.RunnerPositions
                         .FirstOrDefault(r => r.MatchbookRunner.Id == bestRunner.MappedMatchbookRunner?.Id);
 
-                    if (DetermineIfTrade(bestRunner, marketPosition))
+                    try
                     {
-                        if (!TryDetermineTradeOdds(bestRunner, out var tradeOdds))
+                        if (DetermineIfTrade(bestRunner, marketPosition))
                         {
-                            continue;
-                        }
-
-                        if(!TryDetermineStake(bestRunner, runnerPosition, out var tradeStake))
-                        {
-                            continue;
-                        }
-
-                        var offersRequest = NewRequest(
-                            bestRunner.MappedMatchbookRunner!.Id, 
-                            tradeStake, 
-                            tradeOdds);
-
-                        try
-                        {
-                            var offersResponse = await _matchbookHandler.PostOffer(offersRequest);
-
-                            if (offersResponse!.Offers == null) 
-                                throw new NullReferenceException($"No Offers found in response.");
-
-                            foreach(var offer in offersResponse.Offers)
+                            if (!TryDetermineTradeOdds(bestRunner, out var tradeOdds))
                             {
-                                AccountOffers.Add(offer);
+                                continue;
+                            }
+
+                            if (!TryDetermineStake(bestRunner, runnerPosition, out var tradeStake))
+                            {
+                                continue;
+                            }
+
+                            var offersRequest = NewRequest(
+                                bestRunner.MappedMatchbookRunner!.Id,
+                                tradeStake,
+                                tradeOdds);
+
+                            try
+                            {
+                                var offersResponse = await _matchbookHandler.PostOffer(offersRequest);
+
+                                if (offersResponse!.Offers == null)
+                                    throw new NullReferenceException($"No Offers found in response.");
+
+                                foreach (var offer in offersResponse.Offers)
+                                {
+                                    AccountOffers.Add(offer);
+                                }
+                            }
+                            catch
+                            {
+                                Console.WriteLine($"Could not Post Offer, continuing...");
+                                continue;
                             }
                         }
-                        catch
-                        {
-                            Console.WriteLine($"Could not Post Offer, continuing...");
-                            continue;
-                        }
+                    }
+                    catch(Exception exception)
+                    {
+                        Console.WriteLine($"TRADING_HANDLER_EXCEPTION: {exception}");
                     }
                 }           
             }
