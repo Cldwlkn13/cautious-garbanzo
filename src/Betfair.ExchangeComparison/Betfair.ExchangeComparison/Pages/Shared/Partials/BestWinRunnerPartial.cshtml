@@ -12,20 +12,22 @@
     if (Model.Sport == Domain.Enums.Sport.Racing)
     {
         if (Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes > -45)
+        {
             if (Model.ExchangeWinBestPinkRequestedLiability < 500)
             {
-                renderReason = $"<{Math.Abs(Model.TimeToStart.Minutes)} MTR, <500";
+                renderReason = $"{Model.SportsbookRunner.selectionName} <{Math.Abs(Model.TimeToStart.Minutes)} MTR, <500";
             }
-
+        }
         else if (Model.TimeToStart.Hours <= -6)
+        {
             if (Model.ExchangeWinBestPinkRequestedLiability < 250)
             {
-                renderReason = $">{Math.Abs(Model.TimeToStart.Hours)} HTR, <200";
+                renderReason = $"{Model.SportsbookRunner.selectionName} >{Math.Abs(Model.TimeToStart.Hours)} HTR, <200";
             }
-
-        else if (Model.ExpectedValueWin < 0.992 && Model.ExchangeWinBestPinkRequestedLiability < 250)
+        }
+        else if (Model.ExchangeWinBestPinkRequestedLiability < 100)
         {
-            renderReason = "-ve EV, <200";
+            renderReason = $"{Model.SportsbookRunner.selectionName} -ve EV, <150";
         }
 
         bgColor =
@@ -71,7 +73,7 @@
 }
 else
 {
-    <div class="border border-dark rounded text-lg text-white @bgColor m-1 p-1">
-        @renderReason
+    <div class="border border-dark rounded text-lg text-lightblue bg-neutral m-1 p-1">
+
     </div>
 }
