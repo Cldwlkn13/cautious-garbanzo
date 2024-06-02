@@ -1,6 +1,7 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Interfaces;
 using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
@@ -36,10 +37,25 @@ namespace Betfair.ExchangeComparison.Pages.Models
             VolumeTradedBelowSportsbook = rpo.VolumeTradedBelowSportsbook;
             ExchangeWinBestPinkRequestedLiability = rpo.BestWinAvailable[Side.LAY].RequestedLiability();
             Bookmaker = rpo.Bookmaker;
-            MappedEventName = rpo.MappedScrapedEventName;
+            MappedEventName = $"{rpo.EventWithCompetition.Event.Venue} {rpo.MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime()}";
             TimeToStart = rpo.MarketDetail.marketStartTime.TimeToStart();
             MappedMatchbookRunner = rpo.MappedMatchbookRunner;
+            WeightedAveragePrice = rpo.WeightedAveragePrice;
+            DifferenceToWeightedAveragePrice = rpo.SbkDifferenceToWeightedAveragePrice;
+            TotalRunnerVolume = rpo.TotalRunnerVolume;
+            TotalMarketVolume = rpo.TotalMarketVolume;
+            MarketMeta = this.MapMarketMeta();
 
+            if (rpo.MarketCatalogue.MarketName.Contains("Hrd") ||
+                rpo.MarketCatalogue.MarketName.Contains("Chs") ||
+                rpo.MarketCatalogue.MarketName.Contains("NHF"))
+            {
+                ModelParams = new JumpsParams(rpo);
+            }
+            else
+            {
+                ModelParams = new FlatParams(rpo);
+            }
         }
 
         public Sport Sport { get; set; }
@@ -61,11 +77,22 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double PlaceFractionDenominator { get; set; }
         public double LastPriceTraded { get; set; }
         public double VolumeTradedBelowSportsbook { get; set; }
+        public double WeightedAveragePrice { get; set; }
+        public double DifferenceToWeightedAveragePrice { get; set; }
+        public double TotalRunnerVolume { get; set; }
+        public double TotalMarketVolume { get; set; }
         public Bookmaker Bookmaker { get; set; }
         public string MappedEventName { get; set; }
         public TimeSpan TimeToStart { get; set; }
         public double ExpectedPrice {  get; set; }
         public MatchbookRunner? MappedMatchbookRunner { get; set; }
+        public IModelParams ModelParams { get; set; }
+        public MarketMeta MarketMeta { get; set; }
+
+        public override string ToString()
+        {
+            return $"{SportsbookRunner.selectionName}";
+        }
     }
 }
 

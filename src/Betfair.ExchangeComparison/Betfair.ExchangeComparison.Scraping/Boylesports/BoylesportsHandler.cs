@@ -32,8 +32,8 @@ namespace Betfair.ExchangeComparison.Scraping.Boylesports
 
             var scrapedEvent = _parser.BuildScrapedEvent(html, @event);
 
-            Console.WriteLine($"Event={@event.EventWithCompetition.Event.Name} " +
-                $"{@event.SportsbookMarket.marketStartTime} successfully scraped!");
+            //Console.WriteLine($"Event={@event.EventWithCompetition.Event.Name} " +
+            //    $"{@event.SportsbookMarket.marketStartTime} successfully scraped!");
 
             return scrapedEvent;
         }

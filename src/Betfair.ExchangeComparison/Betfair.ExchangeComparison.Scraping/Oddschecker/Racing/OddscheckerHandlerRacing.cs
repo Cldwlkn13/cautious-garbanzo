@@ -33,8 +33,8 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
 
             var scrapedEvent = _parser.BuildScrapedEvent(html, @event);
 
-            Console.WriteLine($"Event={@event.EventWithCompetition.Event.Name} " +
-                $"{@event.SportsbookMarket.marketStartTime} successfully scraped!");
+            //Console.WriteLine($"Event={@event.EventWithCompetition.Event.Name} " +
+            //    $"{@event.SportsbookMarket.marketStartTime} successfully scraped!");
 
             return scrapedEvent;
         }
@@ -44,6 +44,8 @@ namespace Betfair.ExchangeComparison.Scraping.Oddschecker.Racing
             string baseUrl = "https://www.oddschecker.com/horse-racing"; //2023-10-26-lingfield/13:20/winner
 
             var name = compoundObj.EventWithCompetition.Event.Venue.Replace(" ", "-").ToLower();
+
+            if (name == "epsom") name = "epsom-downs";
 
             var date = compoundObj.SportsbookMarket.marketStartTime
                 .ConvertUtcToBritishIrishLocalTime()

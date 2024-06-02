@@ -12,8 +12,8 @@
     @Model.SportsbookRunner.selectionName
     <span class="text-lime"> @Model.WinnerOddsString </span>
     <span class="text-lime">@Model.PlacePartOddsString </span>
-    [<span class="text-pink">@Model.ExchangeWinBestPink.ToString("0.00")</span> :
-    <span class="text-pink">@Model.ExchangePlaceBestPink.ToString("0.00")</span>]
+    [<span class="text-pink">@Model.ExchangeWinBestPink:F</span> :
+    <span class="text-pink">@Model.ExchangePlaceBestPink:F</span>]
     <span>@ev.ToString("0.0%") </span>
     <small class="text-lightblue">@Model.Bookmaker.ToString().ToLower().Substring(0, 2) </small>
 </div>

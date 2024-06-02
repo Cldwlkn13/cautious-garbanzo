@@ -1,6 +1,6 @@
-﻿using Betfair.ExchangeComparison.Matchbook;
+﻿using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
+using Betfair.ExchangeComparison.Matchbook;
 using Betfair.ExchangeComparison.Matchbook.Clients;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Betfair.ExchangeComparison.Configurations

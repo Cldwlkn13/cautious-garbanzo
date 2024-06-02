@@ -1,7 +1,7 @@
-﻿using Betfair.ExchangeComparison.Domain.Matchbook;
+﻿using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.Matchbook.Requests;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
-using Betfair.ExchangeComparison.Matchbook.Settings;
+using Betfair.ExchangeComparison.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -54,7 +54,6 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             {
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}"));
                 var loginResponse = await HandleResponse<LoginResponse>(message);
-                Console.WriteLine($"Session Token Validated! {loginResponse.SessionToken}");
                 return loginResponse.SessionToken;
             }
             catch (Exception exception)

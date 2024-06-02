@@ -1,12 +1,8 @@
 ﻿
 @using Betfair.ExchangeComparison.Domain.Extensions;
+@using Betfair.ExchangeComparison.Domain.Matchbook;
+@using Betfair.ExchangeComparison;
 @model Betfair.ExchangeComparison.Pages.Racing.IndexModel
-@*@if (!string.IsNullOrEmpty(Model.Message))
-    {
-        <script>$(function () {
-                $("#flash-message").flashMessage("Request to load Meeting Catalog Failed. Please contact support.");
-            });</script>
-    }*@
 
 <div class="row">
     <div class="col-12" id="racing-catalog">
@@ -43,6 +39,123 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-6 offset-md-1 m-1 p-3 text-sm">
+                <div class="text-light p-1">Matchbook Orders</div>
+                @foreach (var raceWithOffers in Model.CatalogViewModel.CurrentOffers.OrderByDescending(x => x.Key.TimeToStart))
+                {
+                    @if (!raceWithOffers.Value.Any() || raceWithOffers.Value.SelectMany(x => x.MatchedBets).Count() == 0) continue;
+                    <div class="m-2 p-2 bg-info text-dark border border-dark rounded">
+                        <h6>@raceWithOffers.Key.Parent.Venue @raceWithOffers.Key.SportsbookMarket.marketStartTime.ConvertUtcToBritishIrishLocalTime().ToString("HH:mm")</h6>
+                        @{
+                            var offersByRunner = raceWithOffers.Value
+                                .Where(o => o.Status == "matched" || o.Status == "open")
+                                                        .GroupBy(o => o.RunnerName);
+
+                            var grouped = offersByRunner.Select(x => new Offer
+                            {
+                                RunnerName = x.Key,
+                                Stake = x.Sum(v => (v.Stake - v.Remaining)),
+                                Odds = x.Aggregate(new Double(), (c, n) => c + ((n.Stake - n.Remaining) * (n.Odds))) / x.Sum(v => (v.Stake - v.Remaining)),
+                                Status = "matched",
+                                Side = "back",
+                                EventId = x.First().EventId
+                            });
+
+                            double stakedEv = 0;
+                        }
+                        @foreach (var offer in grouped
+                            .OrderBy(s => s.Odds)
+                            .ThenBy(s => s.RunnerName)
+                            .ThenBy(s => s.Status))
+                        {
+                            var textColor = offer.Status.ToUpper() == "OPEN" ? "text-magenta" : "text-dark";
+                            var currentPrice = @offer.GetCurrentPrice(Model.CatalogViewModel);
+                            var currentExpectedValue = currentPrice > 0 ? offer.Odds.ExpectedValue(currentPrice) : 0;
+                            var currentStakedExpectedValue = currentExpectedValue * offer.Stake;
+                            var latestWap = @offer.LatestWeightedAveragePrice(Model.CatalogViewModel);
+
+                            stakedEv += currentStakedExpectedValue;
+                            if (offer.Stake == 0) continue;
+                            <div class="bg-light @textColor m-1 p-1 border border-dark rounded">
+                                <span><strong>@offer.RunnerName.CleanRunnerName()</strong> &nbsp;</span>
+                                <span>€@offer.Stake.ToString("0.00") at </span>
+                                <span>@offer.Odds.ToString("0.00")</span>
+                                <span>--> @currentPrice.ToString("0.00")</span>
+                                @if (@offer.Status == "matched")
+                                {
+                                    var c = currentExpectedValue >= 0 ? "text-success" : "text-danger";
+                                    <span class="@c"><i>[@currentExpectedValue.ToString("0.000")]</i></span>
+                                }
+                                &nbsp
+                                <span>wap=@latestWap.ToString("0.00")</span>
+                            </div>
+                        }
+                        @{
+                            var evColor = stakedEv >= 0 ? "bg-success" : "bg-danger";
+                            <div class="ms-1 mt-3">
+                                <span class="ps-2 pe-2 pt-1 pb-1 @evColor text-light border border-dark rounded"><small>€@stakedEv.ToString("0.00")</small></span>
+                            </div>
+                        }
+
+                    </div>
+                }
+            </div>
+            <div class="col-md-5 offset-md-1 m-1 p-3">
+                @{
+                    var bestWapsAbove = Model.CatalogViewModel.Markets
+                    .SelectMany(m => m.Runners)
+                    .Where(r => r.ExcDifferenceToWeightedAveragePrice != 0)
+                    .OrderByDescending(r => r.ExcDifferenceToWeightedAveragePrice)
+                    .Take(10)
+                    .OrderBy(w => w.ParentMarket.marketStartTime);
+                 }
+                <div class="text-light p-1">Best Waps</div>
+
+                    @foreach (var runner in @bestWapsAbove)
+                    {
+                    var bgColor = @runner.ExcDifferenceToWeightedAveragePrice >= 0.05 ? "bg-primary" : "bg-secondary";
+                        var bestAvailable = @runner.ExchangeWinRunner?.BestAvailable()?.ContainsKey(Exchange.Model.Side.BACK) != null ?
+                            @runner.ExchangeWinRunner.BestAvailable()[Exchange.Model.Side.BACK].Price.ToString("0.00") : "0";
+                    var diffText = @runner.ExcDifferenceToWeightedAveragePrice >= 0.05 ? "text-lime" : "text-info";
+                    <div class="m-2 p-2 @bgColor text-dark border border-dark rounded">
+                        <span class="text-light">@runner.MappedEventName </span> &nbsp
+                        <span><strong>@runner.SportsbookRunner.selectionName</strong> </span> &nbsp
+                        <span class="text-lime">@bestAvailable </span> -
+                        <span> <span class="text-warning">@runner.WeightedAveragePrice.ToString("0.00") </span> </span>
+                        <span class="@diffText"><i>[@runner.ExcDifferenceToWeightedAveragePrice.ToString("0.000")]</i> </span>
+                        <span class="text-dark"><small>@runner.TotalRunnerVolume.ToString("0")</small> </span>
+                        </div>
+                    }
+                
+            </div>
+            <div class="col-md-5 offset-md-1 m-1 p-3">
+                @{
+                    var bestWapsBelow = Model.CatalogViewModel.Markets
+                    .SelectMany(m => m.Runners)
+                    .Where(r => r.ExcDifferenceToWeightedAveragePrice != 0)
+                    .OrderBy(r => r.ExcDifferenceToWeightedAveragePrice)
+                    .Take(10)
+                    .OrderBy(w => w.ParentMarket.marketStartTime);
+                }
+                <div class="text-light p-1">Lowest Waps</div>
+
+                @foreach (var runner in @bestWapsBelow)
+                {
+                    var bgColor = @runner.ExcDifferenceToWeightedAveragePrice <= -0.05 ? "bg-primary" : "bg-secondary";
+                    var bestAvailable = @runner.ExchangeWinRunner?.BestAvailable()?.ContainsKey(Exchange.Model.Side.BACK) != null ? 
+                        @runner.ExchangeWinRunner.BestAvailable()[Exchange.Model.Side.BACK].Price.ToString("0.00") : "0";
+                    var diffText = @runner.ExcDifferenceToWeightedAveragePrice <= -0.05 ? "text-lime" : "text-info";
+                    <div class="m-2 p-2 @bgColor text-dark border border-dark rounded">
+                        <span class="text-light">@runner.MappedEventName </span> &nbsp
+                        <span><strong>@runner.SportsbookRunner.selectionName</strong> </span> &nbsp
+                        <span class="text-lime">@bestAvailable </span> -
+                        <span> <span class="text-warning">@runner.WeightedAveragePrice.ToString("0.00") </span> </span>
+                        <span class="@diffText"><i>[@runner.ExcDifferenceToWeightedAveragePrice.ToString("0.000")]</i> </span>
+                        <span class="text-dark"><small>@runner.TotalRunnerVolume.ToString("0")</small> </span>
+                    </div>
+                }
+
+            </div>
             <div class="col-md-5 offset-md-1 m-1 p-3">
                 <div class="text-light p-1">Best Each Way</div>
                 <div class="row">
@@ -76,7 +189,6 @@
                 </div>
             </div>
         </div>
-
         <div>
             @if (Model.CatalogViewModel.UsageModel.ApiCreditUsage > 0)
             {

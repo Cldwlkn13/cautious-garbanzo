@@ -13,10 +13,8 @@ using Microsoft.Extensions.FileProviders;
 using Betfair.ExchangeComparison.Workers;
 using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Processors;
-using Betfair.ExchangeComparison.Settings;
 using Betfair.ExchangeComparison.ExpectedValueModel;
-using Betfair.ExchangeComparison.Matchbook.Settings;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
+using Betfair.ExchangeComparison.Domain.Settings;
 
 namespace Betfair.ExchangeComparison
 {
@@ -37,6 +35,7 @@ namespace Betfair.ExchangeComparison
             services.ConfigureExchange();
             services.ConfigureSportsbook();
             services.ConfigureMatchbook();
+            services.ConfigureTrading();
             services.ConfigureScrapers();
             services.ConfigureAuth();
             services.AddHealthChecks();
@@ -67,9 +66,6 @@ namespace Betfair.ExchangeComparison
             //expected value model 
             services.AddSingleton<IExpectedValueModelFlat, FlatModel>();
             services.AddSingleton<IExpectedValueModelJumps, JumpsModel>();
-
-            //trading
-            services.AddSingleton<ITradingHandler, TradingHandler>();
 
             //settings
             services.Configure<LoginSettings>(Configuration.GetSection(nameof(LoginSettings)));

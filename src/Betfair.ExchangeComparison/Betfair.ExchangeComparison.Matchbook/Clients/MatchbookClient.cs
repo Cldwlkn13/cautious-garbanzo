@@ -1,5 +1,5 @@
-﻿using Betfair.ExchangeComparison.Matchbook.Interfaces;
-using Betfair.ExchangeComparison.Matchbook.Settings;
+﻿using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
+using Betfair.ExchangeComparison.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -33,9 +33,12 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
                         return (T)Convert.ChangeType(responseContentJson, typeof(T));
                     }
 
-                    return JsonConvert.DeserializeObject<T>(responseContentJson)!;
+                    if(!string.IsNullOrEmpty(responseContentJson))          
+                        return JsonConvert.DeserializeObject<T>(responseContentJson)!;
+
+                    throw new Exception($"Invalid Response");
                 }
-                catch
+                catch(Exception exception)
                 {
                     throw;
                 }

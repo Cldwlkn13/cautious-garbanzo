@@ -64,9 +64,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                 .ListEventTypes(marketFilter) ??
                 throw new NullReferenceException($"Event Types null.");
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListEventTypes)} " +
-                $"Returning {eventTypes.Count()} Event Types!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListEventTypes)} " +
+            //    $"Returning {eventTypes.Count()} Event Types!");
 
             return eventTypes;
         }
@@ -113,9 +113,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                 .ListCompetitions(eventTypeId, time) ??
                 throw new NullReferenceException($"Competitions null.");
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListCompetitions)} " +
-                $"Returning {competitions.Count()} Competitions!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListCompetitions)} " +
+            //    $"Returning {competitions.Count()} Competitions!");
 
             return competitions;
         }
@@ -164,9 +164,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
 
             var response = events?.Select(e => e.Event) ?? new List<Event>();
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListEventsByEventType)} " +
-                $"Returning {response.Count()} Events!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListEventsByEventType)} " +
+            //    $"Returning {response.Count()} Events!");
 
             return response;
         }
@@ -227,9 +227,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
             }
         }
 
-        Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-            $"Action={nameof(ListEventsByCompetition)} " +
-            $"Returning {result.Count()} Competitions With Events!");
+        //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+        //    $"Action={nameof(ListEventsByCompetition)} " +
+        //    $"Returning {result.Count()} Competitions With Events!");
 
         return result;
     }
@@ -242,9 +242,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                  .ListMarketTypes("7") ??
                     throw new NullReferenceException($"Market Types null.");
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListMarketTypes)} " +
-                $"Returning {marketTypes.Count()} Market Types!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListMarketTypes)} " +
+            //    $"Returning {marketTypes.Count()} Market Types!");
 
             return marketTypes;
         }
@@ -289,9 +289,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                 ??
                 throw new NullReferenceException($"Market Catalogues null.");
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListMarketCatalogues)} " +
-                $"Returning {marketCatalogues.Count()} Market Catalogues!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListMarketCatalogues)} " +
+            //    $"Returning {marketCatalogues.Count()} Market Catalogues!");
 
             return marketCatalogues;
         }
@@ -310,9 +310,9 @@ public class BetfairSportsbookHandler : IBetfairSportsbookHandler
                 .ListMarketPrices(marketIds) ??
                 throw new NullReferenceException($"Prices null.");
 
-            Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
-                $"Action={nameof(ListPrices)} " +
-                $"Returning {prices.marketDetails.Count()} Market Details!");
+            //Console.WriteLine($"Source={nameof(BetfairSportsbookHandler)} " +
+            //    $"Action={nameof(ListPrices)} " +
+            //    $"Returning {prices.marketDetails.Count()} Market Details!");
 
             return prices;
         }

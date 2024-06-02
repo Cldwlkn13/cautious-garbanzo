@@ -1,11 +1,11 @@
-﻿using Betfair.ExchangeComparison.Domain.Matchbook;
+﻿using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
+using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Domain.Matchbook.Requests;
+using Betfair.ExchangeComparison.Domain.Settings;
 using Betfair.ExchangeComparison.Exchange.Model;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
-using Betfair.ExchangeComparison.Matchbook.Settings;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using System.Reflection.Metadata.Ecma335;
 using Exception = System.Exception;
 
 namespace Betfair.ExchangeComparison.Matchbook
@@ -16,15 +16,17 @@ namespace Betfair.ExchangeComparison.Matchbook
         private readonly IAccountClient _accountClient;
         private readonly ICatalogueClient _catalogueClient;
         private readonly IBettingClient _bettingClient;
+        private readonly IReportsClient _reportsClient;
         private readonly IOptions<MatchbookSettings> _settings;
 
         public MatchbookHandler(ISessionClient client, IAccountClient accountClient, ICatalogueClient catalogueClient,
-            IBettingClient bettingClient, IOptions<MatchbookSettings> settings)
+            IBettingClient bettingClient, IReportsClient reportsClient, IOptions<MatchbookSettings> settings)
         {
             _sessionClient = client;
             _accountClient = accountClient;
             _catalogueClient = catalogueClient;
             _bettingClient = bettingClient;
+            _reportsClient = reportsClient;
             _settings = settings;
         }
 
@@ -34,11 +36,17 @@ namespace Betfair.ExchangeComparison.Matchbook
         public async Task PostSessionToken()
         {
             SessionToken = await _sessionClient.PostSessionToken();
+            UpdateClients(SessionToken);
         }
 
         public async Task GetSessionToken(bool refreshToken = true)
         {
-            SessionToken = await _sessionClient.GetSessionToken(refreshToken);
+            var result = await _sessionClient.GetSessionToken(refreshToken);
+            if(result != SessionToken)
+            {
+                UpdateClients(result);
+            }
+            SessionToken = result;
         }
 
         public async Task DeleteSessionToken()
@@ -46,12 +54,20 @@ namespace Betfair.ExchangeComparison.Matchbook
             SessionToken = await _sessionClient.DeleteSessionToken(SessionToken);
         }
 
+        private void UpdateClients(string token)
+        {
+            _accountClient.SessionToken = token;
+            _bettingClient.SessionToken = token;
+            _catalogueClient.SessionToken = token;
+            _reportsClient.SessionToken = token;
+        }
+
         //ACCOUNT
         public async Task<Account?> GetAccount()
         {
             try
             {
-                return await _accountClient.GetAccount(SessionToken);
+                return await _accountClient.GetAccount();
             }
             catch (InvalidDataException exception)
             {
@@ -64,7 +80,7 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                return await _accountClient.GetBalance(SessionToken);
+                return await _accountClient.GetBalance();
             }
             catch (InvalidDataException exception)
             {
@@ -81,10 +97,10 @@ namespace Betfair.ExchangeComparison.Matchbook
             var total = 0;
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
+                await GetSessionToken(true);
                 do
                 {
-                    var response = await _catalogueClient.GetSports(SessionToken, offset);
+                    var response = await _catalogueClient.GetSports(offset);
                     result.AddRange(response!.Sports);
                     total = response.Total;
                     offset += response.PerPage;
@@ -106,8 +122,8 @@ namespace Betfair.ExchangeComparison.Matchbook
 
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                return await _catalogueClient.GetAccountSports(SessionToken) ??
+                await GetSessionToken(true);
+                return await _catalogueClient.GetAccountSports() ??
                     throw new NullReferenceException($"API responded with NULL Account Sports");
             }
             catch (InvalidDataException exception)
@@ -124,10 +140,10 @@ namespace Betfair.ExchangeComparison.Matchbook
             var total = 0;
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
+                await GetSessionToken(true);
                 do
                 {
-                    var response = await _catalogueClient.GetEvents(SessionToken, offset);
+                    var response = await _catalogueClient.GetEvents(offset);
                     result.AddRange(response!.Events);
                     total = response.Total;
                     offset += response.PerPage;
@@ -147,8 +163,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                return await _catalogueClient.GetSingleEvent(SessionToken, eventId);
+                await GetSessionToken(true);
+                return await _catalogueClient.GetSingleEvent(eventId);
             }
             catch (InvalidDataException exception)
             {
@@ -164,10 +180,10 @@ namespace Betfair.ExchangeComparison.Matchbook
             var total = 0;
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
+                await GetSessionToken(true);
                 do
                 {
-                    var response = await _catalogueClient.GetMarkets(SessionToken, eventId, offset);
+                    var response = await _catalogueClient.GetMarkets(eventId, offset);
                     result.AddRange(response!.Markets);
                     total = response.Total;
                     offset += response.PerPage;
@@ -187,8 +203,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                return await _catalogueClient.GetSingleMarket(SessionToken, eventId, marketId);
+                await GetSessionToken(true);
+                return await _catalogueClient.GetSingleMarket(eventId, marketId);
             }
             catch (InvalidDataException exception)
             {
@@ -201,8 +217,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                var response = await _catalogueClient.GetRunners(SessionToken, eventId, marketId);
+                await GetSessionToken(true);
+                var response = await _catalogueClient.GetRunners(eventId, marketId);
                 return response.Runners;
             }
             catch (InvalidDataException exception)
@@ -216,8 +232,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                return await _catalogueClient.GetSingleRunner(SessionToken, eventId, marketId, runnerId);
+                await GetSessionToken(true);
+                return await _catalogueClient.GetSingleRunner(eventId, marketId, runnerId);
             }
             catch (InvalidDataException exception)
             {
@@ -230,8 +246,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                var response = await _catalogueClient.GetPrices(SessionToken, eventId, marketId, runnerId);
+                await GetSessionToken(true);
+                var response = await _catalogueClient.GetPrices(eventId, marketId, runnerId);
                 return response.Prices;
             }
             catch (Exception exception)
@@ -246,8 +262,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                var response = await _bettingClient.PostOffer(SessionToken, request) ??
+                await GetSessionToken(true);
+                var response = await _bettingClient.PostOffer(request) ??
                         throw new NullReferenceException($"MatchbookHandler:Post Offer Failed! " +
                         $"{JsonConvert.SerializeObject(request)}");
 
@@ -259,17 +275,50 @@ namespace Betfair.ExchangeComparison.Matchbook
             }
         }
 
-        public async Task<List<Offer>> GetOffers(long[] marketIds)
+        public async Task<List<Offer>> DeleteOffers(long runnerId)
         {
-            var idsAsString = String.Join(",", marketIds); 
-
+            var result = new List<Offer>();
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                var response = await _bettingClient.GetOffers(SessionToken, marketIds) ??
-                        throw new NullReferenceException($"Could not load Offers");
+                await GetSessionToken(true);
 
-                return response!.Offers;
+  
+                var response = await _bettingClient.DeleteOffer(runnerId) ??
+                       throw new NullReferenceException($"Could not delete Offers");
+
+                result.AddRange(response.Offers);
+
+                return result;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Offer>> GetOffers(long[] marketIds)
+        {
+
+            var result = new List<Offer>();
+            var offset = 0;
+            try
+            {
+                await GetSessionToken(true);
+
+                int responseCount;
+                do
+                {
+                    var response = await _bettingClient.GetOffers(marketIds, offset) ??
+                            throw new NullReferenceException($"Could not load Offers");
+
+                    result.AddRange(response.Offers);
+                    responseCount = response.Offers.Count();
+
+                    offset += 20;
+                }
+                while (responseCount > 0);
+
+                return result;
             }
             catch
             {
@@ -281,8 +330,8 @@ namespace Betfair.ExchangeComparison.Matchbook
         {
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-                var response = await _bettingClient.GetOffer(SessionToken, offerId) ??
+                await GetSessionToken(true);
+                var response = await _bettingClient.GetOffer(offerId) ??
                         throw new NullReferenceException($"Could not load Offer");
 
                 return response!;
@@ -300,13 +349,12 @@ namespace Betfair.ExchangeComparison.Matchbook
             var result = new List<AggregatedMatchedBets>();
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
-
+                await GetSessionToken(true);
                 int offset = 0;
                 int total = 0;
                 do
                 {
-                    var response = await _bettingClient.GetAggregatedMatchedBets(SessionToken, marketIds, offset) ??
+                    var response = await _bettingClient.GetAggregatedMatchedBets(marketIds, offset) ??
                         throw new NullReferenceException($"Could not load AggregatedMatchedBets");
 
                     result.Add(response);
@@ -333,10 +381,10 @@ namespace Betfair.ExchangeComparison.Matchbook
             var total = 0;
             try
             {
-                SessionToken = await _sessionClient.GetSessionToken(true);
+                await GetSessionToken(true);
                 do
                 {
-                    var response = await _bettingClient.GetPositions(SessionToken, marketIds) ??
+                    var response = await _bettingClient.GetPositions(marketIds) ??
                         throw new NullReferenceException($"Could not load Positions");
 
                     result.AddRange(response!.Positions);
@@ -352,6 +400,38 @@ namespace Betfair.ExchangeComparison.Matchbook
                 throw;
             }
         }
+
+        //REPORTS
+        public async Task<List<SettledBetMarket>> GetSettledBets(string sportId, TimeRange timeRange)
+        {
+            var AfterEpoch = timeRange.From.Date.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+            var BeforeEpoch = timeRange.To.Date.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+
+            var result = new List<SettledBetMarket>();
+            var offset = 0;
+            var total = 0;
+            try
+            {
+                await GetSessionToken(true);
+                do
+                {
+                    var response = await _reportsClient.GetSettledBets(sportId, BeforeEpoch, AfterEpoch, offset) ??
+                        throw new NullReferenceException($"Could not load Settled Bets");
+
+                    result.AddRange(response!.markets);
+                    total = response.total;
+                    offset += response.perpage;
+                }
+                while (offset < total);
+
+                return result;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
     }
 }
 

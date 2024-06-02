@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Interfaces;
 
 namespace Betfair.ExchangeComparison.Workers
@@ -26,6 +27,8 @@ namespace Betfair.ExchangeComparison.Workers
                 {
                     if (_scrapingControl.SwitchBoard[provider])
                     {
+                        ConsoleExtensions.WriteLine($"Initializing Scraping Cycle for {provider}", ConsoleColor.Green);
+                        
                         var catalog = _catalogService.UpdateMarketDetailCatalog(Sport.Racing, 1);
 
                         if (!catalog.Any())

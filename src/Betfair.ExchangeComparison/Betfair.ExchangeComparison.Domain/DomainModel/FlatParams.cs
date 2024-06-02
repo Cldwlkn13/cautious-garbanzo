@@ -1,6 +1,9 @@
-﻿namespace Betfair.ExchangeComparison.Domain.DomainModel
+﻿using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Interfaces;
+
+namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
-    public class FlatParams
+    public class FlatParams : IModelParams
     {
         public bool IsTurf { get; set; }
         public bool IsSprintDistance { get; set; }
@@ -19,7 +22,7 @@
         {
             var furlongs = Furlongs(rpo.MarketCatalogue.MarketName);
 
-            IsTurf = false;
+            IsTurf = !MetaExtensions.AllWeatherTracks().Contains(rpo.EventWithCompetition.Event.Venue);
             IsSprintDistance = GetIsSprintDistance(furlongs);
             IsMileDistance = GetIsMileDistance(furlongs);
             IsMidDistance = GetIsMidDistance(furlongs);
@@ -33,6 +36,7 @@
             IsShortPrice = GetIsShortPrice(rpo.SportsbookRunner.winRunnerOdds.@decimal);
             IsMidPrice = GetIsMidPrice(rpo.SportsbookRunner.winRunnerOdds.@decimal);
         }
+
 
         private static bool GetIsSprintDistance(int furlongs)
         {

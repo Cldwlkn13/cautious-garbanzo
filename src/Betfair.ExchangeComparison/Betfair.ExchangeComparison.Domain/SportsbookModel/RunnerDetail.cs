@@ -1,5 +1,4 @@
-﻿using System;
-namespace Betfair.ExchangeComparison.Sportsbook.Model
+﻿namespace Betfair.ExchangeComparison.Sportsbook.Model
 {
     public class RunnerDetail
     {
@@ -10,6 +9,11 @@ namespace Betfair.ExchangeComparison.Sportsbook.Model
         public EachwayRunnerOdds eachwayRunnerOdds { get; set; }
         public double handicap { get; set; }
         public string runnerStatus { get; set; }
+
+        public override string ToString()
+        {
+            return $"{selectionName}";
+        }
     }
 }
 

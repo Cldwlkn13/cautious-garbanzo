@@ -254,8 +254,9 @@ namespace Betfair.ExchangeComparison.Services
 
         public bool TryMapMatchbookEvents(List<MatchbookEvent> matchbookEvents, EventWithCompetition ewc, out List<MatchbookEvent> result)
         {
+            var venue = ewc.Event.Venue == "Chelmsford City" ? "Chelmsford" : ewc.Event.Venue;
             var mappedEvents = matchbookEvents.Where(s =>
-                 s.Name.ToLower().Contains(ewc.Event.Venue.ToLower()));
+                 s.Name.ToLower().Contains(venue.ToLower()));
 
             if (mappedEvents == null)
             {

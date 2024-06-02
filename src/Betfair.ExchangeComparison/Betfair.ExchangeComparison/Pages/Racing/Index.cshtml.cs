@@ -1,5 +1,6 @@
 ﻿using Betfair.ExchangeComparison.Domain.Definitions.Sport;
 using Betfair.ExchangeComparison.Domain.Enums;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.ScrapingModel;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
@@ -73,7 +74,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                 var usageModel = await _scrapingOrchestrator.Usage();
                 CatalogViewModel.UsageModel = usageModel;
 
-                await _tradingHandler.TradeCatalogue(CatalogViewModel);
+                CatalogViewModel = await _tradingHandler.TradeCatalogue(CatalogViewModel);
+                CatalogViewModel.CurrentOffers = CatalogViewModel.Markets.ToDictionary(o => o, o => o.CurrentMarketOffers);
 
                 return Page();
             }
@@ -150,7 +152,8 @@ namespace Betfair.ExchangeComparison.Pages.Racing
                 var usageModel = await _scrapingOrchestrator.Usage();
                 result.UsageModel = usageModel;
 
-                await _tradingHandler.TradeCatalogue(result);
+                result = await _tradingHandler.TradeCatalogue(result);
+                result.CurrentOffers = result.Markets.ToDictionary(o => o, o => o.CurrentMarketOffers);
 
                 return result;
             }

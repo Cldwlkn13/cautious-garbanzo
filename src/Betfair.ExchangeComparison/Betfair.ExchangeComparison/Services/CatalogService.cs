@@ -2,11 +2,11 @@
 using Betfair.ExchangeComparison.Domain.DomainModel;
 using Betfair.ExchangeComparison.Domain.Enums;
 using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
 using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Interfaces;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Interfaces;
 using Betfair.ExchangeComparison.Sportsbook.Model;
 using Sport = Betfair.ExchangeComparison.Domain.Enums.Sport;
@@ -96,8 +96,15 @@ namespace Betfair.ExchangeComparison.Services
             return exchangeCatalogue;
         }
 
-        public async Task<List<MatchbookEvent>> GetMatchbookCatalogue(Domain.Enums.Sport sport, TimeRange? timeRange = null)
+        public async Task<List<MatchbookEvent>> GetMatchbookCatalogue(Sport sport, TimeRange? timeRange = null)
         {
+            var settledMarkets = await _matchbookHandler.GetSettledBets(MatchbookExtensions.HorseRacingId, 
+                new TimeRange()
+                {
+                    From = DateTime.Now.Date.AddDays(-1),
+                    To = DateTime.Now.Date.AddDays(0)
+                });
+            
             await _matchbookHandler.GetSessionToken(true);
 
             var events = await _matchbookHandler.GetEvents();

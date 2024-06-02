@@ -17,11 +17,15 @@ namespace Betfair.ExchangeComparison.Processors
         private readonly IRunnerProcessor _runnerProcessor;
         private readonly IPricingComparisonHandler _pricingComparisonHandler;
 
+        private readonly List<string> Exceptions;
+
         public MarketProcessor(IMappingService mappingService, IRunnerProcessor runnerProcessor, IPricingComparisonHandler pricingComparisonHandler)
         {
             _mappingService = mappingService;
             _runnerProcessor = runnerProcessor;
             _pricingComparisonHandler = pricingComparisonHandler;
+
+            Exceptions = new List<string>();
         }
 
         public async Task<MarketViewModel?> Process(BasePageModel basePageModel, EventWithCompetition ewc, MarketDetail marketDetail, 
@@ -118,10 +122,16 @@ namespace Betfair.ExchangeComparison.Processors
             }
             catch (System.Exception exception)
             {
-                Console.WriteLine($"MARKET_PROCESSOR_EXCEPTION; " +
+                var exceptionLog = $"MARKET_PROCESSOR_EXCEPTION; " +
                    $"Exception={exception.Message}; " +
                    $"Market={marketDetail.marketName} {marketDetail.marketStartTime}; " +
-                   $"Event={ewc.Event.Name}");
+                   $"Event={ewc.Event.Name}";
+
+                if (!Exceptions.Contains(exceptionLog))
+                {
+                    Console.WriteLine(exceptionLog);
+                    Exceptions.Add(exceptionLog);
+                }
 
                 return null;
             }

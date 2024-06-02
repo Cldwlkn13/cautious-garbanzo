@@ -23,7 +23,7 @@ namespace Betfair.ExchangeComparison.Domain.Matchbook
         [JsonProperty("currency")]
         public string Currency { get; set; }
         [JsonProperty("created-at")]
-        public string CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         [JsonProperty("status")]
         public string Status { get; set; }
         [JsonProperty("in-play")]

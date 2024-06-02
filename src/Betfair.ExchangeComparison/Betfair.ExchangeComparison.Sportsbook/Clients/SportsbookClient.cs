@@ -91,7 +91,7 @@ namespace Betfair.ExchangeComparison.Sportsbook.Clients
 
             var body = JsonConvert.Serialize(obj);
 
-            Console.WriteLine("Calling Sportsbook: " + method + " With body: " + body);
+            //Console.WriteLine("Calling Sportsbook: " + method + " With body: " + body);
 
             HttpContent content = new StringContent(body, Encoding.UTF8, "application/json");
 

@@ -1,10 +1,11 @@
 ﻿using Betfair.ExchangeComparison.Domain.Matchbook;
-using System.Collections.Generic;
 
 namespace Betfair.ExchangeComparison.Domain.Extensions
 {
     public static class MatchbookExtensions
     {
+        public static string HorseRacingId = "24735152712200";
+
         public static string CleanRunnerName(this string  runnerName)
         {
             var split = runnerName.Split(new char[] { ' ' }, 2);
@@ -29,6 +30,11 @@ namespace Betfair.ExchangeComparison.Domain.Extensions
         }
 
         public static int GetClosestTick(this double price)
+        {
+            var bestMatch = MatchbookOddsLadder.PriceToTick.OrderBy(e => Math.Abs(e.Key - price)).FirstOrDefault();
+            return bestMatch.Value;
+        }
+        public static int GetClosestTick(this float price)
         {
             var bestMatch = MatchbookOddsLadder.PriceToTick.OrderBy(e => Math.Abs(e.Key - price)).FirstOrDefault();
             return bestMatch.Value;

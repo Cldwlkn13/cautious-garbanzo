@@ -29,8 +29,14 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         public double ExpectedValuePlace { get; set; }
         public double ExpectedValueEachWay { get; set; }
         public double LastPriceTradedWin { get; set; }
-        public double LastPriceTradedPlace { get; set; }
+        public double LastPriceTradedPlace { get; set; } 
         public double VolumeTradedBelowSportsbook { get; set; }
+        public double BestExchangeWinPrice { get; set; }
+        public double WeightedAveragePrice { get; set; }
+        public double SbkDifferenceToWeightedAveragePrice { get; set; }
+        public double ExcDifferenceToWeightedAveragePrice { get; set; }
+        public double TotalRunnerVolume { get; set; }
+        public double TotalMarketVolume { get; set; }
         public Bookmaker Bookmaker { get; set; }
         public string MappedScrapedEventName { get; set; }
         public MatchbookRunner? MappedMatchbookRunner { get; set; }
@@ -39,7 +45,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
         {
         }
 
-        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, 
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketBook marketbook,
             MarketDetail marketDetail, MarketCatalogue marketCatalogue, RunnerDetail sportsbookRunner, 
             Runner exchangeWinRunner, Runner? exchangePlaceRunner = null, 
             Bookmaker bookmaker = Bookmaker.BetfairSportsbook, MatchbookRunner? mappedMatchbookRunner = null)
@@ -65,6 +71,15 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             VolumeTradedBelowSportsbook = exchangeWinRunner.TradedVolumeBelowSportsbook(
                 SportsbookRunner.winRunnerOdds.@decimal);
 
+            var totalRunnerVolume = exchangeWinRunner.TradedVolume().Sum(v => v.Size);
+            var wap = exchangeWinRunner.TradedVolume().WeightedAverage(x => x.Price, y => y.Size);
+
+            TotalRunnerVolume = totalRunnerVolume;
+            TotalMarketVolume = marketbook.TotalMatched;
+            BestExchangeWinPrice = exchangeWinRunner?.BestAvailable() != null && exchangeWinRunner.BestAvailable().ContainsKey(Side.BACK) ? exchangeWinRunner.BestAvailable()[Side.BACK].Price : 0;
+            WeightedAveragePrice = wap;
+            SbkDifferenceToWeightedAveragePrice = (1 / wap) - (1 / SportsbookRunner.winRunnerOdds.@decimal);
+            ExcDifferenceToWeightedAveragePrice = BestExchangeWinPrice > 0 ? (1 / wap) - (1 / BestExchangeWinPrice) : 0;
             NumberEachWayPlaces = marketDetail.numberOfPlaces;
             EachWayFraction = marketDetail.placeFractionDenominator;
 
@@ -83,7 +98,7 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
             MappedMatchbookRunner = mappedMatchbookRunner == null ? new MatchbookRunner() : mappedMatchbookRunner;
         }
 
-        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketDetail marketDetail, MarketCatalogue marketCatalogue, 
+        public RunnerPriceOverview(Sport sport, EventWithCompetition ewc, MarketBook marketbook, MarketDetail marketDetail, MarketCatalogue marketCatalogue, 
             ScrapedMarket scrapedMarket, Runner exchangeWinRunner, RunnerDetail sportsbookRunner, ScrapedRunner scrapedRunner, 
             Runner? exchangePlaceRunner = null, Bookmaker bookmaker = Bookmaker.BetfairSportsbook, ScrapedEvent ? scrapedEvent = null,
             MatchbookRunner? mappedMatchbookRunner = null)
@@ -122,8 +137,17 @@ namespace Betfair.ExchangeComparison.Domain.DomainModel
                 SportsbookRunner = sportsbookRunner;
             }
 
+            var totalRunnerVolume = exchangeWinRunner.TradedVolume().Sum(v => v.Size);
+            var wap = exchangeWinRunner.TradedVolume().WeightedAverage(x => x.Price, y => y.Size);
+
+            TotalRunnerVolume = totalRunnerVolume;
+            TotalMarketVolume = marketbook.TotalMatched;
+            WeightedAveragePrice = wap;
             ExchangeWinRunner = exchangeWinRunner;
             BestWinAvailable = exchangeWinRunner.BestAvailable();
+            BestExchangeWinPrice = exchangeWinRunner?.BestAvailable() != null && exchangeWinRunner.BestAvailable().ContainsKey(Side.BACK) ? exchangeWinRunner.BestAvailable()[Side.BACK].Price : 0;
+            SbkDifferenceToWeightedAveragePrice = (1 / wap) - (1 / SportsbookRunner.winRunnerOdds.@decimal);
+            ExcDifferenceToWeightedAveragePrice = BestExchangeWinPrice > 0 ? (1 / wap) - (1 / BestExchangeWinPrice) : 0;
             ExpectedWinPrice = BestWinAvailable.ExpectedPrice(0);
             ExpectedValueWin = SportsbookRunner.winRunnerOdds.@decimal.ExpectedValue(ExpectedWinPrice);
             LastPriceTradedWin = exchangeWinRunner.LastPriceTraded();

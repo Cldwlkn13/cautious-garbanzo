@@ -11,25 +11,6 @@
 
     if (Model.Sport == Domain.Enums.Sport.Racing)
     {
-        if (Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes > -45)
-        {
-            if (Model.ExchangeWinBestPinkRequestedLiability < 500)
-            {
-                renderReason = $"{Model.SportsbookRunner.selectionName} <{Math.Abs(Model.TimeToStart.Minutes)} MTR, <500";
-            }
-        }
-        else if (Model.TimeToStart.Hours <= -6)
-        {
-            if (Model.ExchangeWinBestPinkRequestedLiability < 250)
-            {
-                renderReason = $"{Model.SportsbookRunner.selectionName} >{Math.Abs(Model.TimeToStart.Hours)} HTR, <200";
-            }
-        }
-        else if (Model.ExchangeWinBestPinkRequestedLiability < 100)
-        {
-            renderReason = $"{Model.SportsbookRunner.selectionName} -ve EV, <150";
-        }
-
         bgColor =
              Model.TimeToStart.Hours > -1 && Model.TimeToStart.Minutes >= -45 ? "bg-neutral" : 
              Model.TimeToStart.Hours <= -6 ? "bg-neutral" :
@@ -67,8 +48,9 @@
         ]  
         <span>@ev.ToString("0.0%") </span>
         <small class="text-pink">@Model.LastPriceTraded.ToString("0.00") </small>
-        <small class="text-orange">@Model.VolumeTradedBelowSportsbook.ToString("0.00") </small>
+        <small class="text-light">@Model.VolumeTradedBelowSportsbook.ToString("0.00") </small>
         <small class="text-lightblue">@Model.Bookmaker.ToString().ToLower().Substring(0, 2) </small>&nbsp
+        <small class="text-orange">wap=@Model.WeightedAveragePrice.ToString("0.00") </small>
     </div>
 }
 else

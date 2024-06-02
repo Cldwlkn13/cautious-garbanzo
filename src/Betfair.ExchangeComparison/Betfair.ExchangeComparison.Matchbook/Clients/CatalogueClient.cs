@@ -1,18 +1,27 @@
 ﻿using Betfair.ExchangeComparison.Domain.Extensions;
+using Betfair.ExchangeComparison.Domain.Interfaces.Matchbook;
 using Betfair.ExchangeComparison.Domain.Matchbook;
-using Betfair.ExchangeComparison.Matchbook.Interfaces;
-using Betfair.ExchangeComparison.Matchbook.Settings;
+using Betfair.ExchangeComparison.Domain.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Linq;
 using System.Net.Http.Headers;
 
 namespace Betfair.ExchangeComparison.Matchbook.Clients
 {
     public class CatalogueClient : MatchbookClient, ICatalogueClient
     {
+        private string _sessionToken;
         protected readonly HttpClient _httpClient;
         protected override string EndpointAddress { get => $"{DomainAddress}/edge/rest"; }
+        public string SessionToken
+        {
+            get => _sessionToken;
+            set
+            {
+                _httpClient.HandleSessionTokenHeader(value);
+                _sessionToken = value;
+            }
+        }
 
         public CatalogueClient(HttpClient httpClient, IOptions<MatchbookSettings> settings, ILogger<MatchbookClient> logger) :
             base(settings, logger)
@@ -23,11 +32,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "api-doc-test-client");
         }
 
-        public async Task<SportsResponse?> GetSports(string sessionToken, int offset)
+        public async Task<SportsResponse?> GetSports(int offset)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"offset={offset}&per-page=20&order=name%20asc&status=active";
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}/lookups/sports?{query}"));
                 var sportsResponse = await HandleResponse<SportsResponse>(message);
@@ -40,11 +48,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<List<MatchbookSport>?> GetAccountSports(string sessionToken)
+        public async Task<List<MatchbookSport>?> GetAccountSports()
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}/account/sports"));
                 var sports = await HandleResponse<List<MatchbookSport>>(message);
                 return sports;
@@ -56,18 +63,18 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<EventsResponse> GetEvents(string sessionToken, int offset)
+        public async Task<EventsResponse> GetEvents(int offset)
         {
+            var AfterEpoch = DateTime.Now.Date.AddDays(0).ToEpochTimeSeconds().ToString();
             var BeforeEpoch = DateTime.Now.Date.AddDays(1).ToEpochTimeSeconds().ToString();
-            var HorseRacingId = "24735152712200";
 
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events?offset={offset}" +
                     "&per-page=20" +
+                    $"&after={AfterEpoch}" +
                     $"&before={BeforeEpoch}" +
-                    $"&sport-ids={HorseRacingId}" +
+                    $"&sport-ids={MatchbookExtensions.HorseRacingId}" +
                     "&states=open" +
                     "&exchange-type=back-lay" +
                     "&odds-type=DECIMAL" +
@@ -79,7 +86,7 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
                     "&currency=EUR" +
                     "&markets-limit=1";
 
-                return new EventsResponse() { Events = new List<MatchbookEvent>() };
+                //return new EventsResponse() { Events = new List<MatchbookEvent>() };
 
                 var message = await _httpClient.GetAsync(new Uri($"{EndpointAddress}{query}"));
                 var eventsResponse = await HandleResponse<EventsResponse>(message);
@@ -94,11 +101,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<MatchbookEvent> GetSingleEvent(string sessionToken, long eventId)
+        public async Task<MatchbookEvent> GetSingleEvent(long eventId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}?" +
                     "&exchange-type=back-lay" +
                     "&odds-type=DECIMAL" +
@@ -121,11 +127,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<MarketsResponse> GetMarkets(string sessionToken, long eventId, int offset)
+        public async Task<MarketsResponse> GetMarkets(long eventId, int offset)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}/markets?offset={offset}" +
                     "&per-page=3" +
                     "&states=open" +
@@ -149,11 +154,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<MatchbookMarket> GetSingleMarket(string sessionToken, long eventId, long marketId)
+        public async Task<MatchbookMarket> GetSingleMarket(long eventId, long marketId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}/markets/{marketId}?" +
                     "&exchange-type=back-lay" +
                     "&odds-type=DECIMAL" +
@@ -175,11 +179,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<RunnersResponse> GetRunners(string sessionToken, long eventId, long marketId)
+        public async Task<RunnersResponse> GetRunners(long eventId, long marketId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}/markets/{marketId}?" +
                     "&states=open" +
                     "&exchange-type=back-lay" +
@@ -202,11 +205,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<MatchbookRunner> GetSingleRunner(string sessionToken, long eventId, long marketId, long runnerId)
+        public async Task<MatchbookRunner> GetSingleRunner(long eventId, long marketId, long runnerId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}/markets/{marketId}/runners/{runnerId}?" +
                     "&exchange-type=back-lay" +
                     "&odds-type=DECIMAL" +
@@ -228,11 +230,10 @@ namespace Betfair.ExchangeComparison.Matchbook.Clients
             }
         }
 
-        public async Task<PricesResponse> GetPrices(string sessionToken, long eventId, long marketId, long runnerId)
+        public async Task<PricesResponse> GetPrices(long eventId, long marketId, long runnerId)
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Add("session-token", sessionToken);
                 var query = $"/events/{eventId}/markets/{marketId}/runners/{runnerId}/prices?" +
                     "&exchange-type=back-lay" +
                     "&odds-type=DECIMAL" +

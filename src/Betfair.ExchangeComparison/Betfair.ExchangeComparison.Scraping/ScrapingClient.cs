@@ -65,7 +65,7 @@ namespace Betfair.ExchangeComparison.Scraping
             string html = string.Empty;
             try
             {
-                Console.WriteLine($"Calling ZenRows with Url={url}");
+                //Console.WriteLine($"Calling ZenRows with Url={url}");
 
                 var result = await RetryPolicy().ExecuteAsync(
                      () => client.ExecuteAsync(request));
@@ -130,7 +130,7 @@ namespace Betfair.ExchangeComparison.Scraping
 
                 var content = result.Content == null ? "" : result.Content;
 
-                Console.WriteLine($"Usage={content}");
+                //Console.WriteLine($"Usage={content}");
 
                 var usageModel = JsonConvert.DeserializeObject<UsageModel>(content) ??
                     throw new NullReferenceException($"USAGE_MODEL_PARSE_FAILURE");

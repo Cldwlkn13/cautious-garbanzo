@@ -7,7 +7,6 @@ using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
-using System.Linq;
 
 namespace Betfair.ExchangeComparison.Processors
 {
@@ -15,12 +14,15 @@ namespace Betfair.ExchangeComparison.Processors
     {
         private readonly IMappingService _mappingService;
         private readonly ICatalogService _catalogService;
-        
+
+        private readonly List<string> Exceptions;
+
         public RunnerProcessor(IMappingService mappingService, ICatalogService catalogService)
 		{
 			_mappingService = mappingService;
             _catalogService = catalogService;
 
+            Exceptions = new List<string>();
         }
 
         public async Task<RunnerPriceOverview?> Process(BasePageModel basePageModel, EventWithCompetition @event, MarketBook mappedWinMarketBook, 
@@ -82,6 +84,7 @@ namespace Betfair.ExchangeComparison.Processors
                     return new RunnerPriceOverview(
                         basePageModel.Sport,
                         @event,
+                        mappedWinMarketBook,
                         marketDetail,
                         mappedMarketCatalogue,
                         mappedScrapedMarket,
@@ -98,6 +101,7 @@ namespace Betfair.ExchangeComparison.Processors
                     return new RunnerPriceOverview(
                         basePageModel.Sport,
                         @event,
+                        mappedWinMarketBook,
                         marketDetail,
                         mappedMarketCatalogue,
                         sportsbookRunner,
@@ -111,11 +115,17 @@ namespace Betfair.ExchangeComparison.Processors
             }
             catch (System.Exception exception)
             {
-                Console.WriteLine($"RUNNER_PROCESSING_EXCEPTION; " +
+                var exceptionLog = $"RUNNER_PROCESSING_EXCEPTION; " +
                     $"Exception={exception.Message}; " +
                     $"Runner={sportsbookRunner.selectionName}; " +
                     $"Market={marketDetail.marketName} {marketDetail.marketStartTime}; " +
-                    $"Event={@event.Event.Name}");
+                    $"Event={@event.Event.Name}";
+
+                if (!Exceptions.Contains(exceptionLog))
+                {
+                    Console.WriteLine(exceptionLog);
+                    Exceptions.Add(exceptionLog);
+                }
 
                 return null;
             }
@@ -161,7 +171,8 @@ namespace Betfair.ExchangeComparison.Processors
             }
 
             var mappedRunner = matchbookMarket.Runners.FirstOrDefault(r => 
-            r.Name.CleanRunnerName().Replace(" ", "").ToLower() == sportsbookRunner.selectionName.Replace(" ", "").ToLower());
+            r.Name.Replace("'", "").CleanRunnerName().Replace(" ", "").ToLower() == 
+                sportsbookRunner.selectionName.Replace(" ", "").ToLower());
 
             if(mappedRunner ==  null)
             {

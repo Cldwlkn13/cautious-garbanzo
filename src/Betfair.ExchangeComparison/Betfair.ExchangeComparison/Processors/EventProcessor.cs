@@ -34,6 +34,8 @@ namespace Betfair.ExchangeComparison.Processors
                                 baseCatalogModel.ExchangeCatalogue.MarketBooks,
                                 ewc);
 
+                    
+
                     //Map the Sportsbook Market Details to that same Event
                     if (!_mappingService.TryMapSportsbookMarketDetailsToEvent(
                         baseCatalogModel.SportsbookCatalogue.EventsWithMarketDetails,

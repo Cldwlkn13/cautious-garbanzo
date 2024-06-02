@@ -1,4 +1,5 @@
-﻿using Betfair.ExchangeComparison.Domain.ScrapingModel;
+﻿using Betfair.ExchangeComparison.Domain.Matchbook;
+using Betfair.ExchangeComparison.Domain.ScrapingModel;
 
 namespace Betfair.ExchangeComparison.Pages.Models
 {
@@ -7,6 +8,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public List<MarketViewModel> Markets { get; set; }
         public List<BestRunner> BestWinRunners { get; set; }
         public List<BestRunner> BestEachWayRunners { get; set; }
+        public Dictionary<MarketViewModel, List<Offer>> CurrentOffers { get; set; }
         public string? Message { get; set; }
         public UsageModel UsageModel { get; set; }
 
@@ -15,6 +17,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
             Markets = new List<MarketViewModel>();
             BestWinRunners = new List<BestRunner>();
             BestEachWayRunners = new List<BestRunner>();
+            CurrentOffers = new Dictionary<MarketViewModel, List<Offer>>();
             UsageModel = new UsageModel();
         }
     }

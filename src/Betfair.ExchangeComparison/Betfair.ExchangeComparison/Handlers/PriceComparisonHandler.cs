@@ -1,7 +1,7 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Settings;
 using Betfair.ExchangeComparison.Interfaces;
 using Betfair.ExchangeComparison.Pages.Models;
-using Betfair.ExchangeComparison.Settings;
 using Microsoft.Extensions.Options;
 
 namespace Betfair.ExchangeComparison.Handlers

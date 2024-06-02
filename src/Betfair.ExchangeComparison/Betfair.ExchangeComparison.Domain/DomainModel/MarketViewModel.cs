@@ -20,6 +20,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public IEnumerable<BestRunner> BestEachWayRunners { get; set; }
         public TimeSpan TimeToStart { get; set; }
         public MatchbookEvent? MappedMatchbookEvent { get; set; }
+        public List<Offer> CurrentMarketOffers { get; set; }
 
         public MarketViewModel(Event parent)
         {
@@ -31,6 +32,7 @@ namespace Betfair.ExchangeComparison.Pages.Models
             BestRunners = new List<BestRunner>();
             BestEachWayRunners = new List<BestRunner>();
             MappedMatchbookEvent = new MatchbookEvent();
+            CurrentMarketOffers = new List<Offer>();
         }
 
         public override string ToString()

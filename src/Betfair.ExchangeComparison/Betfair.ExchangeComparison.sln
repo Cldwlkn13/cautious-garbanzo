@@ -20,7 +20,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Auth", "Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj", "{4737A88D-FBFD-487F-8004-4587BE0CFF88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Matchbook", "Betfair.ExchangeComparison.Matchbook\Betfair.ExchangeComparison.Matchbook.csproj", "{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Betfair.ExchangeComparison.Matchbook", "Betfair.ExchangeComparison.Matchbook\Betfair.ExchangeComparison.Matchbook.csproj", "{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Tests.Unit", "Betfair.ExchangeComparison.Tests.Unit\Betfair.ExchangeComparison.Tests.Unit.csproj", "{5789F0FC-EADE-4C34-BAA7-B96F2D185528}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Tests.Integration", "Betfair.ExchangeComparison.Tests.Integration\Betfair.ExchangeComparison.Tests.Integration.csproj", "{5998D103-842E-41F4-A19D-4657BA177A89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betfair.ExchangeComparison.Trading", "Betfair.ExchangeComparison.Trading\Betfair.ExchangeComparison.Trading.csproj", "{307B297B-0B46-4D97-B7C8-93D0688DACA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +62,18 @@ Global
 		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{642BB59D-FD53-4A4A-931C-5FC86BC2A29E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5789F0FC-EADE-4C34-BAA7-B96F2D185528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5789F0FC-EADE-4C34-BAA7-B96F2D185528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5789F0FC-EADE-4C34-BAA7-B96F2D185528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5789F0FC-EADE-4C34-BAA7-B96F2D185528}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5998D103-842E-41F4-A19D-4657BA177A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5998D103-842E-41F4-A19D-4657BA177A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5998D103-842E-41F4-A19D-4657BA177A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5998D103-842E-41F4-A19D-4657BA177A89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{307B297B-0B46-4D97-B7C8-93D0688DACA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{307B297B-0B46-4D97-B7C8-93D0688DACA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{307B297B-0B46-4D97-B7C8-93D0688DACA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{307B297B-0B46-4D97-B7C8-93D0688DACA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

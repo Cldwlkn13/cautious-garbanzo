@@ -1,4 +1,5 @@
 ﻿using Betfair.ExchangeComparison.Domain.DomainModel;
+using Betfair.ExchangeComparison.Domain.Extensions;
 using Betfair.ExchangeComparison.Domain.Matchbook;
 using Betfair.ExchangeComparison.Exchange.Model;
 using Betfair.ExchangeComparison.Sportsbook.Model;
@@ -7,6 +8,8 @@ namespace Betfair.ExchangeComparison.Pages.Models
 {
     public class RunnerViewModel
     {
+        public MarketDetail ParentMarket { get; set; }
+        public string MappedEventName { get; set; }
         public RunnerDetail SportsbookRunner { get; set; }
         public Runner? ExchangeWinRunner { get; set; }
         public Runner? ExchangePlaceRunner { get; set; }
@@ -18,6 +21,10 @@ namespace Betfair.ExchangeComparison.Pages.Models
         public double PlaceExpectedValue { get; set; }
         public double EachWayExpectedValue { get; set; }
         public string WinnerOddsString { get; set; }
+        public double WeightedAveragePrice { get; set; }
+        public double SbkDifferenceToWeightedAveragePrice { get; set; }
+        public double ExcDifferenceToWeightedAveragePrice { get; set; }
+        public double TotalRunnerVolume { get; set; }
         public MatchbookRunner MappedMatchbookRunner { get; set; }
 
         public RunnerViewModel()
@@ -27,6 +34,8 @@ namespace Betfair.ExchangeComparison.Pages.Models
 
         public RunnerViewModel(RunnerPriceOverview rpo)
         {
+            MappedEventName = $"{rpo.EventWithCompetition.Event.Venue} {rpo.MarketDetail.marketStartTime.ConvertUtcToBritishIrishLocalTime():HH:mm}";
+            ParentMarket = rpo.MarketDetail;
             SportsbookRunner = rpo.SportsbookRunner;
             SportsbookWinPrice = rpo.SportsbookRunner.winRunnerOdds.@decimal;
             ExpectedExchangeWinPrice = rpo.ExpectedWinPrice;
@@ -35,8 +44,12 @@ namespace Betfair.ExchangeComparison.Pages.Models
             PlaceExpectedValue = rpo.ExpectedValuePlace;
             EachWayExpectedValue = rpo.ExpectedValueEachWay;
             WinnerOddsString = rpo.WinnerOddsString;
+            WeightedAveragePrice = rpo.WeightedAveragePrice;
+            SbkDifferenceToWeightedAveragePrice = rpo.SbkDifferenceToWeightedAveragePrice;
+            ExcDifferenceToWeightedAveragePrice = rpo.ExcDifferenceToWeightedAveragePrice;
+            TotalRunnerVolume = rpo.TotalRunnerVolume;
 
-            if(rpo.ExchangeWinRunner != null)
+            if (rpo.ExchangeWinRunner != null)
             {
                 ExchangeWinRunner = rpo.ExchangeWinRunner;
             }

@@ -55,7 +55,7 @@ namespace Betfair.ExchangeComparison.Handlers
         public void UpdateExpiry(Provider provider)
         {
             Expiries[provider] = DateTime.UtcNow.AddMinutes(10);
-            Console.WriteLine($"Update Expiry on {provider} scraping to {Expiries[provider]}");
+            //Console.WriteLine($"Update Expiry on {provider} scraping to {Expiries[provider]}");
         }
 
         public async Task Orchestrate(Dictionary<EventWithCompetition, List<MarketDetail>> catalog, Provider provider)

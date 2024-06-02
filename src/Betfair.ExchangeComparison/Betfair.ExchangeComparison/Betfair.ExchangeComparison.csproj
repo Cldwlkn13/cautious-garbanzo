@@ -78,13 +78,12 @@
 		<ProjectReference Include="..\Betfair.ExchangeComparison.Auth\Betfair.ExchangeComparison.Auth.csproj">
 		  <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
 		</ProjectReference>
+		<ProjectReference Include="..\Betfair.ExchangeComparison.Trading\Betfair.ExchangeComparison.Trading.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="Pages\Racing\" />
 		<Folder Include="Pages\Football\" />
 		<Folder Include="Services\" />
-		<Folder Include="Pages\Model\" />
-		<Folder Include="Pages\Extensions\" />
 		<Folder Include="Pages\Test\" />
 		<Folder Include="Workers\" />
 		<Folder Include="TestHtml\" />

@@ -1,6 +1,8 @@
-﻿namespace Betfair.ExchangeComparison.Domain.DomainModel
+﻿using Betfair.ExchangeComparison.Domain.Interfaces;
+
+namespace Betfair.ExchangeComparison.Domain.DomainModel
 {
-    public class JumpsParams
+    public class JumpsParams : IModelParams
     {
         public bool IsTurf { get; set; }
         public bool IsShortDistance { get; set; }
